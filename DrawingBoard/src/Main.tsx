@@ -4,7 +4,7 @@ import App from "./App.tsx";
 import "./main.css";
 import { Application } from "pixi.js";
 
-const rootElement = document.getElementById("root");
+const rootElement = document.getElementById("root") as HTMLDivElement;
 
 (async () => {
   const app = new Application();
@@ -12,7 +12,7 @@ const rootElement = document.getElementById("root");
     resizeTo: window,
     backgroundColor: 0xff000
   });
-  document.body.appendChild(app.canvas);
+  rootElement.appendChild(app.canvas);
 })();
 
 if (rootElement) {

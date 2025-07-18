@@ -1,5 +1,9 @@
+import { Toolbar } from "./components/canvas/Brush";
+
 const App = () => {
-  return <div></div>;
+  return (
+     <Toolbar />
+  );
 };
 
 export default App;
