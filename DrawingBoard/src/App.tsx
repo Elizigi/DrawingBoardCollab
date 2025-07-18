@@ -1,8 +1,5 @@
-import Brush from "./components/canvas/Brush";
-
 const App = () => {
-  return (
-    <Brush />)
+  return <div></div>;
 };
 
 export default App;
