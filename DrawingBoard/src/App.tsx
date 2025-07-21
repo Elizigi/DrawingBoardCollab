@@ -1,4 +1,4 @@
-import { Toolbar } from "./components/canvas/Brush";
+import { Toolbar } from "./components/toolbar/Toolbar";
 
 const App = () => {
   return (

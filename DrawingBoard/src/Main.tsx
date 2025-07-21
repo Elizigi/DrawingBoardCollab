@@ -2,70 +2,140 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./main.css";
-import { Application, Graphics } from "pixi.js";
+import { Application, Graphics, RenderTexture, Sprite } from "pixi.js";
+import { useBrushStore } from "./zustand/useBrushStore.ts";
 const rootElement = document.getElementById("root") as HTMLDivElement;
 
 let mouseDown = false;
 let pendingPoints: { x: number; y: number }[] = [];
 let lastStrokeTime = 0;
+let lastPoint: { x: number; y: number } | null = null;
 
-const strokeStyle = { color: 0xff0000, width: 2 };
 const STROKE_THROTTLE = 16;
 
 (async () => {
   const app = new Application();
-  await app.init({ resizeTo: window, backgroundColor: 0xffffff });
+  await app.init({ resizeTo: rootElement, backgroundColor: 0xffffff });
   rootElement.appendChild(app.canvas);
 
   let canvasRect = app.canvas.getBoundingClientRect();
-  const drawingLayer = new Graphics();
-  app.stage.addChild(drawingLayer);
+  const renderTexture = RenderTexture.create({
+    width: app.renderer.width,
+    height: app.renderer.height,
+  });
+  function addPoint(x: number, y: number) {
+    if (lastPoint) {
+      const dx = x - lastPoint.x;
+      const dy = y - lastPoint.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      const minDistance = Math.max(1, getBrush().brushSize * 0.1);
+      if (distance < minDistance) return;
+    }
+
+    pendingPoints.push({ x, y });
+    lastPoint = { x, y };
+  }
+
+  const drawingSurface = new Sprite(renderTexture);
+  app.stage.addChild(drawingSurface);
+
+  const tempGraphics = new Graphics();
+  app.stage.addChild(tempGraphics);
 
   window.addEventListener("resize", () => {
     canvasRect = app.canvas.getBoundingClientRect();
   });
 
+  const getBrush = () => useBrushStore.getState();
+
   app.ticker.add(() => {
     const now = Date.now();
     if (pendingPoints.length > 0 && now - lastStrokeTime > STROKE_THROTTLE) {
-      for (const point of pendingPoints) {
-        drawingLayer.lineTo(point.x, point.y);
-      }
-      drawingLayer.stroke(strokeStyle);
-      pendingPoints.length = 0;
+      processStroke();
       lastStrokeTime = now;
     }
   });
 
+  function processStroke() {
+    if (pendingPoints.length === 0) return;
+
+    const { brushColor, brushSize } = getBrush();
+    tempGraphics.clear();
+
+    if (pendingPoints.length >= 2) {
+      const firstPoint = pendingPoints[0];
+      tempGraphics.moveTo(firstPoint.x, firstPoint.y);
+
+      for (let i = 1; i < pendingPoints.length - 1; i++) {
+        const currentPoint = pendingPoints[i];
+        const nextPoint = pendingPoints[i + 1];
+
+        const midX = (currentPoint.x + nextPoint.x) / 2;
+        const midY = (currentPoint.y + nextPoint.y) / 2;
+
+        tempGraphics.quadraticCurveTo(
+          currentPoint.x,
+          currentPoint.y,
+          midX,
+          midY
+        );
+      }
+
+      const lastPoint = pendingPoints[pendingPoints.length - 1];
+      tempGraphics.lineTo(lastPoint.x, lastPoint.y);
+
+      tempGraphics.stroke({
+        color: brushColor,
+        width: brushSize,
+        cap: "round",
+        join: "round",
+      });
+    } else if (pendingPoints.length === 1) {
+      const point = pendingPoints[0];
+      tempGraphics.circle(point.x, point.y, brushSize / 2);
+      tempGraphics.fill({ color: brushColor });
+    }
+  }
   document.addEventListener("mousedown", (e) => {
     mouseDown = true;
     const { x, y } = getMousePos(e);
-    drawingLayer.moveTo(x, y);
     pendingPoints.length = 0;
+    lastPoint = { x, y };
+    addPoint(x, y);
   });
 
   document.addEventListener("mouseup", () => {
     mouseDown = false;
-    flushPending();
+    commitStroke();
   });
 
   document.addEventListener("mousemove", (e) => {
     if (!mouseDown) return;
     const { x, y } = getMousePos(e);
-    pendingPoints.push({ x, y });
+    addPoint(x, y);
   });
 
-  function flushPending() {
+  function commitStroke() {
     if (pendingPoints.length === 0) return;
-    for (const point of pendingPoints) drawingLayer.lineTo(point.x, point.y);
-    drawingLayer.stroke(strokeStyle);
+    processStroke();
+    app.renderer.render({
+      container: tempGraphics,
+      target: renderTexture,
+      clear: false,
+    });
+    tempGraphics.clear();
     pendingPoints.length = 0;
+    lastPoint = null;
   }
 
   function getMousePos(e: MouseEvent) {
+    const scaleX = app.renderer.width / canvasRect.width;
+    const scaleY = app.renderer.height / canvasRect.height;
+
     return {
-      x: Math.max(0, Math.min(e.clientX - canvasRect.left, app.canvas.width)),
-      y: Math.max(0, Math.min(e.clientY - canvasRect.top, app.canvas.height)),
+      x: (e.clientX - canvasRect.left) * scaleX,
+      y: (e.clientY - canvasRect.top) * scaleY,
     };
   }
 })();
