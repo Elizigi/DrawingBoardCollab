@@ -97,11 +97,12 @@ const STROKE_THROTTLE = 16;
       tempGraphics.fill({ color: brushColor });
     }
   }
-  document.addEventListener("mousedown", (e) => {
+  app.canvas.addEventListener("mousedown", (e) => {
     mouseDown = true;
     const { x, y } = getMousePos(e);
     pendingPoints.length = 0;
-    lastPoint = { x, y };
+     lastPoint = null;
+  useBrushStore.getState().addUsedColor(getBrush().brushColor);
     addPoint(x, y);
   });
 
