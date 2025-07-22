@@ -101,8 +101,8 @@ const STROKE_THROTTLE = 16;
     mouseDown = true;
     const { x, y } = getMousePos(e);
     pendingPoints.length = 0;
-     lastPoint = null;
-  useBrushStore.getState().addUsedColor(getBrush().brushColor);
+    lastPoint = null;
+    useBrushStore.getState().addUsedColor(getBrush().brushColor);
     addPoint(x, y);
   });
 

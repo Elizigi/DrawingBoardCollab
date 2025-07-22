@@ -14,10 +14,10 @@ export const useBrushStore = create<BrushState>((set) => ({
   setBrushColor: (color) => set({ brushColor: color }),
   brushSize: 2,
   setBrushSize: (size) => set({ brushSize: size }),
-  usedColors: [],
+  usedColors: new Array(6).fill(null),
   addUsedColor: (color) =>
     set((state) => {
-      if (state.usedColors.includes(color)) return state;
-      return { usedColors: [...state.usedColors, color].slice(-6) };
+    const withoutCurrent = state.usedColors.filter(c => c !== color );
+    return { usedColors: [color, ...withoutCurrent, 0, 0, 0, 0, 0, 0].slice(0, 6) };
     }),
 }));

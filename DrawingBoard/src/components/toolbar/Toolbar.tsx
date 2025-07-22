@@ -34,16 +34,27 @@ export const Toolbar = () => {
         </div>
 
         <div className={styles.toolContainer}>
-          {usedColors.map((color) => (
-            <button
-              key={color}
-              className={styles.colorBox}
-              style={{
-                backgroundColor: `#${color.toString(16).padStart(6, "0")}`,
-              }}
-              onClick={() => setBrushColor(color)}
-            ></button>
-          ))}
+          {usedColors
+            .map((color, index) =>
+              color !==null? (
+                <button
+                  key={`${color}-${index}`} 
+                  className={styles.colorBox}
+                  style={{
+                    backgroundColor: `#${color.toString(16).padStart(6, "0")}`,
+                  }}
+                  onClick={() => setBrushColor(color)}
+                ></button>
+              ) : (
+                <button
+                  key={`empty-${-index}`}
+                  className={styles.colorBox}
+                  style={{
+                    backgroundColor: `#5b5a5a`,
+                  }}
+                ></button>
+              )
+            )}
         </div>
       </div>
     </div>
