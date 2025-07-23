@@ -1,26 +1,32 @@
+$bg-dark: #2e2e38;
+$bg-medium: #3c3c4a;
+$bg-light: #4a4a5a;
+$border-color: #5e5e70;
+$accent: #3877aa;
+$highlight: #cfd8dc;
+$text-color: #e0e0e0;
 .toolbar {
   z-index: 9999999;
   position: relative;
   width: 250px;
   height: 100vh;
-  background-color: #7a7676;
+  background-color: $bg-dark;
   display: flex;
   flex-direction: column;
 }
 
 .mainToolContainer {
-  background-color: rgb(100, 96, 96);
   position: relative;
   top: 1rem;
   margin: 1rem;
   padding: 1rem;
-  border: 1px solid rgb(80, 76, 76);
-  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.3);
+  background-color: $bg-medium;
+  border: 1px solid $border-color;
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.4);
   border-radius: 2px;
 }
 
 .toolContainer {
-  background-color: rgb(100, 96, 96);
   position: relative;
   justify-content: space-evenly;
   top: 1rem;
@@ -29,25 +35,16 @@
   grid-template-columns: repeat(3, 1fr);
   margin: 1rem;
   padding: 1rem;
-  border: 1px solid rgb(80, 76, 76);
-  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.3);
-  border-radius: 2px;
-}
-.layerContainer {
-  background-color: rgb(100, 96, 96);
-  align-self: center;
-  margin-top: auto;
-  width: 90%;
-  height: 40%;
-  border: 1px solid rgb(80, 76, 76);
-  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.3);
+  background-color: $bg-medium;
+  border: 1px solid $border-color;
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.4);
   border-radius: 2px;
 }
 
 .currentColorBox {
   width: 50px;
   height: 50px;
-  border: 1px solid rgb(80, 76, 76);
+  border: 1px solid $border-color;
 }
 .colorBox {
   width: 50px;
@@ -57,5 +54,66 @@
 
 .currentWidthSlider {
   width: 100%;
-  background-color: rgb(80, 76, 76);
+  background-color: $bg-light;
+}
+.layerContainer {
+  align-self: center;
+  margin-top: auto;
+  width: 90%;
+  height: 40%;
+  background-color: $bg-medium;
+  border: 1px solid $border-color;
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.4);
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  .layer {
+    display: flex;
+    width: 80%;
+    height: 50px;
+    margin-top: 1rem;
+    align-items: center;
+    background-color: $bg-light;
+    border: 1px solid $border-color;
+    overflow-x:hidden;
+  }
+
+  .layerBox {
+    width: 40px;
+    height: 40px;
+    background-color: aliceblue;
+    border: solid 1px black;
+    flex-shrink: 0;
+  }
+  .layerNameContainer {
+    background-color: $bg-dark;
+  }
+  .layerName {
+    margin: 0.1rem;
+    font-size: 1rem;
+    color: $highlight;
+    
+  }
+  .backGReen {
+    border: 2px solid $accent;
+  }
+  .addNewLayer {
+    width: 100%;
+    background-color: $bg-dark;
+    display: flex;
+    justify-content: center;
+    .plusBTN {
+      background-color: $accent;
+      color: rgb(255, 255, 255);
+      border: none;
+      font-weight: bold;
+      user-select: none;
+    }
+    .layerNameInput {
+      background-color: $highlight;
+      border: 1px solid $border-color;
+    }
+  }
 }

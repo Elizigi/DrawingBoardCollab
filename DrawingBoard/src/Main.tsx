@@ -2,7 +2,13 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./main.css";
-import { Application, Graphics, RenderTexture, Sprite } from "pixi.js";
+import {
+  Application,
+  Container,
+  Graphics,
+  RenderTexture,
+  Sprite,
+} from "pixi.js";
 import { useBrushStore } from "./zustand/useBrushStore.ts";
 const rootElement = document.getElementById("root") as HTMLDivElement;
 
@@ -19,10 +25,20 @@ const STROKE_THROTTLE = 16;
   rootElement.appendChild(app.canvas);
 
   let canvasRect = app.canvas.getBoundingClientRect();
-  const renderTexture = RenderTexture.create({
-    width: app.renderer.width,
-    height: app.renderer.height,
-  });
+  const layersContainer = new Container();
+  app.stage.addChild(layersContainer);
+
+  const layersMap: Record<string, RenderTexture> = {};
+
+  function createPixiLayer(id: string) {
+    const rt = RenderTexture.create({
+      width: app.renderer.width,
+      height: app.renderer.height,
+    });
+    const sprite = new Sprite(rt);
+    layersContainer.addChild(sprite);
+    layersMap[id] = rt;
+  }
   function addPoint(x: number, y: number) {
     if (lastPoint) {
       const dx = x - lastPoint.x;
@@ -37,9 +53,6 @@ const STROKE_THROTTLE = 16;
     lastPoint = { x, y };
   }
 
-  const drawingSurface = new Sprite(renderTexture);
-  app.stage.addChild(drawingSurface);
-
   const tempGraphics = new Graphics();
   app.stage.addChild(tempGraphics);
 
@@ -48,7 +61,42 @@ const STROKE_THROTTLE = 16;
   });
 
   const getBrush = () => useBrushStore.getState();
+  const { layers } = useBrushStore.getState();
+  layers.forEach((l) => createPixiLayer(l.id));
+  window.addEventListener("resize", () => {
+    canvasRect = app.canvas.getBoundingClientRect();
+    Object.keys(layersMap).forEach((id, index) => {
+      const oldRT = layersMap[id];
+      const newRT = RenderTexture.create({
+        width: app.renderer.width,
+        height: app.renderer.height,
+      });
+      const tempSprite = new Sprite(oldRT);
+      app.renderer.render({
+        container: tempSprite,
+        target: newRT,
+        clear: true,
+      });
 
+      layersMap[id] = newRT;
+      (layersContainer.children[index] as Sprite).texture = newRT;
+      oldRT.destroy(true);
+    });
+  });
+ useBrushStore.subscribe((state) => {
+  state.layers.forEach((layer, idx) => {
+    const sprite = layersContainer.children[idx] as Sprite | undefined;
+    if (sprite) {
+      sprite.visible = layer.visible;
+    }
+  });
+});
+  useBrushStore.subscribe((state, prev) => {
+    if (state.layers.length > prev.layers.length) {
+      const newLayer = state.layers[state.layers.length - 1];
+      createPixiLayer(newLayer.id);
+    }
+  });
   app.ticker.add(() => {
     const now = Date.now();
     if (pendingPoints.length > 0 && now - lastStrokeTime > STROKE_THROTTLE) {
@@ -120,9 +168,10 @@ const STROKE_THROTTLE = 16;
   function commitStroke() {
     if (pendingPoints.length === 0) return;
     processStroke();
+    const { activeLayerId } = useBrushStore.getState();
     app.renderer.render({
       container: tempGraphics,
-      target: renderTexture,
+      target: layersMap[activeLayerId],
       clear: false,
     });
     tempGraphics.clear();
