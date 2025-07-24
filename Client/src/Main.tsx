@@ -10,6 +10,19 @@ import {
   Sprite,
 } from "pixi.js";
 import { useBrushStore } from "./zustand/useBrushStore.ts";
+import { io } from "socket.io-client";
+
+export const socket = io("http://localhost:3000");
+
+socket.on("connect", () => {
+  console.log("Connected:", socket.id);
+  
+});
+
+socket.on("disconnect", () => {
+  console.log("Disconnected");
+});
+
 const rootElement = document.getElementById("root") as HTMLDivElement;
 
 let mouseDown = false;

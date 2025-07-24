@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useBrushStore } from "../../zustand/useBrushStore";
 import styles from "./Toolbar.module.scss";
+import OnlineComponent from "../onlineComponent/onlineComponent";
 
 export const Toolbar = () => {
   const brushColor = useBrushStore((state) => state.brushColor);
@@ -27,7 +28,7 @@ export const Toolbar = () => {
     setNewLayerName(e.target.value);
   };
   const addNewLayer = () => {
-    if(newLayerName.trim().length<2)return;
+    if (newLayerName.trim().length < 2) return;
     addLayer(newLayerName);
     setNewLayerName("");
   };
@@ -78,6 +79,7 @@ export const Toolbar = () => {
             )
           )}
         </div>
+          <OnlineComponent />
         <div className={styles.layerContainer}>
           <div className={styles.addNewLayer}>
             <button className={styles.plusBTN} onClick={addNewLayer}>
@@ -90,26 +92,29 @@ export const Toolbar = () => {
               className={styles.layerNameInput}
             />
           </div>
-          {allLayers.slice().reverse().map((layer) => (
-            <button
-              onClick={() => changeLayer(layer.id)}
-              key={layer.id}
-              className={`${styles.layer} ${layer.id === activeLayerId ? styles.backGReen : ""}`}
-            >
-              <div className={styles.visibilityIcon}></div>
-              <input
-                type="checkbox"
-                checked={layer.visible}
-                onChange={() => changeVisible(layer.id)}
-              />
+          {allLayers
+            .slice()
+            .reverse()
+            .map((layer) => (
+              <button
+                onClick={() => changeLayer(layer.id)}
+                key={layer.id}
+                className={`${styles.layer} ${layer.id === activeLayerId ? styles.backGReen : ""}`}
+              >
+                <div className={styles.visibilityIcon}></div>
+                <input
+                  type="checkbox"
+                  checked={layer.visible}
+                  onChange={() => changeVisible(layer.id)}
+                />
 
-              <div className={styles.layerBox}></div>
-              <div className={styles.layerNameContainer}>
-                <h5 className={styles.layerName}>{layer.name}</h5>
-              </div>
-              <div></div>
-            </button>
-          ))}
+                <div className={styles.layerBox}></div>
+                <div className={styles.layerNameContainer}>
+                  <h5 className={styles.layerName}>{layer.name}</h5>
+                </div>
+                <div></div>
+              </button>
+            ))}
         </div>
       </div>
     </div>
