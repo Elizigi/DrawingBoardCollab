@@ -1,4 +1,8 @@
 # Logs
+**/node_modules/
+server/node_modules/
+server/dist/
+server/*.log
 logs
 *.log
 npm-debug.log*
