@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
 import styles from "./onlineComponent.module.scss";
 import { socket } from "../../Main";
-import { useBrushStore } from "../../zustand/useBrushStore";
 
 const OnlineComponent = () => {
-  const brushStore = useBrushStore.getState();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHost, setIsHost] = useState(false);
   const [name, setName] = useState("");
-  const [address, setAddress] = useState("");
-  const [roomAddress, setRoomAddress] = useState("");
+  const [roomId, setRoomId] = useState("");
+  const [connected, setConnected] = useState(false);
 
   const handleHost = () => {
     setIsHost(true);
@@ -27,8 +25,8 @@ const OnlineComponent = () => {
   };
 
   const handleAddress = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.value;
-    setAddress(name);
+    const id = e.target.value;
+    setRoomId(id);
   };
 
   const handleSubmit = () => {
@@ -36,42 +34,34 @@ const OnlineComponent = () => {
       socket.emit("create-room");
       return;
     }
-    if (!address) return;
-    socket.emit("join-room", { address });
+    if (!roomId) return;
+    socket.emit("join-room", { roomId });
   };
 
   useEffect(() => {
     socket.on("room-created", (roomId) => {
       console.log("Room ID to share:", roomId);
-      setRoomAddress(roomId);
+      setRoomId(roomId);
       setIsModalOpen(false);
-    });
-    socket.on("request-state", ({ from }) => {
-      const state = brushStore;
-      socket.emit("send-state", { to: from, state });
+      setConnected(true);
     });
 
     socket.on("user-joined", ({ guestId }) => {
-      if (socket.id === guestId) {
-        socket.emit("request-state", { to: address });
-      }
+      //empty for now
+      console.log(guestId,"Has joined")
     });
 
-    socket.on("init", (state) => {
-      for (const stroke of state.strokes) {
-        stroke(stroke);
-      }
-    });
-    socket.on("joined-room", ({ roomAddress }) => {
-      setRoomAddress(roomAddress);
+    socket.on("joined-room", ({ roomId }) => {
+      setRoomId(roomId);
+      console.log("joined:", roomId);
       setIsModalOpen(false);
+      socket.emit("request-state", { to: roomId });
+      setConnected(true);
     });
     return () => {
       socket.off("room-created");
-      socket.off("request-state");
       socket.off("user-joined");
-      socket.off("join-room");
-      socket.off("init");
+      socket.off("joined-room");
     };
   }, []);
 
@@ -114,7 +104,7 @@ const OnlineComponent = () => {
                 <input
                   type="text"
                   onChange={handleAddress}
-                  value={address}
+                  value={roomId}
                   required={!name.trim()}
                 />
               </>
@@ -127,7 +117,7 @@ const OnlineComponent = () => {
       )}
       <div className={styles.roomAddress}>
         <h3>Room Address</h3>
-        <h4>{roomAddress}</h4>
+        <h4>{connected ? roomId : ""}</h4>
       </div>
     </div>
   );

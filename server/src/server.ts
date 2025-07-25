@@ -17,15 +17,27 @@ io.on("connection", (socket) => {
   console.log("User connected to server:", socket.id);
 
   socket.on("create-room", () => {
-    const address  = socket.id;
-    socket.join(address );
-    socket.emit("room-created", address );
+    const roomId = `room_${socket.id}`;
+    socket.join(roomId);
+    socket.data.isHost = true;
+    socket.data.roomId = roomId;
+    socket.emit("room-created", roomId);
   });
 
-  socket.on("join-room", ({address   }) => {
-    socket.join(address);
-     socket.emit("joined-room", { roomAddress: address });
-    io.to(address).emit("user-joined", { guestId: socket.id });
+ socket.on("draw-progress", (stroke) => {
+    const roomId = socket.data.roomId; 
+    if (!roomId) return;
+    
+    socket.broadcast
+      .to(roomId)
+      .emit("draw-progress", { ...stroke, senderId: socket.id });
+  });
+
+  socket.on("join-room", ({ roomId }) => {
+    socket.join(roomId);
+    socket.data.roomId = roomId;
+    socket.emit("joined-room", { roomId });
+    socket.to(roomId).emit("user-joined", { guestId: socket.id });
   });
 
   socket.on("request-state", ({ to }) => {

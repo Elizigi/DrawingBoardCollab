@@ -9,14 +9,13 @@ import {
   RenderTexture,
   Sprite,
 } from "pixi.js";
-import { useBrushStore } from "./zustand/useBrushStore.ts";
+import { Stroke, useBrushStore } from "./zustand/useBrushStore.ts";
 import { io } from "socket.io-client";
 
 export const socket = io("http://localhost:3000");
 
 socket.on("connect", () => {
   console.log("Connected:", socket.id);
-  
 });
 
 socket.on("disconnect", () => {
@@ -69,6 +68,9 @@ const STROKE_THROTTLE = 16;
   const tempGraphics = new Graphics();
   app.stage.addChild(tempGraphics);
 
+  const remoteGraphics = new Graphics();
+  app.stage.addChild(remoteGraphics);
+
   window.addEventListener("resize", () => {
     canvasRect = app.canvas.getBoundingClientRect();
   });
@@ -96,14 +98,14 @@ const STROKE_THROTTLE = 16;
       oldRT.destroy(true);
     });
   });
- useBrushStore.subscribe((state) => {
-  state.layers.forEach((layer, idx) => {
-    const sprite = layersContainer.children[idx] as Sprite | undefined;
-    if (sprite) {
-      sprite.visible = layer.visible;
-    }
+  useBrushStore.subscribe((state) => {
+    state.layers.forEach((layer, idx) => {
+      const sprite = layersContainer.children[idx] as Sprite | undefined;
+      if (sprite) {
+        sprite.visible = layer.visible;
+      }
+    });
   });
-});
   useBrushStore.subscribe((state, prev) => {
     if (state.layers.length > prev.layers.length) {
       const newLayer = state.layers[state.layers.length - 1];
@@ -121,7 +123,24 @@ const STROKE_THROTTLE = 16;
   function processStroke() {
     if (pendingPoints.length === 0) return;
 
-    const { brushColor, brushSize } = getBrush();
+    const { brushColor, brushSize, activeLayerId } = getBrush();
+
+    drawStroke(
+      {
+        points: [...pendingPoints],
+        color: brushColor,
+        size: brushSize,
+        layerId: activeLayerId,
+      },
+      true
+    );
+    socket.emit("draw-progress", {
+      points: [...pendingPoints],
+      color: brushColor,
+      size: brushSize,
+      layerId: activeLayerId,
+    });
+
     tempGraphics.clear();
 
     if (pendingPoints.length >= 2) {
@@ -158,6 +177,7 @@ const STROKE_THROTTLE = 16;
       tempGraphics.fill({ color: brushColor });
     }
   }
+
   app.canvas.addEventListener("mousedown", (e) => {
     mouseDown = true;
     const { x, y } = getMousePos(e);
@@ -187,6 +207,14 @@ const STROKE_THROTTLE = 16;
       target: layersMap[activeLayerId],
       clear: false,
     });
+
+    useBrushStore.getState().addStroke({
+      points: [...pendingPoints],
+      color: getBrush().brushColor,
+      size: getBrush().brushSize,
+      layerId: activeLayerId,
+    });
+
     tempGraphics.clear();
     pendingPoints.length = 0;
     lastPoint = null;
@@ -200,6 +228,59 @@ const STROKE_THROTTLE = 16;
       x: (e.clientX - canvasRect.left) * scaleX,
       y: (e.clientY - canvasRect.top) * scaleY,
     };
+  }
+  socket.on("request-state", ({ from }) => {
+    const state = useBrushStore.getState();
+    socket.emit("send-state", { to: from, state: { strokes: state.strokes } });
+  });
+  socket.on("init", (state) => {
+    console.log("init");
+    for (const stroke of state.strokes) {
+      drawStroke(stroke);
+    }
+  });
+  socket.on("draw-progress", (stroke) => {
+    if (stroke.senderId === socket.id) return;
+    drawStroke(stroke);
+  });
+  socket.emit("draw-progress", {
+    points: [...pendingPoints],
+    color: getBrush().brushColor,
+    size: getBrush().brushSize,
+    layerId: useBrushStore.getState().activeLayerId,
+  });
+  function drawStroke(strokeData: Stroke, isLocal = false) {
+    const { points, color, size, layerId } = strokeData;
+    if (!layersMap[layerId]) return;
+
+    const graphics = isLocal ? tempGraphics : remoteGraphics;
+
+    graphics.clear();
+
+    if (points.length >= 2) {
+      graphics.moveTo(points[0].x, points[0].y);
+      for (let i = 1; i < points.length - 1; i++) {
+        const current = points[i];
+        const next = points[i + 1];
+        const midX = (current.x + next.x) / 2;
+        const midY = (current.y + next.y) / 2;
+        graphics.quadraticCurveTo(current.x, current.y, midX, midY);
+      }
+      const last = points[points.length - 1];
+      graphics.lineTo(last.x, last.y);
+      graphics.stroke({ color, width: size, cap: "round", join: "round" });
+    } else if (points.length === 1) {
+      graphics.circle(points[0].x, points[0].y, size / 2);
+      graphics.fill({ color });
+    }
+
+    app.renderer.render({
+      container: graphics,
+      target: layersMap[layerId],
+      clear: false,
+    });
+
+    if (!isLocal) graphics.clear(); // Optionally clear remoteGraphics after rendering
   }
 })();
 

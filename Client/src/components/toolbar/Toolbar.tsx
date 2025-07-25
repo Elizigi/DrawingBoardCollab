@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useBrushStore } from "../../zustand/useBrushStore";
 import styles from "./Toolbar.module.scss";
-import OnlineComponent from "../onlineComponent/onlineComponent";
+import OnlineComponent from "../onlineComponent/OnlineComponent";
 
 export const Toolbar = () => {
   const brushColor = useBrushStore((state) => state.brushColor);

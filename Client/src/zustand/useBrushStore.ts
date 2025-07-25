@@ -5,6 +5,12 @@ type LayerMeta = {
   name: string;
   visible: boolean;
 };
+export type Stroke = {
+  points: { x: number; y: number }[];
+  color: number;
+  size: number;
+  layerId: string;
+};
 
 type BrushState = {
   brushColor: number;
@@ -19,6 +25,10 @@ type BrushState = {
   addLayer: (name: string) => void;
   setActiveLayer: (id: string) => void;
   toggleLayer: (id: string) => void;
+
+  strokes: Stroke[];
+  addStroke: (stroke: Stroke) => void;
+  clearStrokes: () => void;
 };
 
 export const useBrushStore = create<BrushState>((set, _) => ({
@@ -37,6 +47,13 @@ export const useBrushStore = create<BrushState>((set, _) => ({
 
   layers: [{ id: "layer-1", name: "Layer 1", visible: true }],
   activeLayerId: "layer-1",
+
+  strokes: [],
+  addStroke: (stroke) =>
+    set((state) => ({
+      strokes: [...state.strokes, stroke],
+    })),
+  clearStrokes: () => set({ strokes: [] }),
 
   addLayer: (name) => {
     const id = crypto.randomUUID();
