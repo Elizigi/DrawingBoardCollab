@@ -37,6 +37,11 @@ const STROKE_THROTTLE = 16;
   rootElement.appendChild(app.canvas);
 
   let canvasRect = app.canvas.getBoundingClientRect();
+  let windowSize = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  };
+
   const layersContainer = new Container();
   app.stage.addChild(layersContainer);
 
@@ -73,6 +78,8 @@ const STROKE_THROTTLE = 16;
 
   window.addEventListener("resize", () => {
     canvasRect = app.canvas.getBoundingClientRect();
+    windowSize.width = window.innerWidth;
+    windowSize.height = window.innerHeight;
   });
 
   const getBrush = () => useBrushStore.getState();
@@ -193,8 +200,11 @@ const STROKE_THROTTLE = 16;
   });
 
   document.addEventListener("mousemove", (e) => {
+    socket.emit("user-move", { position:getMousePosPercent(e) });
     if (!mouseDown) return;
+
     const { x, y } = getMousePos(e);
+
     addPoint(x, y);
   });
 
@@ -227,6 +237,12 @@ const STROKE_THROTTLE = 16;
     return {
       x: (e.clientX - canvasRect.left) * scaleX,
       y: (e.clientY - canvasRect.top) * scaleY,
+    };
+  }
+  function getMousePosPercent(e: MouseEvent) {
+    return {
+      x: e.clientX ,
+      y: e.clientY
     };
   }
   socket.on("request-state", ({ from }) => {
