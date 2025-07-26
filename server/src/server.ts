@@ -16,7 +16,7 @@ app.use(cors());
 io.on("connection", (socket) => {
   console.log("User connected to server:", socket.id);
 
-  socket.on("create-room", (name) => {
+  socket.on("create-room", ({name}) => {
     const roomId = `room_${socket.id}`;
     socket.join(roomId);
     socket.data.isHost = true;

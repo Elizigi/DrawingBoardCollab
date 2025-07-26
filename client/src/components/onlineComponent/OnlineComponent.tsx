@@ -80,14 +80,21 @@ const OnlineComponent = () => {
     });
 
     socket.on("user-moved", ({ name, position }) => {
-      console.log(connectedUsers,"newmove:",position)
-      setConnectedUsers((prevUsers) =>
-        prevUsers.map((user) =>
-          user.name === name ? { ...user, position } : user
-        )
-      );
+      console.log("Looking for:", name);
+      setConnectedUsers((prevUsers) => {
+        console.log(
+          "Current users:",
+          prevUsers.map((u) => u.name)
+        );
+        return prevUsers.map((user) => {
+          console.log(
+            `Comparing "${user.name}" === "${name}":`,
+            user.name === name
+          );
+          return user.name === name ? { ...user, position: position } : user;
+        });
+      });
     });
-
     return () => {
       socket.off("room-created");
       socket.off("user-joined");
