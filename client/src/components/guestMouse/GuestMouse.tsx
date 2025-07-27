@@ -4,7 +4,6 @@ interface ConnectedUser {
   position: { x: number; y: number };
 }
 const GuestMouse = ({ name, position }: ConnectedUser) => {
-  console.log(name, "newmove:", position);
 
   return (
     <div

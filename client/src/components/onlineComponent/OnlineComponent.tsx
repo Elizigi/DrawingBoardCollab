@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "./onlineComponent.module.scss";
 import { socket } from "../../Main";
 import GuestMouse from "../guestMouse/GuestMouse";
@@ -11,10 +11,12 @@ interface ConnectedUser {
 const OnlineComponent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHost, setIsHost] = useState(false);
-  const [name, setName] = useState("");
+  const [myName, setMyName] = useState("");
   const [roomId, setRoomId] = useState("");
   const [connected, setConnected] = useState(false);
   const [connectedUsers, setConnectedUsers] = useState<ConnectedUser[]>([]);
+  const myNameRef = useRef("");
+
   const handleHost = () => {
     setIsHost(true);
     setIsModalOpen(true);
@@ -27,7 +29,7 @@ const OnlineComponent = () => {
 
   const handleName = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
-    setName(name);
+    setMyName(name);
   };
 
   const handleAddress = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,12 +39,20 @@ const OnlineComponent = () => {
 
   const handleSubmit = () => {
     if (isHost) {
-      socket.emit("create-room", { name });
+      socket.emit("create-room", { name: myName });
       return;
     }
     if (!roomId) return;
-    socket.emit("join-room", { roomId, name });
+    socket.emit("join-room", { roomId, name: myName });
   };
+
+  useEffect(() => {
+    myNameRef.current = myName;
+  }, [myName]);
+
+  useEffect(() => {
+    console.log(connectedUsers);
+  }, [connectedUsers.length]);
 
   useEffect(() => {
     socket.on("room-created", (roomId) => {
@@ -58,14 +68,15 @@ const OnlineComponent = () => {
         ...prev,
         { name, position: { x: 0, y: 0 } },
       ]);
-      socket.emit("send-name", { name, guestId });
+      socket.emit("send-name", { name: myNameRef.current, guestId });
     });
 
-    socket.on("add-name", ({ name }) => {
+    socket.on("add-name", ({ username }) => {
+      console.log(username, "was in the room");
       setConnectedUsers((prev) => {
-        const nameAlreadyIn = prev.some((user) => user.name === name);
+        const nameAlreadyIn = prev.some((user) => user.name === username);
         if (!nameAlreadyIn) {
-          return [...prev, { name, position: { x: 0, y: 0 } }];
+          return [...prev, { name: username, position: { x: 0, y: 0 } }];
         }
         return prev;
       });
@@ -80,17 +91,8 @@ const OnlineComponent = () => {
     });
 
     socket.on("user-moved", ({ name, position }) => {
-      console.log("Looking for:", name);
       setConnectedUsers((prevUsers) => {
-        console.log(
-          "Current users:",
-          prevUsers.map((u) => u.name)
-        );
         return prevUsers.map((user) => {
-          console.log(
-            `Comparing "${user.name}" === "${name}":`,
-            user.name === name
-          );
           return user.name === name ? { ...user, position: position } : user;
         });
       });
@@ -133,8 +135,8 @@ const OnlineComponent = () => {
               type="text"
               name="name"
               onChange={handleName}
-              value={name}
-              required={!name.trim()}
+              value={myName}
+              required={!myName.trim()}
             />
             {!isHost && (
               <>
@@ -143,7 +145,7 @@ const OnlineComponent = () => {
                   type="text"
                   onChange={handleAddress}
                   value={roomId}
-                  required={!name.trim()}
+                  required={!roomId.trim()}
                 />
               </>
             )}

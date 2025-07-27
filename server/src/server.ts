@@ -16,7 +16,7 @@ app.use(cors());
 io.on("connection", (socket) => {
   console.log("User connected to server:", socket.id);
 
-  socket.on("create-room", ({name}) => {
+  socket.on("create-room", ({ name }) => {
     const roomId = `room_${socket.id}`;
     socket.join(roomId);
     socket.data.isHost = true;
@@ -36,7 +36,7 @@ io.on("connection", (socket) => {
   socket.on("user-move", ({ position }) => {
     const roomId = socket.data.roomId;
     const name = socket.data.name;
-   
+
     if (!roomId || !name) return;
 
     socket.broadcast.to(roomId).emit("user-moved", { name, position });
@@ -51,7 +51,9 @@ io.on("connection", (socket) => {
   });
 
   socket.on("send-name", ({ name, guestId }) => {
-    socket.to(guestId).emit("add-name", { name });
+    console.log("name Sent:",name)
+    const username = name;
+    socket.to(guestId).emit("add-name", { username });
   });
 
   socket.on("request-state", ({ to }) => {
