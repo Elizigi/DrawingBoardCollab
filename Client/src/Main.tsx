@@ -10,17 +10,13 @@ import {
   Sprite,
 } from "pixi.js";
 import { Stroke, useBrushStore } from "./zustand/useBrushStore.ts";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 
-export const socket = io("http://localhost:3000");
-
-socket.on("connect", () => {
-  console.log("Connected:", socket.id);
+export const socket: Socket = io("http://localhost:3000", {
+  autoConnect: false, 
 });
 
-socket.on("disconnect", () => {
-  console.log("Disconnected");
-});
+
 
 const rootElement = document.getElementById("root") as HTMLDivElement;
 

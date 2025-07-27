@@ -62,6 +62,9 @@ $text-color: #e0e0e0;
   width: 100vw;
   height: 100svh;
   top: 0;
+  left: 0;
+  transform: translateX(-30%);
+
   border: none;
   background-color: #2e2e3863;
 }

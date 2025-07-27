@@ -1,110 +1,22 @@
-import React, { useEffect, useRef, useState } from "react";
 import styles from "./onlineComponent.module.scss";
-import { socket } from "../../Main";
 import GuestMouse from "../guestMouse/GuestMouse";
-
-interface ConnectedUser {
-  name: string;
-  position: { x: number; y: number };
-}
+import OnlineComponentVM from "./OnlineComponentVM";
 
 const OnlineComponent = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isHost, setIsHost] = useState(false);
-  const [myName, setMyName] = useState("");
-  const [roomId, setRoomId] = useState("");
-  const [connected, setConnected] = useState(false);
-  const [connectedUsers, setConnectedUsers] = useState<ConnectedUser[]>([]);
-  const myNameRef = useRef("");
-
-  const handleHost = () => {
-    setIsHost(true);
-    setIsModalOpen(true);
-  };
-
-  const handleConnect = () => {
-    setIsHost(false);
-    setIsModalOpen(true);
-  };
-
-  const handleName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.value;
-    setMyName(name);
-  };
-
-  const handleAddress = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const id = e.target.value;
-    setRoomId(id);
-  };
-
-  const handleSubmit = () => {
-    if (isHost) {
-      socket.emit("create-room", { name: myName });
-      return;
-    }
-    if (!roomId) return;
-    socket.emit("join-room", { roomId, name: myName });
-  };
-
-  useEffect(() => {
-    myNameRef.current = myName;
-  }, [myName]);
-
-  useEffect(() => {
-    console.log(connectedUsers);
-  }, [connectedUsers.length]);
-
-  useEffect(() => {
-    socket.on("room-created", (roomId) => {
-      console.log("Room ID to share:", roomId);
-      setRoomId(roomId);
-      setIsModalOpen(false);
-      setConnected(true);
-    });
-
-    socket.on("user-joined", ({ name, guestId }) => {
-      console.log(guestId, "Has joined");
-      setConnectedUsers((prev) => [
-        ...prev,
-        { name, position: { x: 0, y: 0 } },
-      ]);
-      socket.emit("send-name", { name: myNameRef.current, guestId });
-    });
-
-    socket.on("add-name", ({ username }) => {
-      console.log(username, "was in the room");
-      setConnectedUsers((prev) => {
-        const nameAlreadyIn = prev.some((user) => user.name === username);
-        if (!nameAlreadyIn) {
-          return [...prev, { name: username, position: { x: 0, y: 0 } }];
-        }
-        return prev;
-      });
-    });
-
-    socket.on("joined-room", ({ roomId }) => {
-      setRoomId(roomId);
-      console.log("joined:", roomId);
-      setIsModalOpen(false);
-      socket.emit("request-state", { to: roomId });
-      setConnected(true);
-    });
-
-    socket.on("user-moved", ({ name, position }) => {
-      setConnectedUsers((prevUsers) => {
-        return prevUsers.map((user) => {
-          return user.name === name ? { ...user, position: position } : user;
-        });
-      });
-    });
-    return () => {
-      socket.off("room-created");
-      socket.off("user-joined");
-      socket.off("joined-room");
-      socket.off("user-moved");
-    };
-  }, []);
-
+  const {
+    handleHost,
+    handleConnect,
+    isModalOpen,
+    handleModalOpen,
+    handleName,
+    myName,
+    isHost,
+    handleAddress,
+    roomId,
+    handleSubmit,
+    connected,
+    connectedUsers,
+  } = OnlineComponentVM();
   return (
     <div className={styles.onlineContainer}>
       <div className={styles.onlineTitle}>
@@ -120,14 +32,11 @@ const OnlineComponent = () => {
         <>
           <button
             className={styles.backGround}
-            onClick={() => setIsModalOpen(false)}
+            onClick={() => handleModalOpen()}
           ></button>
 
           <div className={styles.modal}>
-            <button
-              className={styles.XBtn}
-              onClick={() => setIsModalOpen(false)}
-            >
+            <button className={styles.XBtn} onClick={() => handleModalOpen()}>
               X
             </button>
             <h2>name</h2>
@@ -143,13 +52,13 @@ const OnlineComponent = () => {
                 <h2>Connection Address</h2>
                 <input
                   type="text"
-                  onChange={handleAddress}
+                  onChange={(e)=>handleAddress(e)}
                   value={roomId}
                   required={!roomId.trim()}
                 />
               </>
             )}
-            <button onClick={handleSubmit} className={styles.submitBtn}>
+            <button onClick={()=>handleSubmit()} className={styles.submitBtn}>
               <h2> {isHost ? "Host" : "Connect"}</h2>
             </button>
           </div>
