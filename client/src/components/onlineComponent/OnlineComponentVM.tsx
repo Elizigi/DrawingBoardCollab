@@ -4,13 +4,16 @@ import { socket } from "../../Main";
 interface ConnectedUser {
   name: string;
   position: { x: number; y: number };
+  guestId: string;
+  color:string;
 }
 
-const OnlineComponentVM = () => {
+const OnlineComponentVM = (selfId:string) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHost, setIsHost] = useState(false);
   const [myName, setMyName] = useState("");
   const [roomId, setRoomId] = useState("");
+
   const [connected, setConnected] = useState(false);
   const [connectedUsers, setConnectedUsers] = useState<ConnectedUser[]>([]);
   const myNameRef = useRef("");
@@ -53,7 +56,14 @@ const OnlineComponentVM = () => {
     setRoomId(roomId);
     setConnected(true);
   };
-
+const getRandomColor = (): string => {
+  const letters = "0123456789ABCDEF";
+  let color = "#";
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+};
   const handleUserJoined = ({
     name,
     guestId,
@@ -62,16 +72,32 @@ const OnlineComponentVM = () => {
     guestId: string;
   }) => {
     console.log(guestId, "Has joined");
-    setConnectedUsers((prev) => [...prev, { name, position: { x: 0, y: 0 } }]);
-    socket.emit("send-name", { name: myNameRef.current, guestId });
+    setConnectedUsers((prev) => [
+      ...prev,
+      { name, position: { x: 0, y: 0 }, guestId,color:getRandomColor() },
+    ]);
+    socket.emit("send-name", {
+      name: myNameRef.current,
+      userId: selfId,
+      guestId,
+    });
   };
 
-  const handleAddName = ({ username }: { username: string }) => {
+  const handleAddName = ({
+    username,
+    userId,
+  }: {
+    username: string;
+    userId: string;
+  }) => {
     console.log(username, "was in the room");
     setConnectedUsers((prev) => {
-      const nameAlreadyIn = prev.some((user) => user.name === username);
+      const nameAlreadyIn = prev.find((user) => user.name === username);
       if (!nameAlreadyIn) {
-        return [...prev, { name: username, position: { x: 0, y: 0 } }];
+        return [
+          ...prev,
+          { name: username, position: { x: 0, y: 0 }, guestId: userId ,color:getRandomColor()},
+        ];
       }
       return prev;
     });
@@ -84,10 +110,10 @@ const OnlineComponentVM = () => {
     setConnected(true);
   };
 
-  const handleUserMoved = ({ name, position }: ConnectedUser) => {
+  const handleUserMoved = ({ guestId, position }: ConnectedUser) => {
     setConnectedUsers((prevUsers) =>
       prevUsers.map((user) =>
-        user.name === name ? { ...user, position } : user
+        user.guestId === guestId ? { ...user, position } : user
       )
     );
   };

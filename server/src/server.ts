@@ -15,6 +15,7 @@ app.use(cors());
 
 io.on("connection", (socket) => {
   console.log("User connected to server:", socket.id);
+  socket.emit("user-id", socket.id);
 
   socket.on("create-room", ({ name }) => {
     const roomId = `room_${socket.id}`;
@@ -35,11 +36,11 @@ io.on("connection", (socket) => {
 
   socket.on("user-move", ({ position }) => {
     const roomId = socket.data.roomId;
-    const name = socket.data.name;
+    const guestId = socket.id;
 
-    if (!roomId || !name) return;
+    if (!roomId || !guestId) return;
 
-    socket.broadcast.to(roomId).emit("user-moved", { name, position });
+    socket.broadcast.to(roomId).emit("user-moved", { guestId, position });
   });
 
   socket.on("join-room", ({ roomId, name }) => {
@@ -50,10 +51,10 @@ io.on("connection", (socket) => {
     socket.to(roomId).emit("user-joined", { name, guestId: socket.id });
   });
 
-  socket.on("send-name", ({ name, guestId }) => {
-    console.log("name Sent:",name)
+  socket.on("send-name", ({ name, userId, guestId }) => {
+    console.log("name Sent:", name,userId);
     const username = name;
-    socket.to(guestId).emit("add-name", { username });
+    socket.to(guestId).emit("add-name", { username, userId });
   });
 
   socket.on("request-state", ({ to }) => {

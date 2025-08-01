@@ -1,3 +1,7 @@
+$bg-light: #4a4a5a;
+$border-color: #5e5e70;
+$text-color: #e0e0e0;
+
 .topRightToolContainer {
   position: fixed;
   left: 50%;
@@ -40,9 +44,12 @@
     pointer-events: auto;
     position: relative;
     overflow: hidden;
-    .onlineBtn {
-      background-color: transparent;
-      border: none;
+    .onlineBtn { background-color: $bg-light;
+    color: $text-color;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    font-weight: 500;
+
       display: flex;
       align-items: center;
       justify-content: center;

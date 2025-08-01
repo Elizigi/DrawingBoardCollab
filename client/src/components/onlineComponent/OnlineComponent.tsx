@@ -1,8 +1,11 @@
 import styles from "./onlineComponent.module.scss";
 import GuestMouse from "../guestMouse/GuestMouse";
 import OnlineComponentVM from "./OnlineComponentVM";
-
-const OnlineComponent = () => {
+import { FC } from "react";
+interface OnlineComponentProps {
+  selfId: string;
+}
+const OnlineComponent: FC<OnlineComponentProps> = ({ selfId }) => {
   const {
     handleHost,
     handleConnect,
@@ -16,7 +19,7 @@ const OnlineComponent = () => {
     handleSubmit,
     connected,
     connectedUsers,
-  } = OnlineComponentVM();
+  } = OnlineComponentVM(selfId);
   return (
     <div className={styles.onlineContainer}>
       <div className={styles.onlineTitle}>
@@ -49,25 +52,36 @@ const OnlineComponent = () => {
             />
             {!isHost && (
               <>
-                <h2>Connection Address</h2>
+                <h2>Connection Code</h2>
                 <input
                   type="text"
-                  onChange={(e)=>handleAddress(e)}
+                  onChange={(e) => handleAddress(e)}
                   value={roomId}
                   required={!roomId.trim()}
                 />
               </>
             )}
-            <button onClick={()=>handleSubmit()} className={styles.submitBtn}>
+            <button onClick={() => handleSubmit()} className={styles.submitBtn}>
               <h2> {isHost ? "Host" : "Connect"}</h2>
             </button>
           </div>
         </>
       )}
       <div className={styles.roomAddress}>
-        <h3>Room Address</h3>
+        <h3>Room Code</h3>
         <h4>{connected ? roomId : ""}</h4>
       </div>
+      {connectedUsers.length > 0 && (
+        <>
+          <h3>Users in the Room:</h3>
+          {connectedUsers.map((user) => (
+            <button className={styles.guestIcon} key={user.guestId}>
+              <div className={styles.userColorIcon} style={{backgroundColor:user.color}}></div>
+              {user.name}
+            </button>
+          ))}
+        </>
+      )}
       {connectedUsers.map((user) => (
         <GuestMouse key={user.name} {...user} />
       ))}

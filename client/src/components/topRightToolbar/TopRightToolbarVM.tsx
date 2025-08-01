@@ -6,7 +6,7 @@ const TopRightToolbarVM = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
-
+  const [selfId, setSelfId] = useState("");
   const handleMenuOpen = () => {
     setHasInteracted(true);
     setMenuOpen(!menuOpen);
@@ -29,12 +29,22 @@ const TopRightToolbarVM = () => {
       setIsOnline(true);
       console.log("Connected:", socket.id);
     });
+    socket.on("user-id", (userId: string) => {
+      setSelfId(userId);
+    });
     return () => {
       socket.off("connect");
       socket.off("disconnect");
     };
   }, []);
-  return { isOnline, handleOnline, handleMenuOpen, handleAnim, hasInteracted };
+  return {
+    isOnline,
+    handleOnline,
+    handleMenuOpen,
+    handleAnim,
+    hasInteracted,
+    selfId,
+  };
 };
 
 export default TopRightToolbarVM;
