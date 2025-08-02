@@ -4,8 +4,8 @@ $text-color: #e0e0e0;
 
 .topRightToolContainer {
   position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  width: 100%;
   z-index: 9999;
   pointer-events: none;
   display: flex;
@@ -24,7 +24,6 @@ $text-color: #e0e0e0;
     align-items: center;
     justify-content: center;
     font-size: 2rem;
-    z-index: 99999;
     border: none;
     cursor: pointer;
     pointer-events: auto;
