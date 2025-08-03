@@ -24,12 +24,11 @@ let mouseDown = false;
 let pendingPoints: { x: number; y: number }[] = [];
 let lastStrokeTime = 0;
 let lastPoint: { x: number; y: number } | null = null;
-
 const STROKE_THROTTLE = 16;
 
 (async () => {
   const app = new Application();
-  await app.init({ resizeTo: rootElement, backgroundColor: 0xffffff });
+  await app.init({ width:1670, height: 1080, backgroundColor: 0xffffff });
   rootElement.appendChild(app.canvas);
 
   let canvasRect = app.canvas.getBoundingClientRect();
@@ -236,10 +235,10 @@ const STROKE_THROTTLE = 16;
     };
   }
   function getMousePosPercent(e: MouseEvent) {
-    return {
-      x: e.clientX ,
-      y: e.clientY
-    };
+     return {
+    x: (e.clientX / window.innerWidth) * 100,
+    y: (e.clientY / window.innerHeight) * 100,
+  };
   }
   socket.on("request-state", ({ from }) => {
     const state = useBrushStore.getState();

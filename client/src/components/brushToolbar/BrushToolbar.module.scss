@@ -1,0 +1,107 @@
+.brushToolbar {
+  position: absolute;
+  top: 4rem;
+  left: 2rem;
+
+  .blackBorderWrapper {
+    position: relative;
+    border: black 1px solid;
+    width: 4rem;
+    height: 4rem;
+    z-index: 9999;
+
+    border-radius: 50%;
+  }
+  .brushIcon {
+    border-radius: 50%;
+    background-color: rgb(36, 36, 38);
+    width: 4rem;
+    border: none;
+    padding: 0.2rem;
+    height: 4rem;
+    cursor: pointer;
+    transform: scaleX(-1);
+    z-index: 9999;
+  }
+  .colorMenu {
+    width: 3rem;
+    background: linear-gradient(
+      90deg,
+      #3d3d3d 0%,
+      #606060 15%,
+      #4a4a4a 85%,
+      #353535 100%
+    );
+    height: fit-content;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    border-bottom-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    padding-bottom: 0.5rem;
+    padding-top: 1rem;
+    transform: translateY(-1rem);
+    z-index: 1;
+    border: 2px solid rgb(57, 57, 57);
+
+    .pastColorElement {
+      width: 2rem;
+      height: 2rem;
+      margin: 0 auto;
+      cursor: pointer;
+      margin-top: 0.5rem;
+
+      border: 1px black solid;
+      border-radius: 50%;
+    }
+  }
+  .sizeSetBar {
+    width: 5.5rem; // A bit bigger than 5rem
+    height: 5.5rem;
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    border-radius: 50%;
+    transform: translate(-2.75rem, -2.75rem); // Half of 5.5rem
+    border: none;
+    background: transparent;
+    padding: 0;
+
+    .sizeHandle {
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      right: -0.75rem;
+      transform: translateY(-50%);
+      z-index: 9999;
+      border: 1px solid black;
+      background-color: rgb(55, 55, 56);
+    }
+  }
+  .colorOfSlider {
+    width: 7rem;
+    height: 7rem;
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    border-radius: 50%;
+    transform: translate(-3.5rem, -3.5rem);
+    border: none;
+    padding: 0;
+background: conic-gradient(
+  from 0deg,
+  rgb(128, 128, 128) 0deg,      /* Medium grey */
+  rgb(128, 128, 128) 136deg,
+  rgb(96, 96, 96) 136deg,       /* Darker grey */
+  rgb(96, 96, 96) 140deg,
+  transparent 140deg,
+  transparent 340deg,
+  rgb(96, 96, 96) 340deg,
+  rgb(96, 96, 96) 344deg,
+  rgb(128, 128, 128) 344deg,
+  rgb(128, 128, 128) 360deg
+);
+  }
+}
