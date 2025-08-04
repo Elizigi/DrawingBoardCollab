@@ -13,10 +13,8 @@ import { Stroke, useBrushStore } from "./zustand/useBrushStore.ts";
 import { io, Socket } from "socket.io-client";
 
 export const socket: Socket = io("http://localhost:3000", {
-  autoConnect: false, 
+  autoConnect: false,
 });
-
-
 
 const rootElement = document.getElementById("root") as HTMLDivElement;
 
@@ -25,17 +23,17 @@ let pendingPoints: { x: number; y: number }[] = [];
 let lastStrokeTime = 0;
 let lastPoint: { x: number; y: number } | null = null;
 const STROKE_THROTTLE = 16;
+const canvasSize = { width: 1920, height: 1080 };
 
 (async () => {
   const app = new Application();
-  await app.init({ width:1920, height: 1080, backgroundColor: 0xffffff });
+  await app.init({
+    width: canvasSize.width,
+    height: canvasSize.height,
+    backgroundColor: 0xffffff,
+  });
   rootElement.appendChild(app.canvas);
-
   let canvasRect = app.canvas.getBoundingClientRect();
-  let windowSize = {
-    width: window.innerWidth,
-    height: window.innerHeight,
-  };
 
   const layersContainer = new Container();
   app.stage.addChild(layersContainer);
@@ -66,40 +64,17 @@ const STROKE_THROTTLE = 16;
   }
 
   const tempGraphics = new Graphics();
+  const remoteGraphics = new Graphics();
+
   app.stage.addChild(tempGraphics);
 
-  const remoteGraphics = new Graphics();
   app.stage.addChild(remoteGraphics);
 
-  window.addEventListener("resize", () => {
-    canvasRect = app.canvas.getBoundingClientRect();
-    windowSize.width = window.innerWidth;
-    windowSize.height = window.innerHeight;
-  });
 
   const getBrush = () => useBrushStore.getState();
   const { layers } = useBrushStore.getState();
   layers.forEach((l) => createPixiLayer(l.id));
-  window.addEventListener("resize", () => {
-    canvasRect = app.canvas.getBoundingClientRect();
-    Object.keys(layersMap).forEach((id, index) => {
-      const oldRT = layersMap[id];
-      const newRT = RenderTexture.create({
-        width: app.renderer.width,
-        height: app.renderer.height,
-      });
-      const tempSprite = new Sprite(oldRT);
-      app.renderer.render({
-        container: tempSprite,
-        target: newRT,
-        clear: true,
-      });
 
-      layersMap[id] = newRT;
-      (layersContainer.children[index] as Sprite).texture = newRT;
-      oldRT.destroy(true);
-    });
-  });
   useBrushStore.subscribe((state) => {
     state.layers.forEach((layer, idx) => {
       const sprite = layersContainer.children[idx] as Sprite | undefined;
@@ -125,22 +100,16 @@ const STROKE_THROTTLE = 16;
   function processStroke() {
     if (pendingPoints.length === 0) return;
 
-    const { brushColor, brushSize, activeLayerId } = getBrush();
-
-    drawStroke(
-      {
-        points: [...pendingPoints],
-        color: brushColor,
-        size: brushSize,
-        layerId: activeLayerId,
-      },
-      true
-    );
+    const { brushColor, brushSize, activeLayerId, brushOpacity } = getBrush();
+    tempGraphics.alpha = brushOpacity / 100;
     socket.emit("draw-progress", {
       points: [...pendingPoints],
       color: brushColor,
       size: brushSize,
+      opacity: brushOpacity,
       layerId: activeLayerId,
+      final: false,
+      senderId: socket.id,
     });
 
     tempGraphics.clear();
@@ -195,7 +164,7 @@ const STROKE_THROTTLE = 16;
   });
 
   document.addEventListener("mousemove", (e) => {
-    socket.emit("user-move", { position:getMousePosPercent(e) });
+    socket.emit("user-move", { position: getMousePosPercent(e) });
     if (!mouseDown) return;
 
     const { x, y } = getMousePos(e);
@@ -207,17 +176,33 @@ const STROKE_THROTTLE = 16;
     if (pendingPoints.length === 0) return;
     processStroke();
     const { activeLayerId } = useBrushStore.getState();
+    const { brushOpacity } = getBrush();
+    tempGraphics.alpha = brushOpacity / 100;
+
     app.renderer.render({
       container: tempGraphics,
       target: layersMap[activeLayerId],
       clear: false,
     });
 
+    tempGraphics.alpha = 1;
+
     useBrushStore.getState().addStroke({
       points: [...pendingPoints],
       color: getBrush().brushColor,
       size: getBrush().brushSize,
+      opacity: brushOpacity,
       layerId: activeLayerId,
+    });
+
+    socket.emit("draw-progress", {
+      points: [...pendingPoints],
+      color: getBrush().brushColor,
+      size: getBrush().brushSize,
+      opacity: getBrush().brushOpacity,
+      layerId: getBrush().activeLayerId,
+      final: true,
+      senderId: socket.id,
     });
 
     tempGraphics.clear();
@@ -226,8 +211,8 @@ const STROKE_THROTTLE = 16;
   }
 
   function getMousePos(e: MouseEvent) {
-    const scaleX = app.renderer.width / canvasRect.width;
-    const scaleY = app.renderer.height / canvasRect.height;
+    const scaleX = canvasSize.width / canvasRect.width;
+    const scaleY = canvasSize.height / canvasRect.height;
 
     return {
       x: (e.clientX - canvasRect.left) * scaleX,
@@ -235,10 +220,10 @@ const STROKE_THROTTLE = 16;
     };
   }
   function getMousePosPercent(e: MouseEvent) {
-     return {
-    x: (e.clientX / window.innerWidth) * 100,
-    y: (e.clientY / window.innerHeight) * 100,
-  };
+    const rect = app.canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    return { x: x * 100, y: y * 100 };
   }
   socket.on("request-state", ({ from }) => {
     const state = useBrushStore.getState();
@@ -252,46 +237,43 @@ const STROKE_THROTTLE = 16;
   });
   socket.on("draw-progress", (stroke) => {
     if (stroke.senderId === socket.id) return;
-    drawStroke(stroke);
+    drawStroke(stroke, false);
   });
-  socket.emit("draw-progress", {
-    points: [...pendingPoints],
-    color: getBrush().brushColor,
-    size: getBrush().brushSize,
-    layerId: useBrushStore.getState().activeLayerId,
-  });
+
   function drawStroke(strokeData: Stroke, isLocal = false) {
-    const { points, color, size, layerId } = strokeData;
+    const { points, color, size, layerId, opacity, final } = strokeData;
     if (!layersMap[layerId]) return;
 
     const graphics = isLocal ? tempGraphics : remoteGraphics;
-
     graphics.clear();
+    graphics.alpha = opacity / 100;
 
     if (points.length >= 2) {
       graphics.moveTo(points[0].x, points[0].y);
       for (let i = 1; i < points.length - 1; i++) {
-        const current = points[i];
-        const next = points[i + 1];
-        const midX = (current.x + next.x) / 2;
-        const midY = (current.y + next.y) / 2;
-        graphics.quadraticCurveTo(current.x, current.y, midX, midY);
+        const c = points[i];
+        const n = points[i + 1];
+        const midX = (c.x + n.x) / 2;
+        const midY = (c.y + n.y) / 2;
+        graphics.quadraticCurveTo(c.x, c.y, midX, midY);
       }
-      const last = points[points.length - 1];
-      graphics.lineTo(last.x, last.y);
-      graphics.stroke({ color, width: size, cap: "round", join: "round" });
+      graphics.lineTo(points[points.length - 1].x, points[points.length - 1].y);
+      graphics.stroke({ color, width: size, cap: "round", join: "round" ,alpha:opacity });
     } else if (points.length === 1) {
       graphics.circle(points[0].x, points[0].y, size / 2);
       graphics.fill({ color });
     }
 
-    app.renderer.render({
-      container: graphics,
-      target: layersMap[layerId],
-      clear: false,
-    });
+    if (final) {
+      app.renderer.render({
+        container: graphics,
+        target: layersMap[layerId],
+        clear: false,
+      });
+      graphics.clear();
+    }
 
-    if (!isLocal) graphics.clear(); // Optionally clear remoteGraphics after rendering
+    graphics.alpha = 1;
   }
 })();
 

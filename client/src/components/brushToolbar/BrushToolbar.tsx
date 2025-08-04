@@ -21,7 +21,6 @@ const BrushToolbar = () => {
   const handleColorClick = () => {
     colorInputRef.current?.click();
   };
-  const [isHoldingDial, setIsHoldingDial] = useState(false);
 
   useEffect(() => {
     if (isBrushOpen) {
@@ -35,13 +34,10 @@ const BrushToolbar = () => {
       colorSliderRef.current.style.transform = `translate(-2.75rem, -2.75rem) rotate(${angle - 50}deg)`;
     }
   }, [isBrushOpen, brushSize]);
-  const handleMouseUp = () => {
-    setIsHoldingDial(false);
-  };
+
   const handleSizeAdjustment = () => {
     const colorSlider = colorSliderRef.current;
     if (!colorSlider) return;
-    setIsHoldingDial(true);
     const rect = colorSlider.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
@@ -82,7 +78,6 @@ const BrushToolbar = () => {
             <button
               className={styles.sizeHandle}
               onMouseDown={() => handleSizeAdjustment()}
-              onMouseUp={() => handleMouseUp()}
             ></button>
           </div>
         </>
