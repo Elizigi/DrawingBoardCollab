@@ -28,7 +28,7 @@ const STROKE_THROTTLE = 16;
 
 (async () => {
   const app = new Application();
-  await app.init({ width:1670, height: 1080, backgroundColor: 0xffffff });
+  await app.init({ width:1920, height: 1080, backgroundColor: 0xffffff });
   rootElement.appendChild(app.canvas);
 
   let canvasRect = app.canvas.getBoundingClientRect();
