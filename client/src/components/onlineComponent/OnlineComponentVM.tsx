@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
-import { socket } from "../../Main";
+import { onlineStatus, socket } from "../../Main";
 
 interface ConnectedUser {
   name: string;
   position: { x: number; y: number };
   guestId: string;
-  color:string;
+  color: string;
 }
 
-const OnlineComponentVM = (selfId:string) => {
+const OnlineComponentVM = (selfId: string) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isHost, setIsHost] = useState(false);
   const [myName, setMyName] = useState("");
@@ -27,9 +27,11 @@ const OnlineComponentVM = (selfId:string) => {
     setIsHost(false);
     handleModalOpen();
   };
+
   const handleModalOpen = () => {
     setIsModalOpen(!isModalOpen);
   };
+
   const handleName = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
     setMyName(name);
@@ -54,16 +56,20 @@ const OnlineComponentVM = (selfId:string) => {
   const handleRoomCreated = (roomId: string) => {
     console.log("Room ID to share:", roomId);
     setRoomId(roomId);
+    onlineStatus.inRoom = true;
+
     setConnected(true);
   };
-const getRandomColor = (): string => {
-  const letters = "0123456789ABCDEF";
-  let color = "#";
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-};
+
+  const getRandomColor = (): string => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+
   const handleUserJoined = ({
     name,
     guestId,
@@ -74,7 +80,7 @@ const getRandomColor = (): string => {
     console.log(guestId, "Has joined");
     setConnectedUsers((prev) => [
       ...prev,
-      { name, position: { x: 0, y: 0 }, guestId,color:getRandomColor() },
+      { name, position: { x: 0, y: 0 }, guestId, color: getRandomColor() },
     ]);
     socket.emit("send-name", {
       name: myNameRef.current,
@@ -96,7 +102,12 @@ const getRandomColor = (): string => {
       if (!nameAlreadyIn) {
         return [
           ...prev,
-          { name: username, position: { x: 0, y: 0 }, guestId: userId ,color:getRandomColor()},
+          {
+            name: username,
+            position: { x: 0, y: 0 },
+            guestId: userId,
+            color: getRandomColor(),
+          },
         ];
       }
       return prev;
@@ -105,7 +116,10 @@ const getRandomColor = (): string => {
 
   const handleJoinedRoom = ({ roomId }: { roomId: string }) => {
     setRoomId(roomId);
+    onlineStatus.inRoom = true;
+
     console.log("joined:", roomId);
+    document.dispatchEvent(new CustomEvent("clearCanvas"));
     socket.emit("request-state", { to: roomId });
     setConnected(true);
   };

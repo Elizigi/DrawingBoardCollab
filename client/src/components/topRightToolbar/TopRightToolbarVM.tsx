@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { socket } from "../../Main";
+import { onlineStatus, socket } from "../../Main";
 import styles from "./TopRightToolbar.module.scss";
 
 const TopRightToolbarVM = () => {
@@ -16,12 +16,14 @@ const TopRightToolbarVM = () => {
   };
   const handleOnline = () => {
     socket.connect();
+    onlineStatus.isOnline=true;
   };
 
   useEffect(() => {
     socket.on("disconnect", () => {
       setIsOnline(false);
-
+      onlineStatus.isOnline=false;
+      onlineStatus.inRoom=false;
       console.log("Disconnected");
     });
 

@@ -9,9 +9,9 @@ export type Stroke = {
   points: { x: number; y: number }[];
   color: number;
   size: number;
-  opacity: number; 
+  opacity: number;
   layerId: string;
-  final?: boolean,
+  final?: boolean;
 };
 
 type BrushState = {
@@ -50,7 +50,7 @@ export const useBrushStore = create<BrushState>((set, _) => ({
       };
     }),
 
-  brushOpacity: 50,
+  brushOpacity: 100,
   setOpacity: (opacity) => set({ brushOpacity: opacity }),
 
   layers: [{ id: "layer-1", name: "Layer 1", visible: true }],
@@ -58,9 +58,11 @@ export const useBrushStore = create<BrushState>((set, _) => ({
 
   strokes: [],
   addStroke: (stroke) =>
-    set((state) => ({
-      strokes: [...state.strokes, stroke],
-    })),
+    set((state) => {
+      if (!stroke.final) return state;
+      const strokes = [...state.strokes, stroke];
+      return { strokes };
+    }),
   clearStrokes: () => set({ strokes: [] }),
 
   addLayer: (name) => {

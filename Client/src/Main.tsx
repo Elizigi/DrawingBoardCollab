@@ -24,6 +24,7 @@ let lastStrokeTime = 0;
 let lastPoint: { x: number; y: number } | null = null;
 const STROKE_THROTTLE = 16;
 const canvasSize = { width: 1920, height: 1080 };
+export const onlineStatus = { isOnline: false, inRoom: false };
 
 (async () => {
   const app = new Application();
@@ -70,7 +71,6 @@ const canvasSize = { width: 1920, height: 1080 };
 
   app.stage.addChild(remoteGraphics);
 
-
   const getBrush = () => useBrushStore.getState();
   const { layers } = useBrushStore.getState();
   layers.forEach((l) => createPixiLayer(l.id));
@@ -102,15 +102,17 @@ const canvasSize = { width: 1920, height: 1080 };
 
     const { brushColor, brushSize, activeLayerId, brushOpacity } = getBrush();
     tempGraphics.alpha = brushOpacity / 100;
-    socket.emit("draw-progress", {
-      points: [...pendingPoints],
-      color: brushColor,
-      size: brushSize,
-      opacity: brushOpacity,
-      layerId: activeLayerId,
-      final: false,
-      senderId: socket.id,
-    });
+    if (onlineStatus.inRoom)
+      socket.emit("draw-progress", {
+        points: [...pendingPoints],
+        color: brushColor,
+        size: brushSize,
+        opacity: brushOpacity,
+        layerId: activeLayerId,
+        final: false,
+        senderId: socket.id,
+      });
+    tempGraphics.alpha = 1;
 
     tempGraphics.clear();
 
@@ -141,6 +143,7 @@ const canvasSize = { width: 1920, height: 1080 };
         width: brushSize,
         cap: "round",
         join: "round",
+        alpha: brushOpacity / 100,
       });
     } else if (pendingPoints.length === 1) {
       const point = pendingPoints[0];
@@ -171,7 +174,23 @@ const canvasSize = { width: 1920, height: 1080 };
 
     addPoint(x, y);
   });
+  document.addEventListener("clearCanvas", () => {
+    console.log("clearingCanvas");
+    for (const layerId of Object.keys(layersMap)) {
+      const rt = layersMap[layerId];
 
+      const sprite = layersContainer.children.find(
+        (child) => (child as Sprite).texture === rt
+      ) as Sprite;
+
+      if (sprite) {
+        layersContainer.removeChild(sprite);
+      }
+
+        useBrushStore.getState().clearStrokes();
+      createPixiLayer(layerId);
+    }
+  });
   function commitStroke() {
     if (pendingPoints.length === 0) return;
     processStroke();
@@ -193,17 +212,18 @@ const canvasSize = { width: 1920, height: 1080 };
       size: getBrush().brushSize,
       opacity: brushOpacity,
       layerId: activeLayerId,
-    });
-
-    socket.emit("draw-progress", {
-      points: [...pendingPoints],
-      color: getBrush().brushColor,
-      size: getBrush().brushSize,
-      opacity: getBrush().brushOpacity,
-      layerId: getBrush().activeLayerId,
       final: true,
-      senderId: socket.id,
     });
+    if (onlineStatus.inRoom)
+      socket.emit("draw-progress", {
+        points: [...pendingPoints],
+        color: getBrush().brushColor,
+        size: getBrush().brushSize,
+        opacity: getBrush().brushOpacity,
+        layerId: getBrush().activeLayerId,
+        final: true,
+        senderId: socket.id,
+      });
 
     tempGraphics.clear();
     pendingPoints.length = 0;
@@ -226,15 +246,40 @@ const canvasSize = { width: 1920, height: 1080 };
     return { x: x * 100, y: y * 100 };
   }
   socket.on("request-state", ({ from }) => {
-    const state = useBrushStore.getState();
-    socket.emit("send-state", { to: from, state: { strokes: state.strokes } });
+    const allStrokes = useBrushStore.getState().strokes;
+
+    const strokesByLayer: Record<string, Stroke[]> = {};
+    allStrokes.forEach((stroke) => {
+      if (!strokesByLayer[stroke.layerId]) {
+        strokesByLayer[stroke.layerId] = [];
+      }
+      strokesByLayer[stroke.layerId].push(stroke);
+    });
+
+    socket.emit("send-state", {
+      to: from,
+      strokes: strokesByLayer,
+    });
   });
-  socket.on("init", (state) => {
-    console.log("init");
-    for (const stroke of state.strokes) {
-      drawStroke(stroke);
+  socket.on("init", (strokes) => {
+    console.log("Received init event", strokes);
+    if (!strokes) {
+      console.warn("Received init event with no stroke data");
+      return;
+    }
+
+    for (const [layerId, strokeArray] of Object.entries(strokes)) {
+      if (!layersMap[layerId]) {
+        createPixiLayer(layerId);
+      }
+      if (Array.isArray(strokeArray)) {
+        strokeArray.forEach((stroke) => {
+          drawStroke({ ...stroke, final: true }, false);
+        });
+      }
     }
   });
+
   socket.on("draw-progress", (stroke) => {
     if (stroke.senderId === socket.id) return;
     drawStroke(stroke, false);
@@ -245,6 +290,7 @@ const canvasSize = { width: 1920, height: 1080 };
     if (!layersMap[layerId]) return;
 
     const graphics = isLocal ? tempGraphics : remoteGraphics;
+
     graphics.clear();
     graphics.alpha = opacity / 100;
 
@@ -258,7 +304,13 @@ const canvasSize = { width: 1920, height: 1080 };
         graphics.quadraticCurveTo(c.x, c.y, midX, midY);
       }
       graphics.lineTo(points[points.length - 1].x, points[points.length - 1].y);
-      graphics.stroke({ color, width: size, cap: "round", join: "round" ,alpha:opacity });
+      graphics.stroke({
+        color,
+        width: size,
+        cap: "round",
+        join: "round",
+        alpha: opacity / 100,
+      });
     } else if (points.length === 1) {
       graphics.circle(points[0].x, points[0].y, size / 2);
       graphics.fill({ color });

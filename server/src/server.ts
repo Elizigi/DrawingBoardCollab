@@ -61,8 +61,8 @@ io.on("connection", (socket) => {
     io.to(to).emit("request-state", { from: socket.id });
   });
 
-  socket.on("send-state", ({ to, state }) => {
-    io.to(to).emit("init", state);
+  socket.on("send-state", ({ to, strokes  }) => {
+    io.to(to).emit("init", strokes );
   });
 
   socket.on("disconnect", () => {
