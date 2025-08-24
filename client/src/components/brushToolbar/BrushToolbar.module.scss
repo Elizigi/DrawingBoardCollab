@@ -78,6 +78,12 @@
       background-color: #232323;
     }
   }
+  .brushSizeInput{
+    position: absolute;
+    top: 2rem;
+    left: 4rem;
+    z-index: 99999;
+  }
   .colorOfSlider {
     width: 7rem;
     height: 7rem;

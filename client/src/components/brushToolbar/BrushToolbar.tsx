@@ -19,7 +19,7 @@ const BrushToolbar = () => {
   const colorInputRef = useRef<HTMLInputElement>(null);
   const opacitySliderRef = useRef<HTMLDivElement>(null);
 
-  const strokes = useBrushStore((s) => s.strokes);
+  const isMouseDown = useBrushStore((s) => s.isMouseDown);
   const handleColorClick = () => {
     colorInputRef.current?.click();
   };
@@ -28,7 +28,7 @@ const BrushToolbar = () => {
     if (isBrushOpen) {
       setIsBrushOpen(false);
     }
-  }, [strokes.length]);
+  }, [isMouseDown]);
 
   useEffect(() => {
     if (isBrushOpen && opacitySliderRef.current) {
@@ -82,6 +82,14 @@ const BrushToolbar = () => {
               onMouseDown={() => handleTransparentAdjustment()}
             ></button>
           </div>
+          <input
+            className={styles.brushSizeInput}
+            type="range"
+            min={1}
+            max={100}
+            value={brushSize}
+            onChange={(e) => setBrushSize(Number(e.target.value))}
+          />
         </>
       )}
       <div className={styles.blackBorderWrapper}>
@@ -120,6 +128,7 @@ const BrushToolbar = () => {
           />
         )}
       </div>
+
       {isBrushOpen && usedColors[0] !== null && (
         <div className={styles.colorMenu}>
           {usedColors.map((color, index) =>

@@ -15,6 +15,9 @@ export type Stroke = {
 };
 
 type BrushState = {
+  isMouseDown: boolean;
+  setMouseDown: (truth: boolean) => void;
+
   brushColor: number;
   setBrushColor: (color: number) => void;
   brushSize: number;
@@ -37,6 +40,8 @@ type BrushState = {
 };
 
 export const useBrushStore = create<BrushState>((set, _) => ({
+  isMouseDown: false,
+  setMouseDown: (truth) => set({ isMouseDown: truth }),
   brushColor: 0x000000,
   setBrushColor: (color) => set({ brushColor: color }),
   brushSize: 2,

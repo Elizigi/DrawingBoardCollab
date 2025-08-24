@@ -18,8 +18,7 @@ export const socket: Socket = io("http://localhost:3000", {
 
 const rootElement = document.getElementById("root") as HTMLDivElement;
 
-let mouseDown = false;
-let pendingPoints: { x: number; y: number }[] = [];
+const pendingPoints: { x: number; y: number }[] = [];
 let lastStrokeTime = 0;
 let lastPoint: { x: number; y: number } | null = null;
 const STROKE_THROTTLE = 16;
@@ -34,7 +33,6 @@ export const onlineStatus = { isOnline: false, inRoom: false };
     backgroundColor: 0xffffff,
   });
   rootElement.appendChild(app.canvas);
-  let canvasRect = app.canvas.getBoundingClientRect();
 
   const layersContainer = new Container();
   app.stage.addChild(layersContainer);
@@ -56,7 +54,7 @@ export const onlineStatus = { isOnline: false, inRoom: false };
       const dy = y - lastPoint.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      const minDistance = Math.max(1, getBrush().brushSize * 0.1);
+      const minDistance = Math.max(0.02, getBrush().brushSize * 0.01);
       if (distance < minDistance) return;
     }
 
@@ -102,6 +100,7 @@ export const onlineStatus = { isOnline: false, inRoom: false };
 
     const { brushColor, brushSize, activeLayerId, brushOpacity } = getBrush();
     tempGraphics.alpha = brushOpacity / 100;
+
     if (onlineStatus.inRoom)
       socket.emit("draw-progress", {
         points: [...pendingPoints],
@@ -112,30 +111,25 @@ export const onlineStatus = { isOnline: false, inRoom: false };
         final: false,
         senderId: socket.id,
       });
-    tempGraphics.alpha = 1;
 
+    tempGraphics.alpha = 1;
     tempGraphics.clear();
 
     if (pendingPoints.length >= 2) {
-      const firstPoint = pendingPoints[0];
-      tempGraphics.moveTo(firstPoint.x, firstPoint.y);
+      const pixelPoints = pendingPoints.map((p) => percentToCanvas(p.x, p.y));
 
-      for (let i = 1; i < pendingPoints.length - 1; i++) {
-        const currentPoint = pendingPoints[i];
-        const nextPoint = pendingPoints[i + 1];
+      tempGraphics.moveTo(pixelPoints[0].x, pixelPoints[0].y);
 
-        const midX = (currentPoint.x + nextPoint.x) / 2;
-        const midY = (currentPoint.y + nextPoint.y) / 2;
+      for (let i = 1; i < pixelPoints.length - 1; i++) {
+        const c = pixelPoints[i];
+        const n = pixelPoints[i + 1];
+        const midX = (c.x + n.x) / 2;
+        const midY = (c.y + n.y) / 2;
 
-        tempGraphics.quadraticCurveTo(
-          currentPoint.x,
-          currentPoint.y,
-          midX,
-          midY
-        );
+        tempGraphics.quadraticCurveTo(c.x, c.y, midX, midY);
       }
 
-      const lastPoint = pendingPoints[pendingPoints.length - 1];
+      const lastPoint = pixelPoints[pixelPoints.length - 1];
       tempGraphics.lineTo(lastPoint.x, lastPoint.y);
 
       tempGraphics.stroke({
@@ -146,15 +140,15 @@ export const onlineStatus = { isOnline: false, inRoom: false };
         alpha: brushOpacity / 100,
       });
     } else if (pendingPoints.length === 1) {
-      const point = pendingPoints[0];
-      tempGraphics.circle(point.x, point.y, brushSize / 2);
+      const p = percentToCanvas(pendingPoints[0].x, pendingPoints[0].y);
+      tempGraphics.circle(p.x, p.y, brushSize / 2);
       tempGraphics.fill({ color: brushColor });
     }
   }
 
   app.canvas.addEventListener("mousedown", (e) => {
-    mouseDown = true;
-    const { x, y } = getMousePos(e);
+    getBrush().setMouseDown(true);
+    const { x, y } = getMousePosPercent(e);
     pendingPoints.length = 0;
     lastPoint = null;
     useBrushStore.getState().addUsedColor(getBrush().brushColor);
@@ -162,15 +156,15 @@ export const onlineStatus = { isOnline: false, inRoom: false };
   });
 
   document.addEventListener("mouseup", () => {
-    mouseDown = false;
+    getBrush().setMouseDown(false);
     commitStroke();
   });
 
   document.addEventListener("mousemove", (e) => {
     socket.emit("user-move", { position: getMousePosPercent(e) });
-    if (!mouseDown) return;
+    if (!useBrushStore.getState().isMouseDown) return;
 
-    const { x, y } = getMousePos(e);
+    const { x, y } = getMousePosPercent(e);
 
     addPoint(x, y);
   });
@@ -187,7 +181,7 @@ export const onlineStatus = { isOnline: false, inRoom: false };
         layersContainer.removeChild(sprite);
       }
 
-        useBrushStore.getState().clearStrokes();
+      useBrushStore.getState().clearStrokes();
       createPixiLayer(layerId);
     }
   });
@@ -230,15 +224,6 @@ export const onlineStatus = { isOnline: false, inRoom: false };
     lastPoint = null;
   }
 
-  function getMousePos(e: MouseEvent) {
-    const scaleX = canvasSize.width / canvasRect.width;
-    const scaleY = canvasSize.height / canvasRect.height;
-
-    return {
-      x: (e.clientX - canvasRect.left) * scaleX,
-      y: (e.clientY - canvasRect.top) * scaleY,
-    };
-  }
   function getMousePosPercent(e: MouseEvent) {
     const rect = app.canvas.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
@@ -284,6 +269,12 @@ export const onlineStatus = { isOnline: false, inRoom: false };
     if (stroke.senderId === socket.id) return;
     drawStroke(stroke, false);
   });
+  function percentToCanvas(xPercent: number, yPercent: number) {
+    return {
+      x: (xPercent / 100) * canvasSize.width,
+      y: (yPercent / 100) * canvasSize.height,
+    };
+  }
 
   function drawStroke(strokeData: Stroke, isLocal = false) {
     const { points, color, size, layerId, opacity, final } = strokeData;
@@ -295,15 +286,22 @@ export const onlineStatus = { isOnline: false, inRoom: false };
     graphics.alpha = opacity / 100;
 
     if (points.length >= 2) {
-      graphics.moveTo(points[0].x, points[0].y);
-      for (let i = 1; i < points.length - 1; i++) {
-        const c = points[i];
-        const n = points[i + 1];
+      const pixelPoints = points.map((p) => percentToCanvas(p.x, p.y));
+
+      graphics.moveTo(pixelPoints[0].x, pixelPoints[0].y);
+
+      for (let i = 1; i < pixelPoints.length - 1; i++) {
+        const c = pixelPoints[i];
+        const n = pixelPoints[i + 1];
         const midX = (c.x + n.x) / 2;
         const midY = (c.y + n.y) / 2;
+
         graphics.quadraticCurveTo(c.x, c.y, midX, midY);
       }
-      graphics.lineTo(points[points.length - 1].x, points[points.length - 1].y);
+
+      const lastPoint = pixelPoints[pixelPoints.length - 1];
+      graphics.lineTo(lastPoint.x, lastPoint.y);
+
       graphics.stroke({
         color,
         width: size,
@@ -312,7 +310,8 @@ export const onlineStatus = { isOnline: false, inRoom: false };
         alpha: opacity / 100,
       });
     } else if (points.length === 1) {
-      graphics.circle(points[0].x, points[0].y, size / 2);
+      const p = percentToCanvas(points[0].x, points[0].y);
+      graphics.circle(p.x, p.y, size / 2);
       graphics.fill({ color });
     }
 
