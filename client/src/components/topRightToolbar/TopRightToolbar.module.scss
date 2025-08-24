@@ -4,21 +4,20 @@ $text-color: #e0e0e0;
 
 .topRightToolContainer {
   position: fixed;
-  left: 0;
-  width: 100%;
+  width: 3rem;
   z-index: 9999;
   pointer-events: none;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: flex-end;
   gap: 0.5rem;
-
+  right: 2rem;
+  top: 4.5rem;
   .topArrowMenu {
     background-color: rgb(197, 197, 198);
     color: white;
-    width: 50px;
-    height: 50px;
+    width: 3rem;
+    height: 3rem;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -27,6 +26,10 @@ $text-color: #e0e0e0;
     border: none;
     cursor: pointer;
     pointer-events: auto;
+    span {
+      display: block;
+      line-height: 1;
+    }
   }
 
   .subMenu {
@@ -43,11 +46,12 @@ $text-color: #e0e0e0;
     pointer-events: auto;
     position: relative;
     overflow: hidden;
-    .onlineBtn { background-color: $bg-light;
-    color: $text-color;
-    border: 1px solid $border-color;
-    border-radius: 4px;
-    font-weight: 500;
+    .onlineBtn {
+      background-color: $bg-light;
+      color: $text-color;
+      border: 1px solid $border-color;
+      border-radius: 4px;
+      font-weight: 500;
 
       display: flex;
       align-items: center;
@@ -61,27 +65,18 @@ $text-color: #e0e0e0;
     }
   }
 }
-@keyframes slideDown {
-  from {
-    height: 0;
-  }
-  to {
-    height: 50svh;
-  }
-}
 
-@keyframes slideUp {
-  from {
-    height: 50svh;
-  }
-  to {
-    height: 0;
-  }
+.spinLoad {
+  animation: Speeen 1s linear infinite ;
 }
-
-.openMenuAnim {
-  animation: slideDown 0.3s ease-out forwards;
+.spinFinish {
+  animation: Speeen 2s forwards;
 }
-.closeMenuAnim {
-  animation: slideUp 0.3s ease-in forwards;
+@keyframes Speeen {
+  0% {
+    transform: rotateZ(0deg);
+  }
+  100% {
+    transform: rotateZ(360deg);
+  }
 }
