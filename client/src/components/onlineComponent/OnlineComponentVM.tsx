@@ -8,13 +8,17 @@ interface ConnectedUser {
   color: string;
 }
 
-const OnlineComponentVM = (selfId: string,isHost:boolean,setConnected:(connected:boolean)=>void,setOnlineWindowOpen:(windowOpen:boolean)=>void) => {
+const OnlineComponentVM = (
+  selfId: string,
+  isHost: boolean,
+  setConnected: (connected: boolean) => void,
+  setOnlineWindowOpen: (windowOpen: boolean) => void
+) => {
   const [myName, setMyName] = useState("");
   const [roomId, setRoomId] = useState("");
 
   const [connectedUsers, setConnectedUsers] = useState<ConnectedUser[]>([]);
   const myNameRef = useRef("");
-
 
   const handleModalOpen = () => {
     setOnlineWindowOpen(false);
@@ -43,6 +47,7 @@ const OnlineComponentVM = (selfId: string,isHost:boolean,setConnected:(connected
     console.log("Room ID to share:", roomId);
     setRoomId(roomId);
     onlineStatus.inRoom = true;
+    handleModalOpen();
 
     setConnected(true);
   };
@@ -108,6 +113,7 @@ const OnlineComponentVM = (selfId: string,isHost:boolean,setConnected:(connected
     document.dispatchEvent(new CustomEvent("clearCanvas"));
     socket.emit("request-state", { to: roomId });
     setConnected(true);
+    handleModalOpen();
   };
 
   const handleUserMoved = ({ guestId, position }: ConnectedUser) => {

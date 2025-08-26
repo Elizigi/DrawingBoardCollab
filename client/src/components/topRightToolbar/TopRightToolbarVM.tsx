@@ -23,11 +23,6 @@ const TopRightToolbarVM = () => {
   };
 
   useEffect(() => {
-    if (!onlineWindowOpen) return;
-
-    if (connected) setOnlineWindowOpen(false);
-  }, [onlineWindowOpen,connected]);
-  useEffect(() => {
     if (!hasInteracted) return;
 
     if (!isOnline) {

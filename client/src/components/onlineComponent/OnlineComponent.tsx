@@ -8,15 +8,14 @@ interface OnlineComponentProps {
   isHost: boolean;
   setConnected: (connected: boolean) => void;
   connected: boolean;
-  setOnlineWindowOpen:(windowOpen: boolean) => void;
+  setOnlineWindowOpen: (windowOpen: boolean) => void;
 }
 
 const OnlineComponent: FC<OnlineComponentProps> = ({
   selfId,
   isHost,
   setConnected,
-  connected,
-  setOnlineWindowOpen
+  setOnlineWindowOpen,
 }) => {
   const {
     handleModalOpen,
@@ -26,12 +25,14 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
     roomId,
     handleSubmit,
     connectedUsers,
-  } = OnlineComponentVM(selfId, isHost, setConnected,setOnlineWindowOpen);
+  } = OnlineComponentVM(selfId, isHost, setConnected, setOnlineWindowOpen);
   return (
     <div className={styles.onlineContainer}>
       <button className={styles.XBtn} onClick={() => handleModalOpen()}>
         X
       </button>
+      <h1> {isHost ? "Host" : "Join"}</h1>
+      <hr />
       <h2>name</h2>
       <input
         type="text"
