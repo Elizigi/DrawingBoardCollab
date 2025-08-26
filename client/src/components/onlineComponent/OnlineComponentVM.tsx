@@ -8,28 +8,16 @@ interface ConnectedUser {
   color: string;
 }
 
-const OnlineComponentVM = (selfId: string) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isHost, setIsHost] = useState(false);
+const OnlineComponentVM = (selfId: string,isHost:boolean,setConnected:(connected:boolean)=>void,setOnlineWindowOpen:(windowOpen:boolean)=>void) => {
   const [myName, setMyName] = useState("");
   const [roomId, setRoomId] = useState("");
 
-  const [connected, setConnected] = useState(false);
   const [connectedUsers, setConnectedUsers] = useState<ConnectedUser[]>([]);
   const myNameRef = useRef("");
 
-  const handleHost = () => {
-    setIsHost(true);
-    handleModalOpen();
-  };
-
-  const handleConnect = () => {
-    setIsHost(false);
-    handleModalOpen();
-  };
 
   const handleModalOpen = () => {
-    setIsModalOpen(!isModalOpen);
+    setOnlineWindowOpen(false);
   };
 
   const handleName = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,12 +33,10 @@ const OnlineComponentVM = (selfId: string) => {
   const handleSubmit = () => {
     if (isHost) {
       socket.emit("create-room", { name: myName });
-      handleModalOpen();
       return;
     }
     if (!roomId) return;
     socket.emit("join-room", { roomId, name: myName });
-    handleModalOpen();
   };
 
   const handleRoomCreated = (roomId: string) => {
@@ -157,9 +143,6 @@ const OnlineComponentVM = (selfId: string) => {
   }, []);
 
   return {
-    handleHost,
-    handleConnect,
-    isModalOpen,
     handleModalOpen,
     handleName,
     myName,
@@ -167,7 +150,6 @@ const OnlineComponentVM = (selfId: string) => {
     handleAddress,
     roomId,
     handleSubmit,
-    connected,
     connectedUsers,
   };
 };

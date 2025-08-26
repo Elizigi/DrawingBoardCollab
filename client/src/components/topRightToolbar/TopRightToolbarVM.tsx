@@ -4,6 +4,10 @@ import styles from "./TopRightToolbar.module.scss";
 const TopRightToolbarVM = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [onlineWindowOpen, setOnlineWindowOpen] = useState(false);
+  const [isHost, setIsHost] = useState(false);
+  const [connected, setConnected] = useState(false);
+
   const [isOnline, setIsOnline] = useState(false);
   const [selfId, setSelfId] = useState("");
   const [spinnerStyle, setSpinnerStyle] = useState("");
@@ -12,8 +16,20 @@ const TopRightToolbarVM = () => {
     setMenuOpen(!menuOpen);
   };
 
+  const handleConnectionWindow = (host = false) => {
+    setIsHost(host);
+    setHasInteracted(false);
+    setOnlineWindowOpen(!onlineWindowOpen);
+  };
+
+  useEffect(() => {
+    if (!onlineWindowOpen) return;
+
+    if (connected) setOnlineWindowOpen(false);
+  }, [onlineWindowOpen,connected]);
   useEffect(() => {
     if (!hasInteracted) return;
+
     if (!isOnline) {
       setSpinnerStyle(styles.spinLoad);
     } else if (isOnline) setSpinnerStyle(styles.spinFinish);
@@ -51,7 +67,13 @@ const TopRightToolbarVM = () => {
     spinnerStyle,
     selfId,
     menuOpen,
+    onlineWindowOpen,
+    isHost,
+    connected,
+    setOnlineWindowOpen,
+    setConnected,
     handleOnline,
+    handleConnectionWindow,
   };
 };
 

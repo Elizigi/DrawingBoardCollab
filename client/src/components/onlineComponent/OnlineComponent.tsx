@@ -2,81 +2,68 @@ import styles from "./onlineComponent.module.scss";
 import GuestMouse from "../guestMouse/GuestMouse";
 import OnlineComponentVM from "./OnlineComponentVM";
 import { FC } from "react";
+
 interface OnlineComponentProps {
   selfId: string;
+  isHost: boolean;
+  setConnected: (connected: boolean) => void;
+  connected: boolean;
+  setOnlineWindowOpen:(windowOpen: boolean) => void;
 }
-const OnlineComponent: FC<OnlineComponentProps> = ({ selfId }) => {
+
+const OnlineComponent: FC<OnlineComponentProps> = ({
+  selfId,
+  isHost,
+  setConnected,
+  connected,
+  setOnlineWindowOpen
+}) => {
   const {
-    handleHost,
-    handleConnect,
-    isModalOpen,
     handleModalOpen,
     handleName,
     myName,
-    isHost,
     handleAddress,
     roomId,
     handleSubmit,
-    connected,
     connectedUsers,
-  } = OnlineComponentVM(selfId);
+  } = OnlineComponentVM(selfId, isHost, setConnected,setOnlineWindowOpen);
   return (
     <div className={styles.onlineContainer}>
-      <div className={styles.onlineTitle}>
-        <h3>online:</h3>
-        <button className={styles.actionButton} onClick={handleHost}>
-          Host
-        </button>
-        <button className={styles.actionButton} onClick={handleConnect}>
-          Connect
-        </button>
-      </div>
-      {isModalOpen && (
+      <button className={styles.XBtn} onClick={() => handleModalOpen()}>
+        X
+      </button>
+      <h2>name</h2>
+      <input
+        type="text"
+        name="name"
+        onChange={handleName}
+        value={myName}
+        required={!myName.trim()}
+      />
+      {!isHost && (
         <>
-          <button
-            className={styles.backGround}
-            onClick={() => handleModalOpen()}
-          ></button>
-
-          <div className={styles.modal}>
-            <button className={styles.XBtn} onClick={() => handleModalOpen()}>
-              X
-            </button>
-            <h2>name</h2>
-            <input
-              type="text"
-              name="name"
-              onChange={handleName}
-              value={myName}
-              required={!myName.trim()}
-            />
-            {!isHost && (
-              <>
-                <h2>Connection Code</h2>
-                <input
-                  type="text"
-                  onChange={(e) => handleAddress(e)}
-                  value={roomId}
-                  required={!roomId.trim()}
-                />
-              </>
-            )}
-            <button onClick={() => handleSubmit()} className={styles.submitBtn}>
-              <h2> {isHost ? "Host" : "Connect"}</h2>
-            </button>
-          </div>
+          <h2>Connection Code</h2>
+          <input
+            type="text"
+            onChange={(e) => handleAddress(e)}
+            value={roomId}
+            required={!roomId.trim()}
+          />
         </>
       )}
-      <div className={styles.roomAddress}>
-        <h3>Room Code</h3>
-        <h4>{connected ? roomId : ""}</h4>
-      </div>
+      <button onClick={() => handleSubmit()} className={styles.submitBtn}>
+        <h2> {isHost ? "Host" : "Connect"}</h2>
+      </button>
+
       {connectedUsers.length > 0 && (
         <>
           <h3>Users in the Room:</h3>
           {connectedUsers.map((user) => (
             <button className={styles.guestIcon} key={user.guestId}>
-              <div className={styles.userColorIcon} style={{backgroundColor:user.color}}></div>
+              <div
+                className={styles.userColorIcon}
+                style={{ backgroundColor: user.color }}
+              ></div>
               {user.name}
             </button>
           ))}
