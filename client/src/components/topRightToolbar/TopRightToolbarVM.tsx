@@ -7,6 +7,8 @@ const TopRightToolbarVM = () => {
   const [onlineWindowOpen, setOnlineWindowOpen] = useState(false);
   const [isHost, setIsHost] = useState(false);
   const [connected, setConnected] = useState(false);
+  const [roomId, setRoomId] = useState("");
+  const [hideCode, SetHideCode] = useState(false);
 
   const [isOnline, setIsOnline] = useState(false);
   const [selfId, setSelfId] = useState("");
@@ -31,14 +33,22 @@ const TopRightToolbarVM = () => {
   }, [isOnline, hasInteracted]);
 
   const handleOnline = () => {
-    socket.connect();
-    setHasInteracted(true);
-    onlineStatus.isOnline = true;
+    if (!isOnline) {
+      socket.connect();
+      setHasInteracted(true);
+      onlineStatus.isOnline = true;
+    } else {
+      setMenuOpen(!menuOpen);
+    }
+  };
+  const handleLeaveRoom = () => {
+    socket.disconnect();
   };
 
   useEffect(() => {
     socket.on("disconnect", () => {
       setIsOnline(false);
+      setConnected(false);
       onlineStatus.isOnline = false;
       onlineStatus.inRoom = false;
       console.log("Disconnected");
@@ -58,17 +68,21 @@ const TopRightToolbarVM = () => {
     };
   }, []);
   return {
-    isOnline,
     spinnerStyle,
     selfId,
     menuOpen,
     onlineWindowOpen,
     isHost,
     connected,
+    roomId,
+    hideCode,
+    setRoomId,
     setOnlineWindowOpen,
     setConnected,
     handleOnline,
+    handleLeaveRoom,
     handleConnectionWindow,
+    SetHideCode,
   };
 };
 

@@ -9,6 +9,8 @@ interface OnlineComponentProps {
   setConnected: (connected: boolean) => void;
   connected: boolean;
   setOnlineWindowOpen: (windowOpen: boolean) => void;
+  roomId: string;
+  setRoomId: (roomId: string) => void;
 }
 
 const OnlineComponent: FC<OnlineComponentProps> = ({
@@ -16,16 +18,17 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
   isHost,
   setConnected,
   setOnlineWindowOpen,
+   roomId,
+  setRoomId,
 }) => {
   const {
     handleModalOpen,
     handleName,
     myName,
     handleAddress,
-    roomId,
     handleSubmit,
     connectedUsers,
-  } = OnlineComponentVM(selfId, isHost, setConnected, setOnlineWindowOpen);
+  } = OnlineComponentVM(selfId, isHost,roomId, setConnected, setOnlineWindowOpen,  setRoomId);
   return (
     <div className={styles.onlineContainer}>
       <button className={styles.XBtn} onClick={() => handleModalOpen()}>
@@ -43,7 +46,7 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
       />
       {!isHost && (
         <>
-          <h2>Connection Code</h2>
+          <h2>Room Code</h2>
           <input
             type="text"
             onChange={(e) => handleAddress(e)}

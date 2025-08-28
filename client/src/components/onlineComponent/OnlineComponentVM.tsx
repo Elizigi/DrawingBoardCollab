@@ -11,11 +11,12 @@ interface ConnectedUser {
 const OnlineComponentVM = (
   selfId: string,
   isHost: boolean,
+  roomId:string,
   setConnected: (connected: boolean) => void,
-  setOnlineWindowOpen: (windowOpen: boolean) => void
+  setOnlineWindowOpen: (windowOpen: boolean) => void,
+  setRoomId: (roomId: string) => void
 ) => {
   const [myName, setMyName] = useState("");
-  const [roomId, setRoomId] = useState("");
 
   const [connectedUsers, setConnectedUsers] = useState<ConnectedUser[]>([]);
   const myNameRef = useRef("");
@@ -23,7 +24,9 @@ const OnlineComponentVM = (
   const handleModalOpen = () => {
     setOnlineWindowOpen(false);
   };
-
+  useEffect(() => {
+    console.log(`users connected : ${JSON.stringify(connectedUsers)}`);
+  }, [connectedUsers.length]);
   const handleName = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
     setMyName(name);
