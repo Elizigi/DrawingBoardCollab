@@ -1,0 +1,23 @@
+.handleEnd {
+  all: unset;
+  cursor: pointer;
+  background-color: #2e2e38;
+  border-radius: 0 20px 20px 0;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  width: fit-content;
+  height: 100%;
+  border-left: 1px #1b1b20 solid;
+}
+.textCopied {
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: black;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+}

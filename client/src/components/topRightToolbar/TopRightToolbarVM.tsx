@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { onlineStatus, socket } from "../../Main";
 import styles from "./TopRightToolbar.module.scss";
+
 const TopRightToolbarVM = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
@@ -8,7 +9,7 @@ const TopRightToolbarVM = () => {
   const [isHost, setIsHost] = useState(false);
   const [connected, setConnected] = useState(false);
   const [roomId, setRoomId] = useState("");
-  const [hideCode, SetHideCode] = useState(false);
+  const [hideCode, setHideCode] = useState(false);
 
   const [isOnline, setIsOnline] = useState(false);
   const [selfId, setSelfId] = useState("");
@@ -49,6 +50,9 @@ const TopRightToolbarVM = () => {
     socket.on("disconnect", () => {
       setIsOnline(false);
       setConnected(false);
+      setMenuOpen(false);
+      setRoomId("");
+      setIsHost(false);
       onlineStatus.isOnline = false;
       onlineStatus.inRoom = false;
       console.log("Disconnected");
@@ -68,6 +72,7 @@ const TopRightToolbarVM = () => {
     };
   }, []);
   return {
+    isOnline,
     spinnerStyle,
     selfId,
     menuOpen,
@@ -82,7 +87,7 @@ const TopRightToolbarVM = () => {
     handleOnline,
     handleLeaveRoom,
     handleConnectionWindow,
-    SetHideCode,
+    setHideCode,
   };
 };
 

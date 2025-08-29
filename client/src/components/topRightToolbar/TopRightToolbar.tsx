@@ -1,8 +1,12 @@
 import styles from "./TopRightToolbar.module.scss";
 import OnlineComponent from "../onlineComponent/OnlineComponent";
 import TopRightToolbarVM from "./TopRightToolbarVM";
+import CopyText from "./copyText/CopyText";
+import LeaveButton from "./leaveButton/LeaveButton";
+import InternetIcon from "./internetIcon/InternetIcon";
 const TopRightToolbar = () => {
   const {
+    isOnline,
     spinnerStyle,
     selfId,
     menuOpen,
@@ -17,7 +21,7 @@ const TopRightToolbar = () => {
     handleOnline,
     handleLeaveRoom,
     handleConnectionWindow,
-    SetHideCode,
+    setHideCode,
   } = TopRightToolbarVM();
 
   return (
@@ -31,16 +35,10 @@ const TopRightToolbar = () => {
         </button>
       )}
       {menuOpen && connected && (
-        <button
-          onClick={() => handleLeaveRoom()}
-          className={`${styles.HostButton} ${styles.connectionButtons}`}
-          style={{ color: "red" }}
-        >
-          ⎋
-        </button>
+        <LeaveButton handleLeaveRoom={handleLeaveRoom} />
       )}
-      <button className={styles.topArrowMenu} onClick={handleOnline}>
-        <span className={spinnerStyle}>🌐</span>
+      <button className={styles.netMenu} onClick={handleOnline}>
+        <InternetIcon connected={isOnline} spinnerStyle={spinnerStyle} />
       </button>
       {menuOpen && !connected && (
         <button
@@ -52,15 +50,16 @@ const TopRightToolbar = () => {
       )}
       {menuOpen && connected && (
         <div className={styles.codeBar}>
-          <button className={styles.handle} onClick={()=>SetHideCode(!hideCode)}>
-            <h3>{hideCode?"◀":"▶"}</h3>
+          <button
+            className={styles.handle}
+            onClick={() => setHideCode(!hideCode)}
+          >
+            <h3>{hideCode ? "◀" : "▶"}</h3>
           </button>
-          <div hidden={hideCode}className={styles.roomIdBar}>
+          <div hidden={hideCode} className={styles.roomIdBar}>
             <h2>{roomId}</h2>
           </div>
-          <div className={styles.handleEnd}>
-            <h3>≣</h3>
-          </div>
+          <CopyText roomId={roomId} />
         </div>
       )}
       {onlineWindowOpen && (
