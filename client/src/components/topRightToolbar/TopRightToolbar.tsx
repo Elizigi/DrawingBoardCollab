@@ -15,6 +15,7 @@ const TopRightToolbar = () => {
     connected,
     roomId,
     hideCode,
+    error,
     setRoomId,
     setOnlineWindowOpen,
     setConnected,
@@ -37,7 +38,7 @@ const TopRightToolbar = () => {
       {menuOpen && connected && (
         <LeaveButton handleLeaveRoom={handleLeaveRoom} />
       )}
-      <button className={styles.netMenu} onClick={handleOnline}>
+      <button className={styles.netMenu} onClick={() => handleOnline()}>
         <InternetIcon connected={isOnline} spinnerStyle={spinnerStyle} />
       </button>
       {menuOpen && !connected && (
@@ -71,6 +72,7 @@ const TopRightToolbar = () => {
             isHost={isHost}
             selfId={selfId}
             roomId={roomId}
+            error={error}
             setRoomId={setRoomId}
           />
         </div>

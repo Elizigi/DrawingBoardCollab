@@ -12,7 +12,9 @@ const io = new SocketIOServer(server, {
 });
 
 app.use(cors());
+const roomsMap = new Map<string, any>();
 
+// add a room
 io.on("connection", (socket) => {
   console.log("User connected to server:", socket.id);
   socket.emit("user-id", socket.id);
@@ -20,6 +22,7 @@ io.on("connection", (socket) => {
   socket.on("create-room", ({ name }) => {
     const roomId = `room_${socket.id}`;
     socket.join(roomId);
+    roomsMap.set(roomId, null);
     socket.data.isHost = true;
     socket.data.name = name;
     socket.data.roomId = roomId;
@@ -44,6 +47,10 @@ io.on("connection", (socket) => {
   });
 
   socket.on("join-room", ({ roomId, name }) => {
+    if (!roomsMap.has(roomId)) {
+      socket.emit("room-not-found");
+      return;
+    }
     socket.join(roomId);
     socket.data.roomId = roomId;
     socket.data.name = name;
@@ -52,7 +59,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("send-name", ({ name, userId, guestId }) => {
-    console.log("name Sent:", name,userId);
+    console.log("name Sent:", name, userId);
     const username = name;
     socket.to(guestId).emit("add-name", { username, userId });
   });
@@ -61,8 +68,8 @@ io.on("connection", (socket) => {
     io.to(to).emit("request-state", { from: socket.id });
   });
 
-  socket.on("send-state", ({ to, strokes  }) => {
-    io.to(to).emit("init", strokes );
+  socket.on("send-state", ({ to, strokes }) => {
+    io.to(to).emit("init", strokes);
   });
 
   socket.on("disconnect", () => {

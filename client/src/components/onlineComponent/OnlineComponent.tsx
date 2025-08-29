@@ -11,6 +11,7 @@ interface OnlineComponentProps {
   setOnlineWindowOpen: (windowOpen: boolean) => void;
   roomId: string;
   setRoomId: (roomId: string) => void;
+  error:string;
 }
 
 const OnlineComponent: FC<OnlineComponentProps> = ({
@@ -18,8 +19,9 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
   isHost,
   setConnected,
   setOnlineWindowOpen,
-   roomId,
+  roomId,
   setRoomId,
+  error,
 }) => {
   const {
     handleModalOpen,
@@ -28,7 +30,14 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
     handleAddress,
     handleSubmit,
     connectedUsers,
-  } = OnlineComponentVM(selfId, isHost,roomId, setConnected, setOnlineWindowOpen,  setRoomId);
+  } = OnlineComponentVM(
+    selfId,
+    isHost,
+    roomId,
+    setConnected,
+    setOnlineWindowOpen,
+    setRoomId
+  );
   return (
     <div className={styles.onlineContainer}>
       <button className={styles.XBtn} onClick={() => handleModalOpen()}>
@@ -53,6 +62,7 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
             value={roomId}
             required={!roomId.trim()}
           />
+          <h2>{error}</h2>
         </>
       )}
       <button onClick={() => handleSubmit()} className={styles.submitBtn}>

@@ -10,6 +10,7 @@ const TopRightToolbarVM = () => {
   const [connected, setConnected] = useState(false);
   const [roomId, setRoomId] = useState("");
   const [hideCode, setHideCode] = useState(false);
+  const [error, setError] = useState("");
 
   const [isOnline, setIsOnline] = useState(false);
   const [selfId, setSelfId] = useState("");
@@ -30,7 +31,7 @@ const TopRightToolbarVM = () => {
 
     if (!isOnline) {
       setSpinnerStyle(styles.spinLoad);
-    } else if (isOnline) setSpinnerStyle(styles.spinFinish);
+    } else setSpinnerStyle(styles.spinFinish);
   }, [isOnline, hasInteracted]);
 
   const handleOnline = () => {
@@ -53,9 +54,14 @@ const TopRightToolbarVM = () => {
       setMenuOpen(false);
       setRoomId("");
       setIsHost(false);
+      setSpinnerStyle("");
+      setError("");
       onlineStatus.isOnline = false;
       onlineStatus.inRoom = false;
       console.log("Disconnected");
+    });
+    socket.on("room-not-found", () => {
+      setError("Room not found");
     });
 
     socket.on("connect", () => {
@@ -81,6 +87,7 @@ const TopRightToolbarVM = () => {
     connected,
     roomId,
     hideCode,
+    error,
     setRoomId,
     setOnlineWindowOpen,
     setConnected,
