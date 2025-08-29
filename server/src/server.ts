@@ -55,7 +55,9 @@ io.on("connection", (socket) => {
     socket.data.roomId = roomId;
     socket.data.name = name;
     socket.emit("joined-room", { roomId });
-    socket.to(roomId).emit("user-joined", { name, guestId: socket.id });
+    socket.broadcast
+      .to(roomId)
+      .emit("user-joined", { name, guestId: socket.id });
   });
 
   socket.on("send-name", ({ name, userId, guestId }) => {

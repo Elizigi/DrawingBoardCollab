@@ -11,7 +11,7 @@ interface ConnectedUser {
 const OnlineComponentVM = (
   selfId: string,
   isHost: boolean,
-  roomId:string,
+  roomId: string,
   setConnected: (connected: boolean) => void,
   setOnlineWindowOpen: (windowOpen: boolean) => void,
   setRoomId: (roomId: string) => void
@@ -92,7 +92,7 @@ const OnlineComponentVM = (
   }) => {
     console.log(username, "was in the room");
     setConnectedUsers((prev) => {
-      const nameAlreadyIn = prev.find((user) => user.name === username);
+      const nameAlreadyIn = prev.find((user) => user.guestId === userId);
       if (!nameAlreadyIn) {
         return [
           ...prev,
