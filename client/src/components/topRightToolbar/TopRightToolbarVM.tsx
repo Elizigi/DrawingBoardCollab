@@ -1,6 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { onlineStatus, socket } from "../../Main";
 import styles from "./TopRightToolbar.module.scss";
+
+interface ConnectedUser {
+  name: string;
+  position: { x: number; y: number };
+  guestId: string;
+  color: string;
+}
 
 const TopRightToolbarVM = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -15,11 +22,88 @@ const TopRightToolbarVM = () => {
   const [isOnline, setIsOnline] = useState(false);
   const [selfId, setSelfId] = useState("");
   const [spinnerStyle, setSpinnerStyle] = useState("");
+  const [connectedUsers, setConnectedUsers] = useState<ConnectedUser[]>([]);
 
+  const myNameRef = useRef<string>("");
+
+  const handleUserJoined = ({
+    name,
+    guestId,
+  }: {
+    name: string;
+    guestId: string;
+  }) => {
+    console.log(guestId, "Has joined");
+    setConnectedUsers((prev) => [
+      ...prev,
+      { name, position: { x: 0, y: 0 }, guestId, color: getRandomColor() },
+    ]);
+    socket.emit("send-name", {
+      name: myNameRef.current,
+      userId: selfId,
+      guestId,
+    });
+  };
+
+  const handleAddName = ({
+    username,
+    userId,
+  }: {
+    username: string;
+    userId: string;
+  }) => {
+    console.log(username, "was in the room");
+    setConnectedUsers((prev) => {
+      const nameAlreadyIn = prev.find((user) => user.guestId === userId);
+      if (!nameAlreadyIn) {
+        return [
+          ...prev,
+          {
+            name: username,
+            position: { x: 0, y: 0 },
+            guestId: userId,
+            color: getRandomColor(),
+          },
+        ];
+      }
+      return prev;
+    });
+  };
+  const getRandomColor = (): string => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+
+  const handleUserMoved = ({ guestId, position }: ConnectedUser) => {
+    setConnectedUsers((prevUsers) =>
+      prevUsers.map((user) =>
+        user.guestId === guestId ? { ...user, position } : user
+      )
+    );
+    connectedUsers.forEach((user) => {
+      console.log(user.name + " : " + JSON.stringify(user.position));
+    });
+  };
   const handleMenuOpen = () => {
     setMenuOpen(!menuOpen);
   };
+  useEffect(() => {
+    socket.on("user-joined", handleUserJoined);
+    socket.on("add-name", handleAddName);
+    socket.on("joined-room", handleJoinedRoom);
+    socket.on("user-moved", handleUserMoved);
 
+    return () => {
+      socket.off("user-joined", handleUserJoined);
+      socket.off("add-name", handleAddName);
+      socket.off("joined-room", handleJoinedRoom);
+      socket.off("user-moved", handleUserMoved);
+    };
+  }, []);
   const handleConnectionWindow = (host = false) => {
     setIsHost(host);
     setHasInteracted(false);
@@ -47,6 +131,15 @@ const TopRightToolbarVM = () => {
     socket.disconnect();
   };
 
+  const handleJoinedRoom = ({ roomId }: { roomId: string }) => {
+    setRoomId(roomId);
+    onlineStatus.inRoom = true;
+
+    console.log("joined:", roomId);
+    document.dispatchEvent(new CustomEvent("clearCanvas"));
+    socket.emit("request-state", { to: roomId });
+    setConnected(true);
+  };
   useEffect(() => {
     socket.on("disconnect", () => {
       setIsOnline(false);
@@ -77,6 +170,7 @@ const TopRightToolbarVM = () => {
       socket.off("disconnect");
     };
   }, []);
+
   return {
     isOnline,
     spinnerStyle,
@@ -88,6 +182,8 @@ const TopRightToolbarVM = () => {
     roomId,
     hideCode,
     error,
+    connectedUsers,
+    myNameRef,
     setRoomId,
     setOnlineWindowOpen,
     setConnected,

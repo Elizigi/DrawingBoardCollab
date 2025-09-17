@@ -4,6 +4,7 @@ import TopRightToolbarVM from "./TopRightToolbarVM";
 import CopyText from "./copyText/CopyText";
 import LeaveButton from "./leaveButton/LeaveButton";
 import InternetIcon from "./internetIcon/InternetIcon";
+import GuestMouse from "../guestMouse/GuestMouse";
 const TopRightToolbar = () => {
   const {
     isOnline,
@@ -16,6 +17,8 @@ const TopRightToolbar = () => {
     roomId,
     hideCode,
     error,
+    connectedUsers,
+    myNameRef,
     setRoomId,
     setOnlineWindowOpen,
     setConnected,
@@ -63,9 +66,10 @@ const TopRightToolbar = () => {
           <CopyText roomId={roomId} />
         </div>
       )}
-      {onlineWindowOpen && (
-        <div className={styles.subMenu}>
+      {onlineWindowOpen&&
+        <div className={styles.subMenu} >
           <OnlineComponent
+          myNameRef={myNameRef}
             setOnlineWindowOpen={setOnlineWindowOpen}
             setConnected={setConnected}
             connected={connected}
@@ -76,7 +80,11 @@ const TopRightToolbar = () => {
             setRoomId={setRoomId}
           />
         </div>
-      )}
+      }
+        {connectedUsers.map((user) => (
+        <GuestMouse key={user.name} {...user} />
+      ))}
+    
     </div>
   );
 };

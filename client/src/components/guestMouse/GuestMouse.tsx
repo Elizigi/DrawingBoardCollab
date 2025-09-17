@@ -4,9 +4,8 @@ interface ConnectedUser {
   position: { x: number; y: number };
 }
 const GuestMouse = ({ name, position }: ConnectedUser) => {
-    const canvas = document.querySelector("canvas")!;
+  const canvas = document.querySelector("canvas")!;
   const rect = canvas.getBoundingClientRect();
-
   const top = rect.top + (position.y / 100) * rect.height;
   const left = rect.left + (position.x / 100) * rect.width;
   return (

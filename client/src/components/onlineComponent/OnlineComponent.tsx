@@ -1,17 +1,17 @@
 import styles from "./onlineComponent.module.scss";
-import GuestMouse from "../guestMouse/GuestMouse";
 import OnlineComponentVM from "./OnlineComponentVM";
-import { FC } from "react";
+import { FC, RefObject } from "react";
 
 interface OnlineComponentProps {
   selfId: string;
   isHost: boolean;
   setConnected: (connected: boolean) => void;
   connected: boolean;
+  myNameRef:RefObject<string>;
   setOnlineWindowOpen: (windowOpen: boolean) => void;
   roomId: string;
   setRoomId: (roomId: string) => void;
-  error:string;
+  error: string;
 }
 
 const OnlineComponent: FC<OnlineComponentProps> = ({
@@ -20,27 +20,28 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
   setConnected,
   setOnlineWindowOpen,
   roomId,
+  myNameRef,
   setRoomId,
   error,
 }) => {
   const {
-    handleModalOpen,
     handleName,
     myName,
     handleAddress,
     handleSubmit,
-    connectedUsers,
+    
   } = OnlineComponentVM(
     selfId,
     isHost,
     roomId,
+    myNameRef,
     setConnected,
     setOnlineWindowOpen,
     setRoomId
   );
   return (
     <div className={styles.onlineContainer}>
-      <button className={styles.XBtn} onClick={() => handleModalOpen()}>
+      <button className={styles.XBtn} onClick={() => {}}>
         X
       </button>
       <h1> {isHost ? "Host" : "Join"}</h1>
@@ -69,7 +70,7 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
         <h2> {isHost ? "Host" : "Connect"}</h2>
       </button>
 
-      {connectedUsers.length > 0 && (
+      {/* {connectedUsers.length > 0 && (
         <>
           <h3>Users in the Room:</h3>
           {connectedUsers.map((user) => (
@@ -82,10 +83,7 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
             </button>
           ))}
         </>
-      )}
-      {connectedUsers.map((user) => (
-        <GuestMouse key={user.name} {...user} />
-      ))}
+      )} */}
     </div>
   );
 };
