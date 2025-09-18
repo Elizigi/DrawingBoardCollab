@@ -6,7 +6,6 @@ $bg-dark: #2e2e38;
 .topRightToolContainer {
   position: fixed;
   width: fit-content;
-  z-index: 9999;
   pointer-events: none;
   display: flex;
   flex-direction: column;
@@ -14,6 +13,8 @@ $bg-dark: #2e2e38;
   gap: 0.5rem;
   right: 4rem;
   top: 5rem;
+  z-index: 99999;
+
   .HostButton {
     top: -3rem;
   }
@@ -21,6 +22,8 @@ $bg-dark: #2e2e38;
     top: 4rem;
   }
   .connectionButtons {
+    z-index: 999999;
+
     border: $border-color 3px solid;
     background-color: $bg-light;
     color: white;
@@ -33,7 +36,6 @@ $bg-dark: #2e2e38;
     transform: translateX(-50%);
     border-radius: 10px;
     animation: moveToCenter 0.3s ease-in reverse;
-    z-index: 4;
     cursor: pointer;
   }
 
@@ -52,7 +54,6 @@ $bg-dark: #2e2e38;
     z-index: 9999;
     margin: 0;
     padding: 0;
-    
   }
 
   .subMenu {
@@ -96,6 +97,7 @@ $bg-dark: #2e2e38;
   flex-direction: row;
   color: white;
   pointer-events: auto;
+  z-index: 9999;
 
   .roomIdBar {
     border: none;
@@ -116,6 +118,8 @@ $bg-dark: #2e2e38;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
     height: 100%;
+    z-index: 9999;
+
     border-right: 1px #1b1b20 solid;
   }
 }

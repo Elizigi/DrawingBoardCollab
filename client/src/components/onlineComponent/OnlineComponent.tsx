@@ -3,11 +3,10 @@ import OnlineComponentVM from "./OnlineComponentVM";
 import { FC, RefObject } from "react";
 
 interface OnlineComponentProps {
-  selfId: string;
   isHost: boolean;
   setConnected: (connected: boolean) => void;
-  connected: boolean;
-  myNameRef:RefObject<string>;
+  myNameRef: RefObject<string>;
+  connected:boolean;
   setOnlineWindowOpen: (windowOpen: boolean) => void;
   roomId: string;
   setRoomId: (roomId: string) => void;
@@ -15,33 +14,28 @@ interface OnlineComponentProps {
 }
 
 const OnlineComponent: FC<OnlineComponentProps> = ({
-  selfId,
   isHost,
   setConnected,
   setOnlineWindowOpen,
   roomId,
+  connected,
   myNameRef,
   setRoomId,
   error,
 }) => {
-  const {
-    handleName,
-    myName,
-    handleAddress,
-    handleSubmit,
-    
-  } = OnlineComponentVM(
-    selfId,
-    isHost,
-    roomId,
-    myNameRef,
-    setConnected,
-    setOnlineWindowOpen,
-    setRoomId
-  );
+  const { handleName, myName, handleAddress, handleModalOpen, handleSubmit } =
+    OnlineComponentVM(
+      isHost,
+      roomId,
+      myNameRef,
+      connected,
+      setConnected,
+      setOnlineWindowOpen,
+      setRoomId
+    );
   return (
     <div className={styles.onlineContainer}>
-      <button className={styles.XBtn} onClick={() => {}}>
+      <button className={styles.XBtn} onClick={() => handleModalOpen()}>
         X
       </button>
       <h1> {isHost ? "Host" : "Join"}</h1>

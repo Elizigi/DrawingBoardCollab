@@ -20,7 +20,7 @@ const TopRightToolbarVM = () => {
   const [error, setError] = useState("");
 
   const [isOnline, setIsOnline] = useState(false);
-  const [selfId, setSelfId] = useState("");
+  const [selfId, setSelfId] = useState(socket.id);
   const [spinnerStyle, setSpinnerStyle] = useState("");
   const [connectedUsers, setConnectedUsers] = useState<ConnectedUser[]>([]);
 
@@ -40,7 +40,7 @@ const TopRightToolbarVM = () => {
     ]);
     socket.emit("send-name", {
       name: myNameRef.current,
-      userId: selfId,
+      userId: socket.id,
       guestId,
     });
   };
@@ -84,10 +84,8 @@ const TopRightToolbarVM = () => {
         user.guestId === guestId ? { ...user, position } : user
       )
     );
-    connectedUsers.forEach((user) => {
-      console.log(user.name + " : " + JSON.stringify(user.position));
-    });
   };
+
   const handleMenuOpen = () => {
     setMenuOpen(!menuOpen);
   };
@@ -149,6 +147,7 @@ const TopRightToolbarVM = () => {
       setIsHost(false);
       setSpinnerStyle("");
       setError("");
+      setConnectedUsers([])
       onlineStatus.isOnline = false;
       onlineStatus.inRoom = false;
       console.log("Disconnected");
@@ -168,6 +167,7 @@ const TopRightToolbarVM = () => {
     return () => {
       socket.off("connect");
       socket.off("disconnect");
+      socket.off("user-id");
     };
   }, []);
 
@@ -178,12 +178,12 @@ const TopRightToolbarVM = () => {
     menuOpen,
     onlineWindowOpen,
     isHost,
-    connected,
     roomId,
     hideCode,
     error,
     connectedUsers,
     myNameRef,
+    connected,
     setRoomId,
     setOnlineWindowOpen,
     setConnected,

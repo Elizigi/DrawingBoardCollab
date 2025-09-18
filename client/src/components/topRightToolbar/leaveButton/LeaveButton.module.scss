@@ -9,6 +9,8 @@
   pointer-events: auto;
   background-color: transparent;
   border: none;
+  z-index: 9999;
+
   h2 {
     cursor: pointer;
     font-size: 4rem;

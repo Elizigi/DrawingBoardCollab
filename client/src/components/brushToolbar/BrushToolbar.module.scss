@@ -2,7 +2,7 @@
   position: absolute;
   top: 4rem;
   left: 2rem;
-
+  z-index: 999999;
   .blackBorderWrapper {
     position: relative;
     border: black 1px solid;
@@ -78,7 +78,7 @@
       background-color: #232323;
     }
   }
-  .brushSizeInput{
+  .brushSizeInput {
     position: absolute;
     top: 2rem;
     left: 4rem;

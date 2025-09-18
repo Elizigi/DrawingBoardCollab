@@ -9,16 +9,15 @@ const TopRightToolbar = () => {
   const {
     isOnline,
     spinnerStyle,
-    selfId,
     menuOpen,
     onlineWindowOpen,
     isHost,
-    connected,
     roomId,
     hideCode,
     error,
     connectedUsers,
     myNameRef,
+    connected,
     setRoomId,
     setOnlineWindowOpen,
     setConnected,
@@ -74,7 +73,6 @@ const TopRightToolbar = () => {
             setConnected={setConnected}
             connected={connected}
             isHost={isHost}
-            selfId={selfId}
             roomId={roomId}
             error={error}
             setRoomId={setRoomId}

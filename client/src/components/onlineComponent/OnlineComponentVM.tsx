@@ -2,10 +2,10 @@ import React, { RefObject, useEffect, useState } from "react";
 import { onlineStatus, socket } from "../../Main";
 
 const OnlineComponentVM = (
-  selfId: string,
   isHost: boolean,
   roomId: string,
   myNameRef: RefObject<string>,
+  connected: boolean,
   setConnected: (connected: boolean) => void,
   setOnlineWindowOpen: (windowOpen: boolean) => void,
   setRoomId: (roomId: string) => void
@@ -24,7 +24,10 @@ const OnlineComponentVM = (
     const id = e.target.value;
     setRoomId(id);
   };
-
+  useEffect(() => {
+    if (connected) handleModalOpen();
+  }, [connected]);
+  
   const handleSubmit = () => {
     if (isHost) {
       socket.emit("create-room", { name: myName });

@@ -2,12 +2,20 @@ import styles from "./GuestMouse.module.scss";
 interface ConnectedUser {
   name: string;
   position: { x: number; y: number };
+  color:string;
 }
-const GuestMouse = ({ name, position }: ConnectedUser) => {
+const GuestMouse = ({ name, position,color }: ConnectedUser) => {
   const canvas = document.querySelector("canvas")!;
   const rect = canvas.getBoundingClientRect();
   const top = rect.top + (position.y / 100) * rect.height;
   const left = rect.left + (position.x / 100) * rect.width;
+
+  const hexToRgba = (hex: string, alpha: number): string => {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
   return (
     <div
       className={styles.guestMouseContainer}
@@ -16,7 +24,7 @@ const GuestMouse = ({ name, position }: ConnectedUser) => {
         left: `${left}px`,
       }}
     >
-      <h2 className={styles.nameOfGuest}>{name}</h2>
+      <h2 className={styles.nameOfGuest} style={{backgroundColor:hexToRgba(color, 0.3)}}>{name}</h2>
       <img src="/guestCursor.svg" alt="cursor" />
     </div>
   );
