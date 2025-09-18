@@ -30,7 +30,9 @@ type BrushState = {
 
   layers: LayerMeta[];
   activeLayerId: string;
+
   addLayer: (name: string) => void;
+  setLayers: (layers: LayerMeta[]) => void;
   setActiveLayer: (id: string) => void;
   toggleLayer: (id: string) => void;
 
@@ -70,6 +72,23 @@ export const useBrushStore = create<BrushState>((set, _) => ({
     }),
   clearStrokes: () => set({ strokes: [] }),
 
+  setLayers: (layers) => {
+    set((state) => {
+      // Check if current activeLayerId exists in new layers
+      const activeLayerExists = layers.some(
+        (layer) => layer.id === state.activeLayerId
+      );
+
+      return {
+        layers: layers,
+        activeLayerId: activeLayerExists
+          ? state.activeLayerId
+          : layers.length > 0
+            ? layers[0].id
+            : state.activeLayerId,
+      };
+    });
+  },
   addLayer: (name) => {
     const id = crypto.randomUUID();
     set((state) => ({

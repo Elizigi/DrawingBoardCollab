@@ -1,5 +1,6 @@
 import TopRightToolbar from "../topRightToolbar/TopRightToolbar";
 import BrushToolbar from "../brushToolbar/BrushToolbar";
+import LayersContainer from "../layerContainer/LayerContainer";
 
 // <div>
 //   <div className={styles.toolbar}>
@@ -50,6 +51,8 @@ export const Toolbar = () => {
   return (
     <div>
       <BrushToolbar />
+      <LayersContainer />
+
       <TopRightToolbar />
     </div>
   );

@@ -65,10 +65,10 @@ const TopRightToolbar = () => {
           <CopyText roomId={roomId} />
         </div>
       )}
-      {onlineWindowOpen&&
-        <div className={styles.subMenu} >
+      {onlineWindowOpen && (
+        <div className={styles.subMenu}>
           <OnlineComponent
-          myNameRef={myNameRef}
+            myNameRef={myNameRef}
             setOnlineWindowOpen={setOnlineWindowOpen}
             setConnected={setConnected}
             connected={connected}
@@ -78,11 +78,10 @@ const TopRightToolbar = () => {
             setRoomId={setRoomId}
           />
         </div>
-      }
-        {connectedUsers.map((user) => (
+      )}
+      {connectedUsers.map((user) => (
         <GuestMouse key={user.name} {...user} />
       ))}
-    
     </div>
   );
 };

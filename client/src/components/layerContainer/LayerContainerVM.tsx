@@ -10,6 +10,7 @@ const LayerContainerVM = () => {
   const activeLayerId = useBrushStore((state) => state.activeLayerId);
 
   const [newLayerName, setNewLayerName] = useState("");
+  const [layerNameInputOpen, setLayerNameInputOpen] = useState(false);
 
   const updateText = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewLayerName(e.target.value);
@@ -17,6 +18,7 @@ const LayerContainerVM = () => {
   const addNewLayer = () => {
     if (newLayerName.trim().length < 2) return;
     addLayer(newLayerName);
+     setLayerNameInputOpen(false);
     setNewLayerName("");
   };
   const changeVisible = (id: string) => {
@@ -25,10 +27,16 @@ const LayerContainerVM = () => {
   const changeLayer = (id: string) => {
     setActiveLayer(id);
   };
+  const handlePlusBtnClick=()=>{
+    if(!layerNameInputOpen)return setLayerNameInputOpen(true);
+    addNewLayer();
+  }
   return {
     newLayerName,
     allLayers,
     activeLayerId,
+    layerNameInputOpen,
+    handlePlusBtnClick,
     updateText,
     changeLayer,
     changeVisible,

@@ -46,20 +46,24 @@ io.on("connection", (socket) => {
     socket.broadcast.to(roomId).emit("user-moved", { guestId, position });
   });
 
- socket.on("join-room", ({ roomId, name }) => {
-  if (!roomsMap.has(roomId)) {
-    socket.emit("room-not-found");
-    return;
-  }
-  socket.join(roomId);
-  socket.data.roomId = roomId;
-  socket.data.name = name;
+  socket.on("join-room", ({ roomId, name }) => {
+    if (!roomsMap.has(roomId)) {
+      socket.emit("room-not-found");
+      return;
+    }
+    socket.join(roomId);
+    socket.data.roomId = roomId;
+    socket.data.name = name;
 
-  console.log("aaaaaaa", roomId, "users now:", [...io.sockets.adapter.rooms.get(roomId) || []]);
+    console.log("aaaaaaa", roomId, "users now:", [
+      ...(io.sockets.adapter.rooms.get(roomId) || []),
+    ]);
 
-  socket.emit("joined-room", { roomId });
-  socket.broadcast.to(roomId).emit("user-joined", { name, guestId: socket.id });
-});
+    socket.emit("joined-room", { roomId });
+    socket.broadcast
+      .to(roomId)
+      .emit("user-joined", { name, guestId: socket.id });
+  });
 
   socket.on("send-name", ({ name, userId, guestId }) => {
     console.log("name Sent:", name, userId);
@@ -71,8 +75,10 @@ io.on("connection", (socket) => {
     io.to(to).emit("request-state", { from: socket.id });
   });
 
-  socket.on("send-state", ({ to, strokes }) => {
-    io.to(to).emit("init", strokes);
+  socket.on("send-state", ({ to, strokes, layers }) => {
+        if(socket.id===to) return;
+
+    io.to(to).emit("init", { strokes, layers });
   });
 
   socket.on("disconnect", () => {

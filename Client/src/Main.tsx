@@ -23,7 +23,10 @@ let lastStrokeTime = 0;
 let lastPoint: { x: number; y: number } | null = null;
 const STROKE_THROTTLE = 16;
 const canvasSize = { width: 1920, height: 1080 };
-export const onlineStatus = { isOnline: false, inRoom: false };
+export const onlineStatus = {
+  isOnline: false,
+  inRoom: false,
+};
 
 (async () => {
   const app = new Application();
@@ -168,6 +171,7 @@ export const onlineStatus = { isOnline: false, inRoom: false };
 
     addPoint(x, y);
   });
+
   document.addEventListener("clearCanvas", () => {
     console.log("clearingCanvas");
     for (const layerId of Object.keys(layersMap)) {
@@ -232,6 +236,7 @@ export const onlineStatus = { isOnline: false, inRoom: false };
   }
   socket.on("request-state", ({ from }) => {
     const allStrokes = useBrushStore.getState().strokes;
+    const layers = useBrushStore.getState().layers;
 
     const strokesByLayer: Record<string, Stroke[]> = {};
     allStrokes.forEach((stroke) => {
@@ -244,23 +249,37 @@ export const onlineStatus = { isOnline: false, inRoom: false };
     socket.emit("send-state", {
       to: from,
       strokes: strokesByLayer,
+      layers: layers,
     });
   });
-  socket.on("init", (strokes) => {
-    console.log("Received init event", strokes);
-    if (!strokes) {
-      console.warn("Received init event with no stroke data");
+  socket.on("init", (data) => {
+    console.log("Received init event", data);
+    if (!data) {
+      console.warn("Received init event with no data");
       return;
     }
+    const { strokes, layers } = data;
 
-    for (const [layerId, strokeArray] of Object.entries(strokes)) {
-      if (!layersMap[layerId]) {
-        createPixiLayer(layerId);
-      }
-      if (Array.isArray(strokeArray)) {
-        strokeArray.forEach((stroke) => {
-          drawStroke({ ...stroke, final: true }, false);
-        });
+    if (layers && Array.isArray(layers)) {
+      useBrushStore.getState().setLayers(layers);
+
+      layers.forEach((layer) => {
+        if (!layersMap[layer.id]) {
+          createPixiLayer(layer.id);
+        }
+      });
+    }
+
+    if (strokes) {
+      for (const [layerId, strokeArray] of Object.entries(strokes)) {
+        if (!layersMap[layerId]) {
+          createPixiLayer(layerId);
+        }
+        if (Array.isArray(strokeArray)) {
+          strokeArray.forEach((stroke) => {
+            drawStroke({ ...stroke, final: true }, false);
+          });
+        }
       }
     }
   });
