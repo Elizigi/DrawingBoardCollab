@@ -77,13 +77,16 @@ export const onlineStatus = {
   layers.forEach((l) => createPixiLayer(l.id));
 
   useBrushStore.subscribe((state) => {
-    state.layers.forEach((layer, idx) => {
-      const sprite = layersContainer.children[idx] as Sprite | undefined;
-      if (sprite) {
-        sprite.visible = layer.visible;
-      }
-    });
+  state.layers.forEach((layer) => {
+    const sprite = layersContainer.children.find(
+      (child) => (child as Sprite).texture === layersMap[layer.id]
+    ) as Sprite | undefined;
+    
+    if (sprite) {
+      sprite.visible = layer.visible;
+    }
   });
+});
   useBrushStore.subscribe((state, prev) => {
     if (state.layers.length > prev.layers.length) {
       const newLayer = state.layers[state.layers.length - 1];

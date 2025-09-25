@@ -73,19 +73,11 @@ export const useBrushStore = create<BrushState>((set, _) => ({
   clearStrokes: () => set({ strokes: [] }),
 
   setLayers: (layers) => {
-    set((state) => {
-      // Check if current activeLayerId exists in new layers
-      const activeLayerExists = layers.some(
-        (layer) => layer.id === state.activeLayerId
-      );
+    set(() => {
 
       return {
         layers: layers,
-        activeLayerId: activeLayerExists
-          ? state.activeLayerId
-          : layers.length > 0
-            ? layers[0].id
-            : state.activeLayerId,
+        activeLayerId:  layers[0].id
       };
     });
   },
