@@ -27,7 +27,7 @@ const OnlineComponentVM = (
   useEffect(() => {
     if (connected) handleModalOpen();
   }, [connected]);
-  
+
   const handleSubmit = () => {
     if (isHost) {
       socket.emit("create-room", { name: myName });
@@ -41,6 +41,8 @@ const OnlineComponentVM = (
     console.log("Room ID to share:", roomId);
     setRoomId(roomId);
     onlineStatus.inRoom = true;
+    onlineStatus.isAdmin = true;
+
     handleModalOpen();
 
     setConnected(true);

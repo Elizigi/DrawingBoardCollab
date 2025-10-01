@@ -96,7 +96,13 @@ $active-color: #6b7280;
       }
     }
   }
-
+  .deleteButton {
+    all: unset;
+    user-select: none;
+    &:hover {
+      scale: 1.1;
+    }
+  }
   .layer {
     all: unset;
     background-color: $bg-light;

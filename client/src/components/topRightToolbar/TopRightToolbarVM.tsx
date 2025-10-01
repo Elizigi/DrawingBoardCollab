@@ -147,9 +147,10 @@ const TopRightToolbarVM = () => {
       setIsHost(false);
       setSpinnerStyle("");
       setError("");
-      setConnectedUsers([])
+      setConnectedUsers([]);
       onlineStatus.isOnline = false;
       onlineStatus.inRoom = false;
+      onlineStatus.isAdmin = false;
       console.log("Disconnected");
     });
     socket.on("room-not-found", () => {

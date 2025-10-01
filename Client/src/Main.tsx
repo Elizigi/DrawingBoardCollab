@@ -26,6 +26,7 @@ const canvasSize = { width: 1920, height: 1080 };
 export const onlineStatus = {
   isOnline: false,
   inRoom: false,
+  isAdmin:false,
 };
 
 (async () => {

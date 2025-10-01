@@ -37,6 +37,12 @@ io.on("connection", (socket) => {
       .emit("draw-progress", { ...stroke, senderId: socket.id });
   });
 
+  socket.on("delete-layer", ({ layerId }) => {
+    const roomId = socket.data.roomId;
+    const hostId = roomsMap.get(roomId);
+    if (socket.id !== hostId) return io.to(socket.id).emit("no-permission");
+    io.to(roomId).emit("remove-layer", { layerId });
+  });
   socket.on("user-move", ({ position }) => {
     const roomId = socket.data.roomId;
     const guestId = socket.id;
@@ -58,16 +64,17 @@ io.on("connection", (socket) => {
     console.log("aaaaaaa", roomId, "users now:", [
       ...(io.sockets.adapter.rooms.get(roomId) || []),
     ]);
-    socket.on("new-layer", ({ layerId, layerName }) => {
-      const roomId = socket.data.roomId;
-      socket.broadcast.to(roomId).emit("add-layer", { layerId, layerName });
-    });
+
     socket.emit("joined-room", { roomId });
     socket.broadcast
       .to(roomId)
       .emit("user-joined", { name, guestId: socket.id });
   });
 
+  socket.on("new-layer", ({ layerId, layerName }) => {
+    const roomId = socket.data.roomId;
+    socket.broadcast.to(roomId).emit("add-layer", { layerId, layerName });
+  });
   socket.on("send-name", ({ name, userId, guestId }) => {
     console.log("name Sent:", name, userId);
     const username = name;

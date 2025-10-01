@@ -30,8 +30,10 @@ type BrushState = {
 
   layers: LayerMeta[];
   activeLayerId: string;
-  addLayer: (name: string,id:string) => void;
-  
+  addLayer: (name: string, id: string) => void;
+
+  removeLayer: (id: string) => void;
+
   setLayers: (layers: LayerMeta[]) => void;
   setActiveLayer: (id: string) => void;
   toggleLayer: (id: string) => void;
@@ -80,13 +82,26 @@ export const useBrushStore = create<BrushState>((set, _) => ({
       };
     });
   },
-  addLayer: (name,id) => {
+  addLayer: (name, id) => {
     set((state) => ({
       layers: [...state.layers, { id, name, visible: true }],
       activeLayerId: state.layers.length === 0 ? id : state.activeLayerId,
     }));
   },
 
+  removeLayer: (id) => {
+    set((state) => {
+      if (state.layers.length <= 1) return state;
+      const newLayers = state.layers.filter((layer) => layer.id !== id);
+
+      return {
+        layers: newLayers,
+        strokes: state.strokes.filter((stroke) => stroke.layerId !== id),
+        activeLayerId:
+          state.activeLayerId === id ? newLayers[0]?.id : state.activeLayerId,
+      };
+    });
+  },
 
   setActiveLayer: (id) => set({ activeLayerId: id }),
 

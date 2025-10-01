@@ -1,3 +1,4 @@
+import { onlineStatus } from "../../Main";
 import LayerContainerVM from "./LayerContainerVM";
 import styles from "./LayersContainer.module.scss";
 
@@ -7,6 +8,7 @@ const LayersContainer = () => {
     allLayers,
     activeLayerId,
     layerNameInputOpen,
+    deleteLayer,
     handlePlusBtnClick,
     updateText,
     changeLayer,
@@ -38,20 +40,32 @@ const LayersContainer = () => {
               key={layer.id}
               className={`${styles.layer} ${layer.id === activeLayerId ? styles.backGReen : ""}`}
             >
-              <input type="checkbox"
-              checked={true}
+              <input
+                type="checkbox"
+                checked={true}
                 className={`${styles.visibilityIcon} ${!layer.visible ? styles.hidden : ""}`}
                 onChange={(e) => {
                   e.stopPropagation();
                   changeVisible(layer.id);
                 }}
-               />
+              />
 
               <div className={styles.layerBox}></div>
               <div className={styles.layerNameContainer}>
                 <h5 className={styles.layerName}>{layer.name}</h5>
               </div>
-              <div></div>
+              {(!onlineStatus.inRoom || onlineStatus.isAdmin) &&
+                allLayers.length > 1 && (
+                  <input
+                    type="button"
+                    value="❌"
+                    className={styles.deleteButton}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteLayer(layer.id);
+                    }}
+                  />
+                )}
             </button>
           ))}
       </div>

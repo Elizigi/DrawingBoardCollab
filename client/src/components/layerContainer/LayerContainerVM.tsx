@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useBrushStore } from "../../zustand/useBrushStore";
-import { socket } from "../../Main";
+import { onlineStatus, socket } from "../../Main";
 type LayerPayload = {
   layerId: string;
   layerName: string;
@@ -9,6 +9,7 @@ const LayerContainerVM = () => {
   const setActiveLayer = useBrushStore((state) => state.setActiveLayer);
   const toggleLayer = useBrushStore((state) => state.toggleLayer);
   const addLayer = useBrushStore((state) => state.addLayer);
+  const removeLayer = useBrushStore((state) => state.removeLayer);
 
   const allLayers = useBrushStore((state) => state.layers);
   const activeLayerId = useBrushStore((state) => state.activeLayerId);
@@ -32,14 +33,20 @@ const LayerContainerVM = () => {
     setLayerNameInputOpen(false);
     setNewLayerName("");
   };
+  const deleteLayer = (layerId: string) => {
+    if (onlineStatus.inRoom) return socket.emit("delete-layer", { layerId });
+    removeLayer(layerId);
+  };
   const addComingLayer = ({ layerId, layerName }: LayerPayload) => {
     console.log(layerId, layerName);
     addLayer(layerName, layerId);
   };
-
+  const removingLayer = ({ layerId }: { layerId: string }) => {
+    removeLayer(layerId);
+  };
   useEffect(() => {
     socket.on("add-layer", addComingLayer);
-
+    socket.on("remove-layer", removingLayer);
     return () => {
       socket.off("add-layer", addComingLayer);
     };
@@ -60,6 +67,7 @@ const LayerContainerVM = () => {
     allLayers,
     activeLayerId,
     layerNameInputOpen,
+    deleteLayer,
     handlePlusBtnClick,
     updateText,
     changeLayer,
