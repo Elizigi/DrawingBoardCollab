@@ -1,14 +1,24 @@
 body {
   margin: 0;
   padding: 0;
+  background-color: bisque;
 }
 
 #root {
-  width: 100%;
-  height: 100vh;
   background-color: bisque;
   overflow: hidden;
   display: flex;
-    position: relative;
+  position: relative;
   align-items: center;
+}
+
+#rot {
+  background-color: white;
+  height: fit-content;
+  width: fit-content;
+  overflow: hidden;
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
 }
