@@ -30,8 +30,8 @@ type BrushState = {
 
   layers: LayerMeta[];
   activeLayerId: string;
-
-  addLayer: (name: string) => void;
+  addLayer: (name: string,id:string) => void;
+  
   setLayers: (layers: LayerMeta[]) => void;
   setActiveLayer: (id: string) => void;
   toggleLayer: (id: string) => void;
@@ -74,20 +74,19 @@ export const useBrushStore = create<BrushState>((set, _) => ({
 
   setLayers: (layers) => {
     set(() => {
-
       return {
         layers: layers,
-        activeLayerId:  layers[0].id
+        activeLayerId: layers[0].id,
       };
     });
   },
-  addLayer: (name) => {
-    const id = crypto.randomUUID();
+  addLayer: (name,id) => {
     set((state) => ({
       layers: [...state.layers, { id, name, visible: true }],
       activeLayerId: state.layers.length === 0 ? id : state.activeLayerId,
     }));
   },
+
 
   setActiveLayer: (id) => set({ activeLayerId: id }),
 

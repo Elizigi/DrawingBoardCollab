@@ -58,7 +58,10 @@ io.on("connection", (socket) => {
     console.log("aaaaaaa", roomId, "users now:", [
       ...(io.sockets.adapter.rooms.get(roomId) || []),
     ]);
-
+    socket.on("new-layer", ({ layerId, layerName }) => {
+      const roomId = socket.data.roomId;
+      socket.broadcast.to(roomId).emit("add-layer", { layerId, layerName });
+    });
     socket.emit("joined-room", { roomId });
     socket.broadcast
       .to(roomId)
@@ -76,7 +79,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("send-state", ({ to, strokes, layers }) => {
-        if(socket.id===to) return;
+    if (socket.id === to) return;
 
     io.to(to).emit("init", { strokes, layers });
   });

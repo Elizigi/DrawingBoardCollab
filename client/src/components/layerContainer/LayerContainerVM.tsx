@@ -1,6 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useBrushStore } from "../../zustand/useBrushStore";
-
+import { socket } from "../../Main";
+type LayerPayload = {
+  layerId: string;
+  layerName: string;
+};
 const LayerContainerVM = () => {
   const setActiveLayer = useBrushStore((state) => state.setActiveLayer);
   const toggleLayer = useBrushStore((state) => state.toggleLayer);
@@ -17,20 +21,40 @@ const LayerContainerVM = () => {
   };
   const addNewLayer = () => {
     if (newLayerName.trim().length < 2) return;
-    addLayer(newLayerName);
-     setLayerNameInputOpen(false);
+    const layerId = crypto.randomUUID();
+    addLayer(newLayerName, layerId);
+
+    socket.emit("new-layer", {
+      layerId,
+      layerName: newLayerName,
+    });
+
+    setLayerNameInputOpen(false);
     setNewLayerName("");
   };
+  const addComingLayer = ({ layerId, layerName }: LayerPayload) => {
+    console.log(layerId, layerName);
+    addLayer(layerName, layerId);
+  };
+
+  useEffect(() => {
+    socket.on("add-layer", addComingLayer);
+
+    return () => {
+      socket.off("add-layer", addComingLayer);
+    };
+  }, []);
+
   const changeVisible = (id: string) => {
     toggleLayer(id);
   };
   const changeLayer = (id: string) => {
     setActiveLayer(id);
   };
-  const handlePlusBtnClick=()=>{
-    if(!layerNameInputOpen)return setLayerNameInputOpen(true);
+  const handlePlusBtnClick = () => {
+    if (!layerNameInputOpen) return setLayerNameInputOpen(true);
     addNewLayer();
-  }
+  };
   return {
     newLayerName,
     allLayers,
