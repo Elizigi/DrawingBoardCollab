@@ -12,9 +12,9 @@ const io = new SocketIOServer(server, {
 });
 
 app.use(cors());
-const roomsMap = new Map<string, any>();
 
-// add a room
+const roomsMap = new Map<string, string>();
+
 io.on("connection", (socket) => {
   console.log("User connected to server:", socket.id);
   socket.emit("user-id", socket.id);
@@ -22,7 +22,7 @@ io.on("connection", (socket) => {
   socket.on("create-room", ({ name }) => {
     const roomId = `room_${socket.id}`;
     socket.join(roomId);
-    roomsMap.set(roomId, null);
+    roomsMap.set(roomId, socket.id);
     socket.data.isHost = true;
     socket.data.name = name;
     socket.data.roomId = roomId;
@@ -85,7 +85,14 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
+    const roomId = socket.data.roomId;
+    if (!roomId) return;
+
+    const hostId = roomsMap.get(roomId);
+    if (socket.id === hostId) {
+      roomsMap.delete(roomId);
+      io.to(roomId).emit("room-closed");
+    }
   });
 });
 
