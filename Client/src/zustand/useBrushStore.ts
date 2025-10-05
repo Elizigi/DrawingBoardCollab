@@ -41,6 +41,7 @@ type BrushState = {
   strokes: Stroke[];
   addStroke: (stroke: Stroke) => void;
   clearStrokes: () => void;
+  setStrokes: (strokes: Stroke[]) => void;
 };
 
 export const useBrushStore = create<BrushState>((set, _) => ({
@@ -72,8 +73,12 @@ export const useBrushStore = create<BrushState>((set, _) => ({
       const strokes = [...state.strokes, stroke];
       return { strokes };
     }),
+    
   clearStrokes: () => set({ strokes: [] }),
 
+  setStrokes: (strokes) => {
+    set({ strokes: strokes });
+  },
   setLayers: (layers) => {
     set(() => {
       return {

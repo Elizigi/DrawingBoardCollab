@@ -23,15 +23,14 @@ export const onlineStatus = {
   isAdmin: false,
 };
 
-// maps and DOM refs
 const layersCanvasMap: Record<
   string,
   { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D }
 > = {};
 let containerEl: HTMLDivElement | null = null;
-let topInputCanvas!: HTMLCanvasElement; // captures input
-let localTempCanvas: HTMLCanvasElement | null = null; // local in-progress strokes
-let remoteTempCanvas: HTMLCanvasElement | null = null; // remote in-progress strokes
+let topInputCanvas!: HTMLCanvasElement;
+let localTempCanvas: HTMLCanvasElement | null = null;
+let remoteTempCanvas: HTMLCanvasElement | null = null;
 
 function numToHexColor(num: number) {
   return "#" + num.toString(16).padStart(6, "0");
@@ -49,7 +48,7 @@ function createLayerCanvas(id: string) {
   canvas.style.top = "0";
 
   canvas.style.left = "0";
-  canvas.style.pointerEvents = "none"; // input is handled by topInputCanvas
+  canvas.style.pointerEvents = "none";
 
   const ctx = canvas.getContext("2d")!;
   ctx.imageSmoothingEnabled = true;
@@ -76,9 +75,9 @@ function redrawLayer(layerId: string) {
   if (!entry) return;
   clearLayerCanvas(layerId);
 
-  const strokes = useBrushStore.getState().strokes.filter(
-    (s) => s.layerId === layerId
-  );
+  const strokes = useBrushStore
+    .getState()
+    .strokes.filter((s) => s.layerId === layerId);
   strokes.forEach((s) => drawStrokeToCtx(entry.ctx, s));
 }
 
@@ -191,7 +190,6 @@ function commitStroke() {
     return;
   }
 
-  // draw final stroke into layer canvas
   drawStrokeToCtx(entry.ctx, {
     points: [...pendingPoints],
     color: brush.brushColor,
@@ -201,7 +199,6 @@ function commitStroke() {
     final: true,
   });
 
-  // add to state and emit
   useBrushStore.getState().addStroke({
     points: [...pendingPoints],
     color: brush.brushColor,
@@ -223,14 +220,10 @@ function commitStroke() {
     });
   }
 
-  // clear temp
   if (localTempCanvas) {
-    localTempCanvas.getContext("2d")!.clearRect(
-      0,
-      0,
-      localTempCanvas.width,
-      localTempCanvas.height
-    );
+    localTempCanvas
+      .getContext("2d")!
+      .clearRect(0, 0, localTempCanvas.width, localTempCanvas.height);
   }
 
   pendingPoints.length = 0;
@@ -242,7 +235,10 @@ function addPoint(x: number, y: number) {
     const dx = x - lastPoint.x;
     const dy = y - lastPoint.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    const minDistance = Math.max(0.02, useBrushStore.getState().brushSize * 0.01);
+    const minDistance = Math.max(
+      0.02,
+      useBrushStore.getState().brushSize * 0.01
+    );
     if (distance < minDistance) return;
   }
   pendingPoints.push({ x, y });
@@ -257,11 +253,9 @@ function setupDOMAndCanvases() {
   containerEl.style.height = canvasSize.height + "px";
   rotElement.appendChild(containerEl);
 
-  // create layer canvases from store
   const { layers } = useBrushStore.getState();
   layers.forEach((l) => createLayerCanvas(l.id));
 
-  // remote temp canvas
   remoteTempCanvas = document.createElement("canvas");
   remoteTempCanvas.width = canvasSize.width;
   remoteTempCanvas.height = canvasSize.height;
@@ -271,7 +265,6 @@ function setupDOMAndCanvases() {
   remoteTempCanvas.style.pointerEvents = "none";
   containerEl.appendChild(remoteTempCanvas);
 
-  // local temp canvas
   localTempCanvas = document.createElement("canvas");
   localTempCanvas.width = canvasSize.width;
   localTempCanvas.height = canvasSize.height;
@@ -281,8 +274,7 @@ function setupDOMAndCanvases() {
   localTempCanvas.style.pointerEvents = "none";
   containerEl.appendChild(localTempCanvas);
 
-  // top input canvas captures pointer events
-  topInputCanvas = document.createElement("canvas") ;
+  topInputCanvas = document.createElement("canvas");
   topInputCanvas.width = canvasSize.width;
   topInputCanvas.height = canvasSize.height;
   topInputCanvas.style.position = "absolute";
@@ -291,23 +283,17 @@ function setupDOMAndCanvases() {
   topInputCanvas.style.cursor = "crosshair";
   topInputCanvas.style.pointerEvents = "auto";
   containerEl.appendChild(topInputCanvas);
-
-  // react will still render App below, keep it
 }
 
 (async () => {
-  // init DOM + canvases
   setupDOMAndCanvases();
 
-  // subscribe to layer changes: create/remove canvases and update styles
   useBrushStore.subscribe((state, prev) => {
-    // new layer created
     if (state.layers.length > prev.layers.length) {
       const newLayer = state.layers[state.layers.length - 1];
       createLayerCanvas(newLayer.id);
     }
 
-    // removed layer
     if (state.layers.length < prev.layers.length) {
       const prevIds = new Set(prev.layers.map((l) => l.id));
       const newIds = new Set(state.layers.map((l) => l.id));
@@ -316,7 +302,6 @@ function setupDOMAndCanvases() {
       });
     }
 
-    // update visibility/opacity
     state.layers.forEach((layer) => {
       const entry = layersCanvasMap[layer.id];
       if (!entry) return;
@@ -324,20 +309,20 @@ function setupDOMAndCanvases() {
       entry.canvas.style.opacity = (layer as any).opacity ?? "1";
     });
 
-    // if strokes changed, you can redraw affected layers — keep simple: redraw all
     if (state.strokes !== prev.strokes) {
       redrawAllLayers();
     }
   });
 
-  // input handlers
   if (topInputCanvas) {
     topInputCanvas.addEventListener("mousedown", (e) => {
       useBrushStore.getState().setMouseDown(true);
-      const { x, y } = getMousePosPercentOnElement(e, topInputCanvas!);
+      const { x, y } = getMousePosPercentOnElement(e, topInputCanvas);
       pendingPoints.length = 0;
       lastPoint = null;
-      useBrushStore.getState().addUsedColor(useBrushStore.getState().brushColor);
+      useBrushStore
+        .getState()
+        .addUsedColor(useBrushStore.getState().brushColor);
       addPoint(x, y);
     });
   }
@@ -348,9 +333,12 @@ function setupDOMAndCanvases() {
   });
 
   document.addEventListener("mousemove", (e) => {
-    if (onlineStatus.inRoom) socket.emit("user-move", { position: getMousePosPercentOnElement(e, topInputCanvas!) });
+    if (onlineStatus.inRoom)
+      socket.emit("user-move", {
+        position: getMousePosPercentOnElement(e, topInputCanvas!),
+      });
     if (!useBrushStore.getState().isMouseDown) return;
-    const { x, y } = getMousePosPercentOnElement(e, topInputCanvas!);
+    const { x, y } = getMousePosPercentOnElement(e, topInputCanvas);
     addPoint(x, y);
   });
 
@@ -359,14 +347,11 @@ function setupDOMAndCanvases() {
     Object.keys(layersCanvasMap).forEach((id) => clearLayerCanvas(id));
   });
 
-  // throttle / tick loop
   (function tick() {
     const now = Date.now();
     if (pendingPoints.length > 0 && now - lastStrokeTime > STROKE_THROTTLE) {
-      // draw in-progress locally
       processStrokeToTemp();
 
-      // emit progress
       const brush = useBrushStore.getState();
       if (onlineStatus.inRoom) {
         socket.emit("draw-progress", {
@@ -385,7 +370,6 @@ function setupDOMAndCanvases() {
     requestAnimationFrame(tick);
   })();
 
-  // socket handlers
   socket.on("request-state", ({ from }) => {
     const allStrokes = useBrushStore.getState().strokes;
     const layers = useBrushStore.getState().layers;
@@ -406,6 +390,7 @@ function setupDOMAndCanvases() {
   socket.on("init", (data) => {
     if (!data) return;
     const { strokes, layers } = data;
+
     if (layers && Array.isArray(layers)) {
       useBrushStore.getState().setLayers(layers);
       layers.forEach((layer: any) => {
@@ -414,23 +399,27 @@ function setupDOMAndCanvases() {
     }
 
     if (strokes) {
+      const allIncomingStrokes: Stroke[] = [];
+
       for (const [layerId, strokeArray] of Object.entries(strokes)) {
         if (!layersCanvasMap[layerId]) createLayerCanvas(layerId);
         if (Array.isArray(strokeArray)) {
           strokeArray.forEach((stroke: Stroke) => {
-            // draw final strokes into layer canvas
+            allIncomingStrokes.push({ ...stroke, final: true });
+
             const entry = layersCanvasMap[layerId];
             if (entry) drawStrokeToCtx(entry.ctx, { ...stroke, final: true });
           });
         }
       }
+
+      useBrushStore.getState().setStrokes(allIncomingStrokes);
     }
   });
 
   socket.on("draw-progress", (stroke: any) => {
     if (stroke.senderId === socket.id) return;
 
-    // if not final -> draw on remote temp canvas, if final -> commit to layer
     if (!stroke.final) {
       if (!remoteTempCanvas) return;
       const ctx = remoteTempCanvas.getContext("2d")!;
