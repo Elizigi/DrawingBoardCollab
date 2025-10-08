@@ -13,8 +13,21 @@ export type Stroke = {
   layerId: string;
   final?: boolean;
 };
+export interface DrawingState {}
 
 type BrushState = {
+  // Current points being collected for the in-progress stroke
+  pendingPoints: { x: number; y: number }[];
+  // The last point added, used for minimum distance checks
+  lastPoint: { x: number; y: number } | null;
+  // Time of the last point added/throttle check
+  lastStrokeTime: number;
+
+  // Actions
+  setLastPoint: (point: { x: number; y: number } | null) => void;
+  addPendingPoint: (point: { x: number; y: number }) => void;
+  clearPendingStroke: () => void;
+  updateLastStrokeTime: (time: number) => void;
   isMouseDown: boolean;
   setMouseDown: (truth: boolean) => void;
 
@@ -66,6 +79,22 @@ export const useBrushStore = create<BrushState>((set, _) => ({
 
   layers: [{ id: defaultLayer, name: defaultLayer, visible: true }],
   activeLayerId: defaultLayer,
+
+  pendingPoints: [],
+  lastPoint: null,
+  lastStrokeTime: 0,
+
+  setLastPoint: (point) => set({ lastPoint: point }),
+  addPendingPoint: (point) =>
+    set((state) => ({
+      pendingPoints: [...state.pendingPoints, point], // Append new point immutably
+    })),
+  clearPendingStroke: () =>
+    set({
+      pendingPoints: [],
+      lastPoint: null,
+    }),
+  updateLastStrokeTime: (time) => set({ lastStrokeTime: time }),
 
   strokes: [],
   addStroke: (stroke) =>
