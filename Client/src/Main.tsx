@@ -194,12 +194,7 @@ function commitStroke() {
   const entry = layersCanvasMap[activeLayerId];
   const activeLayer = layers.find((l) => l.id === activeLayerId);
   const isLayerVisible = activeLayer?.visible !== false;
-  if (localTempCanvas) {
-    const ctx = localTempCanvas.getContext("2d");
-    if (ctx) {
-      ctx.clearRect(0, 0, localTempCanvas.width, localTempCanvas.height);
-    }
-  }
+
   if (!entry || !isLayerVisible) {
     pendingPoints.length = 0;
     lastPoint = null;
@@ -234,6 +229,12 @@ function commitStroke() {
       final: true,
       senderId: socket.id,
     });
+  }
+
+  if (localTempCanvas) {
+    localTempCanvas
+      .getContext("2d")!
+      .clearRect(0, 0, localTempCanvas.width, localTempCanvas.height);
   }
 
   pendingPoints.length = 0;
@@ -360,18 +361,21 @@ function setupDOMAndCanvases() {
   (function tick() {
     const now = Date.now();
 
+    // Get current state
     const brushState = useBrushStore.getState();
 
+    // Find active layer for visibility check
     const activeLayer = brushState.layers.find(
       (l) => l.id === brushState.activeLayerId
     );
     const isLayerVisible = activeLayer?.visible !== false;
 
+    // Check if drawing should happen AND if the layer is visible
     if (pendingPoints.length > 0 && now - lastStrokeTime > STROKE_THROTTLE) {
       if (isLayerVisible) {
         processStrokeToTemp();
 
-        const brush = brushState;
+        const brush = brushState; // use the state we fetched
         if (onlineStatus.inRoom) {
           socket.emit("draw-progress", {
             points: [...pendingPoints],
@@ -386,12 +390,10 @@ function setupDOMAndCanvases() {
       } else if (localTempCanvas) {
         const canvasEl = localTempCanvas as HTMLCanvasElement;
         const ctx = canvasEl.getContext("2d");
-
         if (ctx) {
           ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
         }
       }
-
       lastStrokeTime = now;
     }
     requestAnimationFrame(tick);
