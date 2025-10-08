@@ -18,13 +18,12 @@ import {
   createLayerCanvas,
   removeLayerCanvas,
   redrawAllLayers,
-  clearLayerCanvas,
   processStrokeToTemp,
   getMousePosPercentOnElement,
-  commitStroke,
   addPoint,
   drawStrokeToCtx,
 } from "./helpers/drawingHelpers.ts";
+import { addListeners } from "./helpers/eventListenersHelpers.ts";
 export const socket: Socket = io("http://localhost:3000", {
   autoConnect: false,
 });
@@ -83,27 +82,7 @@ export const onlineStatus = {
     });
   }
 
-  document.addEventListener("mouseup", () => {
-    useBrushStore.getState().setMouseDown(false);
-    commitStroke();
-  });
-
-  document.addEventListener("mousemove", (e) => {
-    if (!topInputCanvas) return;
-
-    if (onlineStatus.inRoom)
-      socket.emit("user-move", {
-        position: getMousePosPercentOnElement(e, topInputCanvas),
-      });
-    if (!useBrushStore.getState().isMouseDown) return;
-    const { x, y } = getMousePosPercentOnElement(e, topInputCanvas);
-    addPoint(x, y);
-  });
-
-  document.addEventListener("clearCanvas", () => {
-    useBrushStore.getState().clearStrokes();
-    Object.keys(layersCanvasMap).forEach((id) => clearLayerCanvas(id));
-  });
+  addListeners(topInputCanvas);
 
   (function tick() {
     const now = Date.now();
@@ -123,7 +102,6 @@ export const onlineStatus = {
         const brush = brushState;
         if (onlineStatus.inRoom) {
           socket.emit("draw-progress", {
-            // 💡 Use store state property
             points: [...pendingPoints],
             color: brush.brushColor,
             size: brush.brushSize,
