@@ -5,25 +5,24 @@ type LayerMeta = {
   name: string;
   visible: boolean;
 };
+
 export type Stroke = {
   points: { x: number; y: number }[];
   color: number;
   size: number;
   opacity: number;
   layerId: string;
+  local?:boolean;
   final?: boolean;
 };
+
 export interface DrawingState {}
 
 type BrushState = {
-  // Current points being collected for the in-progress stroke
   pendingPoints: { x: number; y: number }[];
-  // The last point added, used for minimum distance checks
   lastPoint: { x: number; y: number } | null;
-  // Time of the last point added/throttle check
   lastStrokeTime: number;
 
-  // Actions
   setLastPoint: (point: { x: number; y: number } | null) => void;
   addPendingPoint: (point: { x: number; y: number }) => void;
   clearPendingStroke: () => void;
@@ -42,7 +41,7 @@ type BrushState = {
   setOpacity: (opacity: number) => void;
 
   layers: LayerMeta[];
-  activeLayerId: string;
+  activeLayerId: string|null;
   addLayer: (name: string, id: string) => void;
 
   removeLayer: (id: string) => void;
@@ -56,6 +55,7 @@ type BrushState = {
   clearStrokes: () => void;
   setStrokes: (strokes: Stroke[]) => void;
 };
+
 const defaultLayer = "background-layer";
 
 export const useBrushStore = create<BrushState>((set, _) => ({
@@ -87,7 +87,7 @@ export const useBrushStore = create<BrushState>((set, _) => ({
   setLastPoint: (point) => set({ lastPoint: point }),
   addPendingPoint: (point) =>
     set((state) => ({
-      pendingPoints: [...state.pendingPoints, point], // Append new point immutably
+      pendingPoints: [...state.pendingPoints, point], 
     })),
   clearPendingStroke: () =>
     set({
@@ -140,10 +140,36 @@ export const useBrushStore = create<BrushState>((set, _) => ({
 
   setActiveLayer: (id) => set({ activeLayerId: id }),
 
-  toggleLayer: (id) =>
-    set((state) => ({
-      layers: state.layers.map((l) =>
-        l.id === id ? { ...l, visible: !l.visible } : l
-      ),
-    })),
+ toggleLayer: (id) =>
+    set((state) => {
+      // 1. Get the layer being toggled and its new visibility
+      const layerToToggle = state.layers.find((l) => l.id === id);
+      if (!layerToToggle) return state; // Safety check
+      const newVisibility = !layerToToggle.visible;
+
+      // 2. Create the new layers array
+      const newLayers = state.layers.map((l) =>
+        l.id === id ? { ...l, visible: newVisibility } : l
+      );
+
+      let newActiveLayerId = state.activeLayerId;
+
+      if (newVisibility) {
+        // 3. If turning a layer ON, it should become the active layer
+        newActiveLayerId = id;
+      } else if (id === state.activeLayerId) {
+        // 4. If turning the currently active layer OFF, find a new active layer
+        
+        // Find the next visible layer in the new array, excluding the one we just turned off
+        const nextVisibleLayer = newLayers.find((l) => l.visible);
+        
+        // If there's a visible layer, make it active, otherwise set to null
+        newActiveLayerId = nextVisibleLayer ? nextVisibleLayer.id : null;
+      }
+
+      return {
+        layers: newLayers,
+        activeLayerId: newActiveLayerId,
+      };
+    }),
 }));

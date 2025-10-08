@@ -4,10 +4,8 @@ import {
   canvasSize,
   layersCanvasMap,
   getCanvasContainer,
-  getLocalTempCanvas
-} from "./canvasHelpers.ts"
-
-// --- Utility Math Functions ---
+  getLocalTempCanvas,
+} from "./canvasHelpers.ts";
 
 export function numToHexColor(num: number) {
   return "#" + num.toString(16).padStart(6, "0");
@@ -30,10 +28,6 @@ export function getMousePosPercentOnElement(
   return { x: x * 100, y: y * 100 };
 }
 
-// --- Layer Management Functions ---
-
-// Note: This function is slightly modified to accept the container,
-// ensuring we don't rely on a global private variable for layer creation.
 export function createLayerCanvas(
   id: string,
   container?: HTMLDivElement | null
@@ -108,8 +102,6 @@ export function fillBackgroundWhite() {
   entry.ctx.restore();
 }
 
-// --- Stroke Drawing and Processing Functions ---
-
 export function drawStrokeToCtx(ctx: CanvasRenderingContext2D, stroke: Stroke) {
   const { points, color, size, opacity } = stroke;
   if (!points || points.length === 0) return;
@@ -149,7 +141,6 @@ export function drawStrokeToCtx(ctx: CanvasRenderingContext2D, stroke: Stroke) {
 }
 
 export function processStrokeToTemp() {
-  // 💡 Use the exported getter to access the temp canvas
   const localTempCanvas = getLocalTempCanvas();
   if (!localTempCanvas) return;
   const ctx = localTempCanvas.getContext("2d")!;
@@ -197,17 +188,15 @@ export function processStrokeToTemp() {
 }
 
 export function commitStroke() {
-  const localTempCanvas = getLocalTempCanvas(); // 💡 Use the exported getter
+  const localTempCanvas = getLocalTempCanvas();
   const state = useBrushStore.getState();
-  const { pendingPoints, activeLayerId, layers } = state;
+  const { pendingPoints, activeLayerId } = state;
 
-  if (pendingPoints.length === 0) return;
+  if (pendingPoints.length === 0||activeLayerId === null) return;
   processStrokeToTemp();
   const entry = layersCanvasMap[activeLayerId];
-  const activeLayer = layers.find((l) => l.id === activeLayerId);
-  const isLayerVisible = activeLayer?.visible !== false;
 
-  if (!entry || !isLayerVisible) {
+  if (!entry) {
     state.clearPendingStroke();
     return;
   }

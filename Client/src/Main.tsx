@@ -10,7 +10,6 @@ import {
   layersCanvasMap,
   STROKE_THROTTLE,
   getTopInputCanvas,
-  getLocalTempCanvas,
   getRemoteTempCanvas,
 } from "./helpers/canvasHelpers.ts";
 import {
@@ -47,8 +46,8 @@ export const onlineStatus = {
     if (state.layers.length > prev.layers.length) {
       const newLayer = state.layers[state.layers.length - 1];
       createLayerCanvas(newLayer.id);
+      
     }
-
     if (state.layers.length < prev.layers.length) {
       const prevIds = new Set(prev.layers.map((l) => l.id));
       const newIds = new Set(state.layers.map((l) => l.id));
@@ -90,13 +89,7 @@ export const onlineStatus = {
     const brushState = useBrushStore.getState();
     const { pendingPoints, lastStrokeTime, updateLastStrokeTime } = brushState;
 
-    const activeLayer = brushState.layers.find(
-      (l) => l.id === brushState.activeLayerId
-    );
-    const isLayerVisible = activeLayer?.visible !== false;
-
     if (pendingPoints.length > 0 && now - lastStrokeTime > STROKE_THROTTLE) {
-      if (isLayerVisible) {
         processStrokeToTemp();
 
         const brush = brushState;
@@ -111,15 +104,7 @@ export const onlineStatus = {
             senderId: socket.id,
           });
         }
-      } else {
-        const localTempCanvas = getLocalTempCanvas();
-        if (localTempCanvas) {
-          const ctx = localTempCanvas.getContext("2d");
-          if (ctx) {
-            ctx.clearRect(0, 0, localTempCanvas.width, localTempCanvas.height);
-          }
-        }
-      }
+      
       updateLastStrokeTime(now);
     }
     requestAnimationFrame(tick);
