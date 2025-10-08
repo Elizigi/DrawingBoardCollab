@@ -43,6 +43,7 @@ type BrushState = {
   clearStrokes: () => void;
   setStrokes: (strokes: Stroke[]) => void;
 };
+const defaultLayer = "background-layer";
 
 export const useBrushStore = create<BrushState>((set, _) => ({
   isMouseDown: false,
@@ -63,8 +64,8 @@ export const useBrushStore = create<BrushState>((set, _) => ({
   brushOpacity: 100,
   setOpacity: (opacity) => set({ brushOpacity: opacity }),
 
-  layers: [{ id: "layer-1", name: "Layer 1", visible: true }],
-  activeLayerId: "layer-1",
+  layers: [{ id: defaultLayer, name: defaultLayer, visible: true }],
+  activeLayerId: defaultLayer,
 
   strokes: [],
   addStroke: (stroke) =>
@@ -73,7 +74,7 @@ export const useBrushStore = create<BrushState>((set, _) => ({
       const strokes = [...state.strokes, stroke];
       return { strokes };
     }),
-    
+
   clearStrokes: () => set({ strokes: [] }),
 
   setStrokes: (strokes) => {

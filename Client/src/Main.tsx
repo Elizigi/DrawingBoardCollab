@@ -73,7 +73,17 @@ function clearLayerCanvas(id: string) {
 function redrawLayer(layerId: string) {
   const entry = layersCanvasMap[layerId];
   if (!entry) return;
+
   clearLayerCanvas(layerId);
+
+  const firstLayerId = useBrushStore.getState().layers[0]?.id;
+
+  if (layerId === firstLayerId) {
+    entry.ctx.save();
+    entry.ctx.fillStyle = "#ffffff";
+    entry.ctx.fillRect(0, 0, entry.canvas.width, entry.canvas.height);
+    entry.ctx.restore();
+  }
 
   const strokes = useBrushStore
     .getState()
@@ -179,12 +189,18 @@ function processStrokeToTemp() {
 function commitStroke() {
   if (pendingPoints.length === 0) return;
   processStrokeToTemp();
-
-  const { activeLayerId } = useBrushStore.getState();
+  const { activeLayerId, layers } = useBrushStore.getState();
   const brush = useBrushStore.getState();
-
   const entry = layersCanvasMap[activeLayerId];
-  if (!entry) {
+  const activeLayer = layers.find((l) => l.id === activeLayerId);
+  const isLayerVisible = activeLayer?.visible !== false;
+  if (localTempCanvas) {
+    const ctx = localTempCanvas.getContext("2d");
+    if (ctx) {
+      ctx.clearRect(0, 0, localTempCanvas.width, localTempCanvas.height);
+    }
+  }
+  if (!entry || !isLayerVisible) {
     pendingPoints.length = 0;
     lastPoint = null;
     return;
@@ -218,12 +234,6 @@ function commitStroke() {
       final: true,
       senderId: socket.id,
     });
-  }
-
-  if (localTempCanvas) {
-    localTempCanvas
-      .getContext("2d")!
-      .clearRect(0, 0, localTempCanvas.width, localTempCanvas.height);
   }
 
   pendingPoints.length = 0;
@@ -287,7 +297,7 @@ function setupDOMAndCanvases() {
 
 (async () => {
   setupDOMAndCanvases();
-
+  fillBackgroundWhite();
   useBrushStore.subscribe((state, prev) => {
     if (state.layers.length > prev.layers.length) {
       const newLayer = state.layers[state.layers.length - 1];
@@ -335,7 +345,7 @@ function setupDOMAndCanvases() {
   document.addEventListener("mousemove", (e) => {
     if (onlineStatus.inRoom)
       socket.emit("user-move", {
-        position: getMousePosPercentOnElement(e, topInputCanvas!),
+        position: getMousePosPercentOnElement(e, topInputCanvas),
       });
     if (!useBrushStore.getState().isMouseDown) return;
     const { x, y } = getMousePosPercentOnElement(e, topInputCanvas);
@@ -349,27 +359,43 @@ function setupDOMAndCanvases() {
 
   (function tick() {
     const now = Date.now();
-    if (pendingPoints.length > 0 && now - lastStrokeTime > STROKE_THROTTLE) {
-      processStrokeToTemp();
 
-      const brush = useBrushStore.getState();
-      if (onlineStatus.inRoom) {
-        socket.emit("draw-progress", {
-          points: [...pendingPoints],
-          color: brush.brushColor,
-          size: brush.brushSize,
-          opacity: brush.brushOpacity,
-          layerId: brush.activeLayerId,
-          final: false,
-          senderId: socket.id,
-        });
+    const brushState = useBrushStore.getState();
+
+    const activeLayer = brushState.layers.find(
+      (l) => l.id === brushState.activeLayerId
+    );
+    const isLayerVisible = activeLayer?.visible !== false;
+
+    if (pendingPoints.length > 0 && now - lastStrokeTime > STROKE_THROTTLE) {
+      if (isLayerVisible) {
+        processStrokeToTemp();
+
+        const brush = brushState;
+        if (onlineStatus.inRoom) {
+          socket.emit("draw-progress", {
+            points: [...pendingPoints],
+            color: brush.brushColor,
+            size: brush.brushSize,
+            opacity: brush.brushOpacity,
+            layerId: brush.activeLayerId,
+            final: false,
+            senderId: socket.id,
+          });
+        }
+      } else if (localTempCanvas) {
+        const canvasEl = localTempCanvas as HTMLCanvasElement;
+        const ctx = canvasEl.getContext("2d");
+
+        if (ctx) {
+          ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+        }
       }
 
       lastStrokeTime = now;
     }
     requestAnimationFrame(tick);
   })();
-
   socket.on("request-state", ({ from }) => {
     const allStrokes = useBrushStore.getState().strokes;
     const layers = useBrushStore.getState().layers;
@@ -397,6 +423,8 @@ function setupDOMAndCanvases() {
         if (!layersCanvasMap[layer.id]) createLayerCanvas(layer.id);
       });
     }
+
+    fillBackgroundWhite();
 
     if (strokes) {
       const allIncomingStrokes: Stroke[] = [];
@@ -432,6 +460,18 @@ function setupDOMAndCanvases() {
     }
   });
 })();
+
+function fillBackgroundWhite() {
+  const firstLayerId = useBrushStore.getState().layers[0]?.id;
+  if (!firstLayerId) return;
+  const entry = layersCanvasMap[firstLayerId];
+  if (!entry) return;
+
+  entry.ctx.save();
+  entry.ctx.fillStyle = "#ffffff";
+  entry.ctx.fillRect(0, 0, entry.canvas.width, entry.canvas.height);
+  entry.ctx.restore();
+}
 
 function getMousePosPercentOnElement(e: MouseEvent, el: HTMLCanvasElement) {
   const rect = el.getBoundingClientRect();

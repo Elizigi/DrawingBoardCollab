@@ -1,7 +1,12 @@
 body {
   margin: 0;
   padding: 0;
-  background-color:  rgb(88, 85, 85);
+  background-color: rgb(88, 85, 85);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 #root {
@@ -13,13 +18,17 @@ body {
 }
 
 #rot {
-  background-color: rgb(88, 85, 85);
   width: fit-content;
-  margin: 0 auto;
+  margin: 0;
   overflow: hidden;
   display: flex;
   position: relative;
-  align-items: center;
-  justify-content: center;
-  height: 100vh; 
+   background-color: #eee;
+    background-image: 
+        linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc), 
+        linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc);
+    
+    background-size: 20px 20px;
+    
+    background-position: 0 0, 10px 10px; 
 }
