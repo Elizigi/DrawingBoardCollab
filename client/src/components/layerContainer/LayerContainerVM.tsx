@@ -53,13 +53,16 @@ const LayerContainerVM = () => {
   }, []);
 
   const changeVisible = (id: string) => {
-    if (activeLayerId === id) {
-      const visibleLayer = allLayers.find((layer) => layer.visible === true);
-      const newActiveLayerID = visibleLayer ? visibleLayer.id : null;
+    toggleLayer(id);
 
+    if (activeLayerId === id) {
+      const visibleLayer = allLayers.find((layer) => layer.visible === true&&layer.id!==id);
+      const newActiveLayerID = visibleLayer ? visibleLayer.id : null;
+      if (newActiveLayerID === null) {
+        console.log("null");
+      }
       setActiveLayer(newActiveLayerID);
     }
-    toggleLayer(id);
   };
   const changeLayer = (id: string) => {
     console.log(id);

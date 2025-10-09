@@ -21,6 +21,7 @@ import {
   getMousePosPercentOnElement,
   addPoint,
   drawStrokeToCtx,
+  redrawLayer,
 } from "./helpers/drawingHelpers.ts";
 import { addListeners } from "./helpers/eventListenersHelpers.ts";
 
@@ -58,18 +59,14 @@ export const onlineStatus = {
 
     state.layers.forEach((layer) => {
       const entry = layersCanvasMap[layer.id];
-      if (!entry) return;
+      const prevLayer = prev.layers.find((l) => l.id === layer.id);
+      if (!entry || !prevLayer) return;
 
       entry.canvas.style.display = layer.visible ? "block" : "none";
-
       entry.canvas.style.opacity = (layer as any).opacity?.toString() ?? "1";
-      if (layer.visible && entry.canvas.style.display === "none") {
-        entry.canvas.style.display = "block";
-        const strokes = useBrushStore
-          .getState()
-          .strokes.filter((s) => s.layerId === layer.id);
-        entry.ctx.clearRect(0, 0, entry.canvas.width, entry.canvas.height);
-        for (const stroke of strokes) drawStrokeToCtx(entry.ctx, stroke);
+
+      if (layer.visible !== prevLayer.visible) {
+        redrawLayer(layer.id);
       }
     });
 
@@ -170,10 +167,19 @@ export const onlineStatus = {
 
   socket.on("draw-progress", (stroke: any) => {
     if (stroke.senderId === socket.id) return;
+    const remoteTempCanvas = getRemoteTempCanvas();
+
+    if (!remoteTempCanvas) return;
+
+    const ctx = remoteTempCanvas.getContext("2d")!;
+    ctx.clearRect(0, 0, remoteTempCanvas.width, remoteTempCanvas.height);
 
     if (!stroke.final) {
-      const remoteTempCanvas = getRemoteTempCanvas();
-      if (!remoteTempCanvas) return;
+      const allLayers = useBrushStore.getState().layers;
+      const strokeLayer = allLayers.find(
+        (layer) => layer.id === stroke.layerId
+      );
+      if (!remoteTempCanvas || !strokeLayer?.visible) return;
       const ctx = remoteTempCanvas.getContext("2d")!;
       ctx.clearRect(0, 0, remoteTempCanvas.width, remoteTempCanvas.height);
       drawStrokeToCtx(ctx, stroke);
@@ -181,9 +187,8 @@ export const onlineStatus = {
       const entry = layersCanvasMap[stroke.layerId];
       if (!entry) return;
 
-      useBrushStore
-        .getState()
-        .setStrokes([...useBrushStore.getState().strokes, stroke]);
+      useBrushStore.getState().addStroke(stroke);
+
       drawStrokeToCtx(entry.ctx, stroke);
     }
   });
