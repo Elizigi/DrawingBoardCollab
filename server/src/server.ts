@@ -99,6 +99,9 @@ io.on("connection", (socket) => {
     if (socket.id === hostId) {
       roomsMap.delete(roomId);
       io.to(roomId).emit("room-closed");
+    }else{
+      const guestId= socket.id;
+          io.to(roomId).emit("user-left",{guestId});
     }
   });
 });

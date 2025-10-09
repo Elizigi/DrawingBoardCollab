@@ -85,7 +85,14 @@ const TopRightToolbarVM = () => {
       )
     );
   };
-
+  const handleUserLeft = ({ guestId }: ConnectedUser) => {
+    console.log(`${guestId} has left`)
+    setConnectedUsers((prevUsers) =>
+      prevUsers.map((user) =>
+        user.guestId === guestId ?  user :{ ...user }
+      )
+    );
+  };
   const handleMenuOpen = () => {
     setMenuOpen(!menuOpen);
   };
@@ -94,12 +101,14 @@ const TopRightToolbarVM = () => {
     socket.on("add-name", handleAddName);
     socket.on("joined-room", handleJoinedRoom);
     socket.on("user-moved", handleUserMoved);
+    socket.on("user-left", handleUserLeft);
 
     return () => {
       socket.off("user-joined", handleUserJoined);
       socket.off("add-name", handleAddName);
       socket.off("joined-room", handleJoinedRoom);
       socket.off("user-moved", handleUserMoved);
+      socket.off("user-left", handleUserLeft);
     };
   }, []);
   const handleConnectionWindow = (host = false) => {
