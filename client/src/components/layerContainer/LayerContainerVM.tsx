@@ -53,9 +53,16 @@ const LayerContainerVM = () => {
   }, []);
 
   const changeVisible = (id: string) => {
+    if (activeLayerId === id) {
+      const visibleLayer = allLayers.find((layer) => layer.visible === true);
+      const newActiveLayerID = visibleLayer ? visibleLayer.id : null;
+
+      setActiveLayer(newActiveLayerID);
+    }
     toggleLayer(id);
   };
   const changeLayer = (id: string) => {
+    console.log(id);
     setActiveLayer(id);
   };
   const handlePlusBtnClick = () => {

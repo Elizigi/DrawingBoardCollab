@@ -12,7 +12,7 @@ export type Stroke = {
   size: number;
   opacity: number;
   layerId: string;
-  local?:boolean;
+  local?: boolean;
   final?: boolean;
 };
 
@@ -41,13 +41,13 @@ type BrushState = {
   setOpacity: (opacity: number) => void;
 
   layers: LayerMeta[];
-  activeLayerId: string|null;
+  activeLayerId: string | null;
   addLayer: (name: string, id: string) => void;
 
   removeLayer: (id: string) => void;
 
   setLayers: (layers: LayerMeta[]) => void;
-  setActiveLayer: (id: string) => void;
+  setActiveLayer: (id: string | null) => void;
   toggleLayer: (id: string) => void;
 
   strokes: Stroke[];
@@ -87,7 +87,7 @@ export const useBrushStore = create<BrushState>((set, _) => ({
   setLastPoint: (point) => set({ lastPoint: point }),
   addPendingPoint: (point) =>
     set((state) => ({
-      pendingPoints: [...state.pendingPoints, point], 
+      pendingPoints: [...state.pendingPoints, point],
     })),
   clearPendingStroke: () =>
     set({
@@ -100,7 +100,10 @@ export const useBrushStore = create<BrushState>((set, _) => ({
   addStroke: (stroke) =>
     set((state) => {
       if (!stroke.final) return state;
+
       const strokes = [...state.strokes, stroke];
+      console.log(strokes);
+
       return { strokes };
     }),
 
@@ -113,7 +116,7 @@ export const useBrushStore = create<BrushState>((set, _) => ({
     set(() => {
       return {
         layers: layers,
-        activeLayerId: layers[0].id,
+        activeLayerId: layers[0].id||null,
       };
     });
   },
@@ -140,24 +143,11 @@ export const useBrushStore = create<BrushState>((set, _) => ({
 
   setActiveLayer: (id) => set({ activeLayerId: id }),
 
- toggleLayer: (id) =>
-  set((state) => {
-    const layers = state.layers.map((l) =>
-      l.id === id ? { ...l, visible: !l.visible } : l
-    );
-
-    const toggled = layers.find((l) => l.id === id);
-    const isActive = id === state.activeLayerId;
-
-    const activeLayerId = (() => {
-      if (toggled?.visible) return id;
-      if (isActive) return helperFindVisible(layers)
-      return state.activeLayerId;
-    })();
-
-    return { layers, activeLayerId };
-  }),
+  toggleLayer: (id) =>
+    set((state) => {
+      const layers = state.layers.map((layer) =>
+        layer.id === id ? { ...layer, visible: !layer.visible } : layer
+      );
+      return { layers };
+    }),
 }));
-function helperFindVisible(layers:LayerMeta[]){
-  return layers.find((l) => l.visible)?.id || null;
-}

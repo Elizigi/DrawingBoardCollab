@@ -23,6 +23,7 @@ import {
   drawStrokeToCtx,
 } from "./helpers/drawingHelpers.ts";
 import { addListeners } from "./helpers/eventListenersHelpers.ts";
+
 export const socket: Socket = io("http://localhost:3000", {
   autoConnect: false,
 });
@@ -46,7 +47,6 @@ export const onlineStatus = {
     if (state.layers.length > prev.layers.length) {
       const newLayer = state.layers[state.layers.length - 1];
       createLayerCanvas(newLayer.id);
-      
     }
     if (state.layers.length < prev.layers.length) {
       const prevIds = new Set(prev.layers.map((l) => l.id));
@@ -61,7 +61,16 @@ export const onlineStatus = {
       if (!entry) return;
 
       entry.canvas.style.display = layer.visible ? "block" : "none";
-      entry.canvas.style.opacity = (layer as any).opacity ?? "1";
+
+      entry.canvas.style.opacity = (layer as any).opacity?.toString() ?? "1";
+      if (layer.visible && entry.canvas.style.display === "none") {
+        entry.canvas.style.display = "block";
+        const strokes = useBrushStore
+          .getState()
+          .strokes.filter((s) => s.layerId === layer.id);
+        entry.ctx.clearRect(0, 0, entry.canvas.width, entry.canvas.height);
+        for (const stroke of strokes) drawStrokeToCtx(entry.ctx, stroke);
+      }
     });
 
     if (state.strokes !== prev.strokes) {
@@ -90,21 +99,21 @@ export const onlineStatus = {
     const { pendingPoints, lastStrokeTime, updateLastStrokeTime } = brushState;
 
     if (pendingPoints.length > 0 && now - lastStrokeTime > STROKE_THROTTLE) {
-        processStrokeToTemp();
+      processStrokeToTemp();
 
-        const brush = brushState;
-        if (onlineStatus.inRoom) {
-          socket.emit("draw-progress", {
-            points: [...pendingPoints],
-            color: brush.brushColor,
-            size: brush.brushSize,
-            opacity: brush.brushOpacity,
-            layerId: brush.activeLayerId,
-            final: false,
-            senderId: socket.id,
-          });
-        }
-      
+      const brush = brushState;
+      if (onlineStatus.inRoom) {
+        socket.emit("draw-progress", {
+          points: [...pendingPoints],
+          color: brush.brushColor,
+          size: brush.brushSize,
+          opacity: brush.brushOpacity,
+          layerId: brush.activeLayerId,
+          final: false,
+          senderId: socket.id,
+        });
+      }
+
       updateLastStrokeTime(now);
     }
     requestAnimationFrame(tick);
@@ -171,6 +180,10 @@ export const onlineStatus = {
     } else {
       const entry = layersCanvasMap[stroke.layerId];
       if (!entry) return;
+
+      useBrushStore
+        .getState()
+        .setStrokes([...useBrushStore.getState().strokes, stroke]);
       drawStrokeToCtx(entry.ctx, stroke);
     }
   });
