@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { onlineStatus, socket } from "../../Main";
 import styles from "./TopRightToolbar.module.scss";
 
-interface ConnectedUser {
+export interface ConnectedUser {
   name: string;
   position: { x: number; y: number };
   guestId: string;

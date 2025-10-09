@@ -64,20 +64,7 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
         <h2> {isHost ? "Host" : "Connect"}</h2>
       </button>
 
-      {/* {connectedUsers.length > 0 && (
-        <>
-          <h3>Users in the Room:</h3>
-          {connectedUsers.map((user) => (
-            <button className={styles.guestIcon} key={user.guestId}>
-              <div
-                className={styles.userColorIcon}
-                style={{ backgroundColor: user.color }}
-              ></div>
-              {user.name}
-            </button>
-          ))}
-        </>
-      )} */}
+      
     </div>
   );
 };

@@ -5,6 +5,7 @@ import CopyText from "./copyText/CopyText";
 import LeaveButton from "./leaveButton/LeaveButton";
 import InternetIcon from "./internetIcon/InternetIcon";
 import GuestMouse from "../guestMouse/GuestMouse";
+import UserList from "./userList/userList";
 const TopRightToolbar = () => {
   const {
     isOnline,
@@ -82,6 +83,7 @@ const TopRightToolbar = () => {
       {connectedUsers.map((user) => (
         <GuestMouse key={user.name} {...user} />
       ))}
+      <UserList connectedUsers={connectedUsers} />
     </div>
   );
 };
