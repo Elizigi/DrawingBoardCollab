@@ -141,35 +141,23 @@ export const useBrushStore = create<BrushState>((set, _) => ({
   setActiveLayer: (id) => set({ activeLayerId: id }),
 
  toggleLayer: (id) =>
-    set((state) => {
-      // 1. Get the layer being toggled and its new visibility
-      const layerToToggle = state.layers.find((l) => l.id === id);
-      if (!layerToToggle) return state; // Safety check
-      const newVisibility = !layerToToggle.visible;
+  set((state) => {
+    const layers = state.layers.map((l) =>
+      l.id === id ? { ...l, visible: !l.visible } : l
+    );
 
-      // 2. Create the new layers array
-      const newLayers = state.layers.map((l) =>
-        l.id === id ? { ...l, visible: newVisibility } : l
-      );
+    const toggled = layers.find((l) => l.id === id);
+    const isActive = id === state.activeLayerId;
 
-      let newActiveLayerId = state.activeLayerId;
+    const activeLayerId = (() => {
+      if (toggled?.visible) return id;
+      if (isActive) return helperFindVisible(layers)
+      return state.activeLayerId;
+    })();
 
-      if (newVisibility) {
-        // 3. If turning a layer ON, it should become the active layer
-        newActiveLayerId = id;
-      } else if (id === state.activeLayerId) {
-        // 4. If turning the currently active layer OFF, find a new active layer
-        
-        // Find the next visible layer in the new array, excluding the one we just turned off
-        const nextVisibleLayer = newLayers.find((l) => l.visible);
-        
-        // If there's a visible layer, make it active, otherwise set to null
-        newActiveLayerId = nextVisibleLayer ? nextVisibleLayer.id : null;
-      }
-
-      return {
-        layers: newLayers,
-        activeLayerId: newActiveLayerId,
-      };
-    }),
+    return { layers, activeLayerId };
+  }),
 }));
+function helperFindVisible(layers:LayerMeta[]){
+  return layers.find((l) => l.visible)?.id || null;
+}
