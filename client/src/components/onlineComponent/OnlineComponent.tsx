@@ -63,8 +63,6 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
       <button onClick={() => handleSubmit()} className={styles.submitBtn}>
         <h2> {isHost ? "Host" : "Connect"}</h2>
       </button>
-
-      
     </div>
   );
 };

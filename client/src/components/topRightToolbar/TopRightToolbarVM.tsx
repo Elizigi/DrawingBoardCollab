@@ -86,11 +86,10 @@ const TopRightToolbarVM = () => {
     );
   };
   const handleUserLeft = ({ guestId }: ConnectedUser) => {
-    console.log(`${guestId} has left`)
+    console.log(`${guestId} has left`);
+
     setConnectedUsers((prevUsers) =>
-      prevUsers.map((user) =>
-        user.guestId === guestId ?  user :{ ...user }
-      )
+      prevUsers.filter((user) => user.guestId !== guestId)
     );
   };
   const handleMenuOpen = () => {
