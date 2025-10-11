@@ -94,8 +94,17 @@ const TopRightToolbarVM = () => {
   };
 
   const handleUserRemoved = () => {
-    onlineStatus.isOnline = false;
-    socket.disconnect();
+    console.log("You have been removed from the room by the host.");
+
+    setConnected(false);
+    setMenuOpen(false);
+    setRoomId("");
+    setIsHost(false);
+    setError("");
+    setConnectedUsers([]);
+
+    onlineStatus.inRoom = false;
+    onlineStatus.isAdmin = false;
   };
 
   const handleMenuOpen = () => {
