@@ -91,6 +91,31 @@ io.on("connection", (socket) => {
     io.to(to).emit("init", { strokes, layers });
   });
 
+  socket.on("remove-user", ({ guestId }) => {
+    console.log("name Sent:");
+    const roomId = socket.data.roomId;
+
+    if (!roomId) return;
+    const hostId = roomsMap.get(roomId);
+    if (socket.id !== hostId) {
+      return io
+        .to(socket.id)
+        .emit("no-permission", "Only the host can remove users.");
+    }
+
+    const guestSocket = io.sockets.sockets.get(guestId);
+    if (!guestSocket) return;
+    guestSocket.leave(roomId);
+    console.log(
+      `User ${guestId} removed from room ${roomId} by host ${socket.id}`
+    );
+
+    delete guestSocket.data.roomId;
+    
+    guestSocket.emit("user-removed", {});
+    io.to(roomId).emit("user-left", { guestId });
+  });
+
   socket.on("disconnect", () => {
     const roomId = socket.data.roomId;
     if (!roomId) return;
@@ -99,9 +124,9 @@ io.on("connection", (socket) => {
     if (socket.id === hostId) {
       roomsMap.delete(roomId);
       io.to(roomId).emit("room-closed");
-    }else{
-      const guestId= socket.id;
-          io.to(roomId).emit("user-left",{guestId});
+    } else {
+      const guestId = socket.id;
+      io.to(roomId).emit("user-left", { guestId });
     }
   });
 });

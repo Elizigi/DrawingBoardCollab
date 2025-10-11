@@ -92,6 +92,12 @@ const TopRightToolbarVM = () => {
       prevUsers.filter((user) => user.guestId !== guestId)
     );
   };
+
+  const handleUserRemoved = () => {
+    onlineStatus.isOnline = false;
+    socket.disconnect();
+  };
+
   const handleMenuOpen = () => {
     setMenuOpen(!menuOpen);
   };
@@ -101,6 +107,7 @@ const TopRightToolbarVM = () => {
     socket.on("joined-room", handleJoinedRoom);
     socket.on("user-moved", handleUserMoved);
     socket.on("user-left", handleUserLeft);
+    socket.on("user-removed", handleUserRemoved);
 
     return () => {
       socket.off("user-joined", handleUserJoined);
@@ -108,6 +115,7 @@ const TopRightToolbarVM = () => {
       socket.off("joined-room", handleJoinedRoom);
       socket.off("user-moved", handleUserMoved);
       socket.off("user-left", handleUserLeft);
+      socket.off("user-removed", handleUserRemoved);
     };
   }, []);
   const handleConnectionWindow = (host = false) => {
