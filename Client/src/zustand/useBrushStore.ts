@@ -102,7 +102,6 @@ export const useBrushStore = create<BrushState>((set, _) => ({
       if (!stroke.final) return state;
 
       const strokes = [...state.strokes, stroke];
-      console.log(strokes);
 
       return { strokes };
     }),

@@ -38,7 +38,6 @@ const LayerContainerVM = () => {
     removeLayer(layerId);
   };
   const addComingLayer = ({ layerId, layerName }: LayerPayload) => {
-    console.log(layerId, layerName);
     addLayer(layerName, layerId);
   };
   const removingLayer = ({ layerId }: { layerId: string }) => {
@@ -58,14 +57,11 @@ const LayerContainerVM = () => {
     if (activeLayerId === id) {
       const visibleLayer = allLayers.find((layer) => layer.visible === true&&layer.id!==id);
       const newActiveLayerID = visibleLayer ? visibleLayer.id : null;
-      if (newActiveLayerID === null) {
-        console.log("null");
-      }
+    
       setActiveLayer(newActiveLayerID);
     }
   };
   const changeLayer = (id: string) => {
-    console.log(id);
     setActiveLayer(id);
   };
   const handlePlusBtnClick = () => {
