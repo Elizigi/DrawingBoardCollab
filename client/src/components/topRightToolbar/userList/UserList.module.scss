@@ -15,6 +15,8 @@ $active-color: #6b7280;
   padding: 0 1rem 1rem 1rem;
   z-index: 9999999;
   max-width: 250px;
+  min-width: 190px;
+
   cursor: text;
   pointer-events: auto;
   border-radius: 1rem;
@@ -27,7 +29,7 @@ $active-color: #6b7280;
   color: $text-color;
   background-color: transparent;
   border: none;
-  padding: 0.5rem;
+  padding: 0 0.5rem;
   width: calc(100% - 1rem);
   border-top: 1px solid transparent;
   border-bottom: 1px solid transparent;
@@ -36,8 +38,9 @@ $active-color: #6b7280;
 
   h2 {
     font-size: 1.5rem;
-        overflow-x: hidden;
-max-width: 80%;
+    overflow-x: hidden;
+    max-width: 75%;
+    margin: 0.5rem 0;
   }
 
   &:hover {
@@ -55,8 +58,10 @@ max-width: 80%;
   align-items: center;
   h3 {
     font-size: 1rem;
+    color: white;
   }
 }
+
 .userColorIcon {
   margin: 0 0.5rem;
 

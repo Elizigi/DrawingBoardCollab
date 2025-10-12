@@ -93,9 +93,8 @@ const TopRightToolbarVM = () => {
     );
   };
 
-  const handleUserRemoved = () => {
-    console.log("You have been removed from the room by the host.");
-
+  const handleUserRemoved = ({ reason }: { reason: string }) => {
+    console.log("Removed:", reason);
     setConnected(false);
     setMenuOpen(false);
     setRoomId("");
@@ -151,7 +150,7 @@ const TopRightToolbarVM = () => {
     }
   };
   const handleLeaveRoom = () => {
-    socket.disconnect();
+    socket.emit("leave-room");
   };
 
   const handleJoinedRoom = ({ roomId }: { roomId: string }) => {

@@ -7,10 +7,9 @@ interface UserListProps {
   menuOpen: boolean;
 }
 const UserList: FC<UserListProps> = ({ connectedUsers, menuOpen }) => {
-
-  const removeUser=(guestId:string)=>{
-    socket.emit("remove-user",{guestId})
-  }
+  const removeUser = (guestId: string) => {
+    socket.emit("remove-user", { guestId });
+  };
 
   return (
     <>
@@ -18,7 +17,15 @@ const UserList: FC<UserListProps> = ({ connectedUsers, menuOpen }) => {
         <div
           className={`${styles.userList} ${menuOpen ? styles.shown : styles.transparent}`}
         >
-          <h3 style={{ color: menuOpen ? "black" : "transparent" }}>
+          <h3
+            style={{
+              opacity: menuOpen ? 1 : 0,
+              visibility: menuOpen ? "visible" : "hidden",
+              pointerEvents: menuOpen ? "auto" : "none",
+              userSelect: menuOpen ? "all" : "none",
+              cursor: menuOpen ? "auto" : "none",
+            }}
+          >
             Users in the Room:
           </h3>
           <div className={styles.usersContainer}>
@@ -28,8 +35,15 @@ const UserList: FC<UserListProps> = ({ connectedUsers, menuOpen }) => {
                   className={styles.userColorIcon}
                   style={{ backgroundColor: user.color }}
                 ></div>
-               <h2> {user.name}</h2>
-                {onlineStatus.isAdmin && menuOpen && <button className={styles.removeUser} onClick={()=>removeUser(user.guestId)}>X</button>}
+                <h2 className={styles.userName}> {user.name}</h2>
+                {onlineStatus.isAdmin && menuOpen && (
+                  <button
+                    className={styles.removeUser}
+                    onClick={() => removeUser(user.guestId)}
+                  >
+                    X
+                  </button>
+                )}
               </div>
             ))}
           </div>
