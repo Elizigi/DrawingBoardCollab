@@ -28,17 +28,25 @@ $active-color: #6b7280;
   background-color: transparent;
   border: none;
   padding: 0.5rem;
-  width: 100%;
+  width: calc(100% - 1rem);
   border-top: 1px solid transparent;
   border-bottom: 1px solid transparent;
   border-radius: 0.5rem;
   cursor: pointer;
-  font-size: 1.5rem;
+
+  h2 {
+    font-size: 1.5rem;
+        overflow-x: hidden;
+max-width: 80%;
+  }
+
   &:hover {
     border-top-color: $bg-dark;
     border-bottom-color: $bg-dark;
     background-color: #626f8a42;
-      text-shadow: 0 0 1px #000, 0 0 2px #000;
+    text-shadow:
+      0 0 1px #000,
+      0 0 2px #000;
   }
 
   display: flex;
@@ -65,4 +73,12 @@ $active-color: #6b7280;
 }
 .transparent {
   background-color: transparent;
+}
+.removeUser {
+  all: unset;
+  margin-left: auto;
+  color: rgb(141, 4, 4);
+  &:hover {
+    color: red;
+  }
 }
