@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { onlineStatus, socket } from "../../Main";
 import styles from "./TopRightToolbar.module.scss";
+import { EventTypes, useBrushStore } from "../../zustand/useBrushStore";
 
 export interface ConnectedUser {
   name: string;
@@ -10,6 +11,8 @@ export interface ConnectedUser {
 }
 
 const TopRightToolbarVM = () => {
+  const addEvent = useBrushStore((state) => state.addEvent);
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [onlineWindowOpen, setOnlineWindowOpen] = useState(false);
@@ -34,6 +37,8 @@ const TopRightToolbarVM = () => {
     guestId: string;
   }) => {
     console.log(guestId, "Has joined");
+    addEvent(EventTypes.joinEvent, name);
+
     setConnectedUsers((prev) => [
       ...prev,
       { name, position: { x: 0, y: 0 }, guestId, color: getRandomColor() },

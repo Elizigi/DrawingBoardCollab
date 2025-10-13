@@ -5,7 +5,6 @@ type LayerMeta = {
   name: string;
   visible: boolean;
 };
-
 export type Stroke = {
   points: { x: number; y: number }[];
   color: number;
@@ -14,6 +13,21 @@ export type Stroke = {
   layerId: string;
   local?: boolean;
   final?: boolean;
+};
+export const EventTypes = {
+  userKickedEvent: "have been kicked",
+  KickedEvent: "you have been kicked",
+  joinEvent: "has joined",
+  roomClosedEvent: "room closed",
+  userLeftEvent: "has left!",
+} as const;
+
+export type EventType = (typeof EventTypes)[keyof typeof EventTypes];
+
+export type EventAlert = {
+  eventType: EventType;
+  name?: string;
+  eventId: string;
 };
 
 export interface DrawingState {}
@@ -51,14 +65,19 @@ type BrushState = {
   toggleLayer: (id: string) => void;
 
   strokes: Stroke[];
+
   addStroke: (stroke: Stroke) => void;
   clearStrokes: () => void;
   setStrokes: (strokes: Stroke[]) => void;
+
+  events: EventAlert[];
+  addEvent: (eventType: EventType, name: string) => void;
+  removeEvent: (eventId: string) => void;
 };
 
 const defaultLayer = "background-layer";
 
-export const useBrushStore = create<BrushState>((set, _) => ({
+export const useBrushStore = create<BrushState>((set, get) => ({
   isMouseDown: false,
   setMouseDown: (truth) => set({ isMouseDown: truth }),
   brushColor: 0x000000,
@@ -115,7 +134,7 @@ export const useBrushStore = create<BrushState>((set, _) => ({
     set(() => {
       return {
         layers: layers,
-        activeLayerId: layers[0].id||null,
+        activeLayerId: layers[0].id || null,
       };
     });
   },
@@ -149,4 +168,21 @@ export const useBrushStore = create<BrushState>((set, _) => ({
       );
       return { layers };
     }),
+  events: [],
+  addEvent: (eventType, name) =>
+    set((state) => {
+      const eventId = crypto.randomUUID();
+      setTimeout(() => get().removeEvent(eventId), 2500);
+
+      return {
+        events: [{ eventType, name, eventId },...state.events],
+      };
+    }),
+  removeEvent: (eventId) => {
+    set((state) => {
+      return {
+        events: state.events.filter((event) => event.eventId !== eventId),
+      };
+    });
+  },
 }));

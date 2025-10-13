@@ -1,11 +1,13 @@
+import { useBrushStore } from '../../zustand/useBrushStore';
 import styles from './EventAlert.module.scss'
 
 const EventAlert = () => {
-    const events = ["user joined : subscribe!"]
+      const events = useBrushStore((state) => state.events);
+    
   return (
     <div className={styles.eventContainer}>
       {events.map(event=>(
-        <div key={event} className={styles.eventBar}>{event}</div>
+        <div key={event.name} className={styles.eventBar}>{event.name} {event.eventType}</div>
       ))}
     </div>
   )
