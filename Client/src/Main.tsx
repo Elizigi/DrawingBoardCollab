@@ -132,6 +132,9 @@ export const onlineStatus = {
       layers: layers,
     });
   });
+  socket.on("remove-stroke", ({ deleteStroke }) => {
+    useBrushStore.getState().removeStroke(deleteStroke);
+  });
 
   socket.on("init", (data) => {
     if (!data) return;
@@ -153,7 +156,7 @@ export const onlineStatus = {
         if (!layersCanvasMap[layerId]) createLayerCanvas(layerId);
         if (Array.isArray(strokeArray)) {
           strokeArray.forEach((stroke: Stroke) => {
-            allIncomingStrokes.push({ ...stroke, final: true });
+            allIncomingStrokes.push({ ...stroke, final: true, isRemote: true });
 
             const entry = layersCanvasMap[layerId];
             if (entry) drawStrokeToCtx(entry.ctx, { ...stroke, final: true });
@@ -168,8 +171,9 @@ export const onlineStatus = {
   socket.on("draw-progress", (stroke: any) => {
     if (stroke.senderId === socket.id) return;
     const remoteTempCanvas = getRemoteTempCanvas();
-
     if (!remoteTempCanvas) return;
+
+    stroke.isRemote = true;
 
     const ctx = remoteTempCanvas.getContext("2d")!;
     ctx.clearRect(0, 0, remoteTempCanvas.width, remoteTempCanvas.height);

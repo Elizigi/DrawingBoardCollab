@@ -5,9 +5,12 @@ import {
   addPoint,
   clearLayerCanvas,
   commitStroke,
+  findLastLocalStroke,
   getMousePosPercentOnElement,
 } from "./drawingHelpers";
 
+const allowedKeys = { ctrl: "ControlLeft", zed: "KeyZ" };
+const keysDown = { ctrl: false, zed: false };
 export function addListeners(topInputCanvas: HTMLCanvasElement) {
   document.addEventListener("mouseup", () => {
     useBrushStore.getState().setMouseDown(false);
@@ -29,5 +32,24 @@ export function addListeners(topInputCanvas: HTMLCanvasElement) {
   document.addEventListener("clearCanvas", () => {
     useBrushStore.getState().clearStrokes();
     Object.keys(layersCanvasMap).forEach((id) => clearLayerCanvas(id));
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.code === allowedKeys.ctrl) {
+      keysDown.ctrl = true;
+    }
+    if (e.code === allowedKeys.zed && keysDown.ctrl) {
+      const lastLocalStroke = findLastLocalStroke();
+      if (!lastLocalStroke) return;
+
+      useBrushStore.getState().removeStroke(lastLocalStroke);
+      if (onlineStatus.inRoom)
+        socket.emit("delete-stroke", { deleteStroke: lastLocalStroke });
+    }
+  });
+  document.addEventListener("keyup", (e) => {
+    if (e.code === allowedKeys.ctrl) {
+      keysDown.ctrl = false;
+    }
   });
 }

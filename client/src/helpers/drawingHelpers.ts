@@ -192,7 +192,7 @@ export function commitStroke() {
   const state = useBrushStore.getState();
   const { pendingPoints, activeLayerId } = state;
 
-  if (pendingPoints.length === 0||activeLayerId === null) return;
+  if (pendingPoints.length === 0 || activeLayerId === null) return;
   processStrokeToTemp();
   const entry = layersCanvasMap[activeLayerId];
 
@@ -202,6 +202,7 @@ export function commitStroke() {
   }
 
   const newStroke = {
+    strokeId: crypto.randomUUID(),
     points: [...pendingPoints],
     color: state.brushColor,
     size: state.brushSize,
@@ -243,4 +244,21 @@ export function addPoint(x: number, y: number) {
   }
   state.addPendingPoint({ x, y });
   state.setLastPoint({ x, y });
+}
+
+export function findLastLocalStroke() {
+  const strokes = useBrushStore.getState().strokes;
+
+  let lastLocalStrokeIndex = -1;
+
+  for (let i = strokes.length - 1; i >= 0; i--) {
+    if (strokes[i].isRemote !== true) {
+      lastLocalStrokeIndex = i;
+      break;
+    }
+  }
+
+  if (lastLocalStrokeIndex === -1) return null;
+
+  return strokes[lastLocalStrokeIndex];
 }

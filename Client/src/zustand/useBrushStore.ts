@@ -1,19 +1,15 @@
 import { create } from "zustand";
 
-type LayerMeta = {
-  id: string;
-  name: string;
-  visible: boolean;
+const defaultLayer = "background-layer";
+
+export type EventType = (typeof EventTypes)[keyof typeof EventTypes];
+
+export type EventAlert = {
+  eventType: EventType;
+  name?: string;
+  eventId: string;
 };
-export type Stroke = {
-  points: { x: number; y: number }[];
-  color: number;
-  size: number;
-  opacity: number;
-  layerId: string;
-  local?: boolean;
-  final?: boolean;
-};
+
 export const EventTypes = {
   userKickedEvent: "have been kicked",
   KickedEvent: "You have been kicked",
@@ -25,15 +21,22 @@ export const EventTypes = {
   default: "Disconnected from room",
 } as const;
 
-export type EventType = (typeof EventTypes)[keyof typeof EventTypes];
-
-export type EventAlert = {
-  eventType: EventType;
-  name?: string;
-  eventId: string;
+type LayerMeta = {
+  id: string;
+  name: string;
+  visible: boolean;
 };
 
-export interface DrawingState {}
+export type Stroke = {
+  strokeId: string;
+  points: { x: number; y: number }[];
+  color: number;
+  size: number;
+  opacity: number;
+  layerId: string;
+  isRemote?: boolean;
+  final?: boolean;
+};
 
 type BrushState = {
   pendingPoints: { x: number; y: number }[];
@@ -68,17 +71,17 @@ type BrushState = {
   toggleLayer: (id: string) => void;
 
   strokes: Stroke[];
+  removedStrokesArray: Stroke[];
 
   addStroke: (stroke: Stroke) => void;
   clearStrokes: () => void;
   setStrokes: (strokes: Stroke[]) => void;
+  removeStroke: (lastLocalStroke:Stroke) => void;
 
   events: EventAlert[];
   addEvent: (eventType: EventType, name: string) => void;
   removeEvent: (eventId: string) => void;
 };
-
-const defaultLayer = "background-layer";
 
 export const useBrushStore = create<BrushState>((set, get) => ({
   isMouseDown: false,
@@ -119,6 +122,18 @@ export const useBrushStore = create<BrushState>((set, get) => ({
   updateLastStrokeTime: (time) => set({ lastStrokeTime: time }),
 
   strokes: [],
+  removedStrokesArray: [],
+  removeStroke: (lastLocalStroke:Stroke) =>
+    set((state) => {
+     
+      const newStrokes = state.strokes.filter((stroke)=>(stroke.strokeId!==lastLocalStroke.strokeId))
+      const isLocal=!lastLocalStroke.isRemote;
+      return {
+        strokes: newStrokes,
+        removedStrokesArray:isLocal? [...state.removedStrokesArray, lastLocalStroke]:state.removedStrokesArray,
+      };
+    }),
+
   addStroke: (stroke) =>
     set((state) => {
       if (!stroke.final) return state;

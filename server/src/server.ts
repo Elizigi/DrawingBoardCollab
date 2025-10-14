@@ -37,6 +37,12 @@ io.on("connection", (socket) => {
       .emit("draw-progress", { ...stroke, senderId: socket.id });
   });
 
+  socket.on("delete-stroke", ({ deleteStroke }) => {
+    const roomId = socket.data.roomId;
+    if (!roomId) return;
+    socket.broadcast.to(roomId).emit("remove-stroke", { deleteStroke });
+  });
+
   socket.on("delete-layer", ({ layerId }) => {
     const roomId = socket.data.roomId;
     const hostId = roomsMap.get(roomId);
