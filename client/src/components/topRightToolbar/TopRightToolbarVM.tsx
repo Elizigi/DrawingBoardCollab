@@ -106,18 +106,18 @@ const TopRightToolbarVM = () => {
   };
   const handleUserRemoved = ({ reason }: { reason: string }) => {
     console.log("Removed:", reason);
-    setConnected(false);
-    setMenuOpen(false);
-    setRoomId("");
-    setIsHost(false);
-    setError("");
-    setConnectedUsers([]);
+    cleanup();
 
-    addEvent(EventTypes.KickedEvent, "");
-    onlineStatus.inRoom = false;
-    onlineStatus.isAdmin = false;
+    (reasonHandlers[reason] || reasonHandlers.default)();
   };
-
+  const reasonHandlers: Record<string, () => void> = {
+    "removed by host": () => addEvent(EventTypes.KickedEvent, ""),
+    "left by choice": () => addEvent(EventTypes.userLeftEvent, ""),
+    "left by choice and room closed": () =>
+      addEvent(EventTypes.roomClosedEvent, ""),
+    "room closed": () => addEvent(EventTypes.roomClosedEvent, ""),
+    default: () => addEvent(EventTypes.default, ""),
+  };
   const handleMenuOpen = () => {
     setMenuOpen(!menuOpen);
   };
@@ -145,7 +145,16 @@ const TopRightToolbarVM = () => {
     setHasInteracted(false);
     setOnlineWindowOpen(!onlineWindowOpen);
   };
-
+  const cleanup = () => {
+    setConnected(false);
+    setMenuOpen(false);
+    setRoomId("");
+    setIsHost(false);
+    setError("");
+    setConnectedUsers([]);
+    onlineStatus.inRoom = false;
+    onlineStatus.isAdmin = false;
+  };
   useEffect(() => {
     if (!hasInteracted) return;
 

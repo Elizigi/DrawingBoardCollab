@@ -20,6 +20,7 @@ export const EventTypes = {
   joinEvent: "has joined",
   roomClosedEvent: "room closed",
   userLeftEvent: "has left!",
+  default: "disconnected from room",
 } as const;
 
 export type EventType = (typeof EventTypes)[keyof typeof EventTypes];
@@ -175,7 +176,7 @@ export const useBrushStore = create<BrushState>((set, get) => ({
       setTimeout(() => get().removeEvent(eventId), 2500);
 
       return {
-        events: [{ eventType, name, eventId },...state.events],
+        events: [{ eventType, name, eventId }, ...state.events],
       };
     }),
   removeEvent: (eventId) => {
