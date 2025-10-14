@@ -92,8 +92,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("remove-user", ({ guestId }) => {
-    console.log("name Sent:");
     const roomId = socket.data.roomId;
+    const name = socket.data.name;
 
     if (!roomId) return;
     const hostId = roomsMap.get(roomId);
@@ -111,13 +111,14 @@ io.on("connection", (socket) => {
     );
 
     delete guestSocket.data.roomId;
-
     guestSocket.emit("user-removed", { reason: "removed by host" });
-    io.to(roomId).emit("user-left", { guestId });
+    io.to(roomId).emit("user-kicked", { guestId, name });
   });
 
   socket.on("leave-room", () => {
     const roomId = socket.data.roomId;
+    const name = socket.data.name;
+
     if (!roomId) return;
 
     const hostId = roomsMap.get(roomId);
@@ -135,13 +136,15 @@ io.on("connection", (socket) => {
         reason: "left by choice and room closed",
       });
     } else {
-      io.to(roomId).emit("user-left", { guestId: socket.id });
+      io.to(roomId).emit("user-left", { guestId: socket.id, name });
       io.to(socket.id).emit("user-removed", { reason: "left by choice" });
     }
   });
 
   socket.on("disconnect", () => {
     const roomId = socket.data.roomId;
+    const name = socket.data.name;
+
     if (!roomId) return;
 
     const hostId = roomsMap.get(roomId);
@@ -150,7 +153,7 @@ io.on("connection", (socket) => {
       io.to(roomId).emit("user-removed", { reason: "room closed" });
     } else {
       const guestId = socket.id;
-      io.to(roomId).emit("user-left", { guestId });
+      io.to(roomId).emit("user-left", { guestId, name });
     }
   });
 });

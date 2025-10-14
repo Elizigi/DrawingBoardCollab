@@ -90,14 +90,20 @@ const TopRightToolbarVM = () => {
       )
     );
   };
-  const handleUserLeft = ({ guestId }: ConnectedUser) => {
+  const handleUserLeft = ({ guestId, name }: ConnectedUser) => {
     console.log(`${guestId} has left`);
-
+    addEvent(EventTypes.userLeftEvent, name);
     setConnectedUsers((prevUsers) =>
       prevUsers.filter((user) => user.guestId !== guestId)
     );
   };
-
+  const handleUserKicked = ({ guestId, name }: ConnectedUser) => {
+    console.log(`${guestId} was kicked`);
+    addEvent(EventTypes.userKickedEvent, name);
+    setConnectedUsers((prevUsers) =>
+      prevUsers.filter((user) => user.guestId !== guestId)
+    );
+  };
   const handleUserRemoved = ({ reason }: { reason: string }) => {
     console.log("Removed:", reason);
     setConnected(false);
@@ -107,6 +113,7 @@ const TopRightToolbarVM = () => {
     setError("");
     setConnectedUsers([]);
 
+    addEvent(EventTypes.KickedEvent, "");
     onlineStatus.inRoom = false;
     onlineStatus.isAdmin = false;
   };
@@ -121,6 +128,7 @@ const TopRightToolbarVM = () => {
     socket.on("user-moved", handleUserMoved);
     socket.on("user-left", handleUserLeft);
     socket.on("user-removed", handleUserRemoved);
+    socket.on("user-kicked", handleUserKicked);
 
     return () => {
       socket.off("user-joined", handleUserJoined);
@@ -129,6 +137,7 @@ const TopRightToolbarVM = () => {
       socket.off("user-moved", handleUserMoved);
       socket.off("user-left", handleUserLeft);
       socket.off("user-removed", handleUserRemoved);
+      socket.off("user-kicked", handleUserKicked);
     };
   }, []);
   const handleConnectionWindow = (host = false) => {
