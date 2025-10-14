@@ -20,7 +20,7 @@ io.on("connection", (socket) => {
   socket.emit("user-id", socket.id);
 
   socket.on("create-room", ({ name }) => {
-    const roomId = `room_${socket.id}`;
+    const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
     socket.join(roomId);
     roomsMap.set(roomId, socket.id);
     socket.data.isHost = true;
