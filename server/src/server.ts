@@ -93,7 +93,6 @@ io.on("connection", (socket) => {
 
   socket.on("remove-user", ({ guestId }) => {
     const roomId = socket.data.roomId;
-    const name = socket.data.name;
 
     if (!roomId) return;
     const hostId = roomsMap.get(roomId);
@@ -109,6 +108,7 @@ io.on("connection", (socket) => {
     console.log(
       `User ${guestId} removed from room ${roomId} by host ${socket.id}`
     );
+    const name = guestSocket.data.name;
 
     delete guestSocket.data.roomId;
     guestSocket.emit("user-removed", { reason: "removed by host" });
