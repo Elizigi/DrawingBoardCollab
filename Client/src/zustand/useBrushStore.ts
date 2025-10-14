@@ -76,7 +76,8 @@ type BrushState = {
   addStroke: (stroke: Stroke) => void;
   clearStrokes: () => void;
   setStrokes: (strokes: Stroke[]) => void;
-  removeStroke: (lastLocalStroke:Stroke) => void;
+  removeStroke: (lastLocalStroke: Stroke) => void;
+  reAssignStroke: (strokeId: string) => void;
 
   events: EventAlert[];
   addEvent: (eventType: EventType, name: string) => void;
@@ -123,14 +124,18 @@ export const useBrushStore = create<BrushState>((set, get) => ({
 
   strokes: [],
   removedStrokesArray: [],
-  removeStroke: (lastLocalStroke:Stroke) =>
+  removeStroke: (lastLocalStroke: Stroke) =>
     set((state) => {
-     
-      const newStrokes = state.strokes.filter((stroke)=>(stroke.strokeId!==lastLocalStroke.strokeId))
-      const isLocal=!lastLocalStroke.isRemote;
+      const newStrokes = state.strokes.filter(
+        (stroke) => stroke.strokeId !== lastLocalStroke.strokeId
+      );
+      const isLocal = !lastLocalStroke.isRemote;
+      const updatedLocalArray = isLocal
+        ? [lastLocalStroke, ...state.removedStrokesArray].slice(0, 10)
+        : state.removedStrokesArray;
       return {
         strokes: newStrokes,
-        removedStrokesArray:isLocal? [...state.removedStrokesArray, lastLocalStroke]:state.removedStrokesArray,
+        removedStrokesArray: updatedLocalArray,
       };
     }),
 
@@ -143,6 +148,15 @@ export const useBrushStore = create<BrushState>((set, get) => ({
       return { strokes };
     }),
 
+  reAssignStroke: (strokeId: string) =>
+    set((state) => {
+      const filteredArray = state.removedStrokesArray.filter(
+        (stroke) => stroke.strokeId !== strokeId
+      );
+
+      return { removedStrokesArray: filteredArray };
+    }),
+    
   clearStrokes: () => set({ strokes: [] }),
 
   setStrokes: (strokes) => {
@@ -156,6 +170,7 @@ export const useBrushStore = create<BrushState>((set, get) => ({
       };
     });
   },
+
   addLayer: (name, id) => {
     set((state) => ({
       layers: [...state.layers, { id, name, visible: true }],

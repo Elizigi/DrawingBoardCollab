@@ -9,8 +9,8 @@ import {
   getMousePosPercentOnElement,
 } from "./drawingHelpers";
 
-const allowedKeys = { ctrl: "ControlLeft", zed: "KeyZ" };
-const keysDown = { ctrl: false, zed: false };
+const allowedKeys = { ctrl: "ControlLeft", z: "KeyZ", y: "KeyY" };
+const keysDown = { ctrl: false, z: false };
 export function addListeners(topInputCanvas: HTMLCanvasElement) {
   document.addEventListener("mouseup", () => {
     useBrushStore.getState().setMouseDown(false);
@@ -38,13 +38,23 @@ export function addListeners(topInputCanvas: HTMLCanvasElement) {
     if (e.code === allowedKeys.ctrl) {
       keysDown.ctrl = true;
     }
-    if (e.code === allowedKeys.zed && keysDown.ctrl) {
+    if (e.code === allowedKeys.z && keysDown.ctrl) {
       const lastLocalStroke = findLastLocalStroke();
       if (!lastLocalStroke) return;
 
       useBrushStore.getState().removeStroke(lastLocalStroke);
       if (onlineStatus.inRoom)
         socket.emit("delete-stroke", { deleteStroke: lastLocalStroke });
+
+    } else if (e.code === allowedKeys.y && keysDown.ctrl) {
+      const removedStrokesArray = useBrushStore.getState().removedStrokesArray;
+
+      if (removedStrokesArray.length < 1) return;
+      const reAssignedStroke = removedStrokesArray[0];
+      useBrushStore.getState().reAssignStroke(reAssignedStroke.strokeId);
+      useBrushStore.getState().addStroke(reAssignedStroke);
+      if (onlineStatus.inRoom)
+        socket.emit("draw-progress", { ...reAssignedStroke} );
     }
   });
   document.addEventListener("keyup", (e) => {
