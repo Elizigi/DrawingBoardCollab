@@ -35,17 +35,15 @@ export function addListeners(topInputCanvas: HTMLCanvasElement) {
   });
 
   document.addEventListener("keydown", (e) => {
-    if (e.code === allowedKeys.ctrl) {
+    if (e.code === allowedKeys.ctrl && !keysDown.ctrl) {
       keysDown.ctrl = true;
-    }
-    if (e.code === allowedKeys.z && keysDown.ctrl) {
+    } else if (e.code === allowedKeys.z && keysDown.ctrl) {
       const lastLocalStroke = findLastLocalStroke();
       if (!lastLocalStroke) return;
 
       useBrushStore.getState().removeStroke(lastLocalStroke);
       if (onlineStatus.inRoom)
         socket.emit("delete-stroke", { deleteStroke: lastLocalStroke });
-
     } else if (e.code === allowedKeys.y && keysDown.ctrl) {
       const removedStrokesArray = useBrushStore.getState().removedStrokesArray;
 
@@ -54,7 +52,7 @@ export function addListeners(topInputCanvas: HTMLCanvasElement) {
       useBrushStore.getState().reAssignStroke(reAssignedStroke.strokeId);
       useBrushStore.getState().addStroke(reAssignedStroke);
       if (onlineStatus.inRoom)
-        socket.emit("draw-progress", { ...reAssignedStroke} );
+        socket.emit("draw-progress", { ...reAssignedStroke });
     }
   });
   document.addEventListener("keyup", (e) => {
