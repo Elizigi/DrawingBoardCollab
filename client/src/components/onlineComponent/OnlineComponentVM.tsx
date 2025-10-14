@@ -1,5 +1,6 @@
 import React, { RefObject, useEffect, useState } from "react";
 import { onlineStatus, socket } from "../../Main";
+import { EventTypes, useBrushStore } from "../../zustand/useBrushStore";
 
 const OnlineComponentVM = (
   isHost: boolean,
@@ -11,6 +12,7 @@ const OnlineComponentVM = (
   setRoomId: (roomId: string) => void
 ) => {
   const [myName, setMyName] = useState("");
+  const addEvent = useBrushStore((state) => state.addEvent);
 
   const handleModalOpen = () => {
     setOnlineWindowOpen(false);
@@ -42,7 +44,7 @@ const OnlineComponentVM = (
     setRoomId(roomId);
     onlineStatus.inRoom = true;
     onlineStatus.isAdmin = true;
-
+    addEvent(EventTypes.roomCreatedEvent, "");
     handleModalOpen();
 
     setConnected(true);

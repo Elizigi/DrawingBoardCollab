@@ -16,11 +16,13 @@ export type Stroke = {
 };
 export const EventTypes = {
   userKickedEvent: "have been kicked",
-  KickedEvent: "you have been kicked",
+  KickedEvent: "You have been kicked",
+  roomCreatedEvent: "Room created",
+  joinedEvent: "Room joined",
   joinEvent: "has joined",
-  roomClosedEvent: "room closed",
+  roomClosedEvent: "Room closed",
   userLeftEvent: "has left!",
-  default: "disconnected from room",
+  default: "Disconnected from room",
 } as const;
 
 export type EventType = (typeof EventTypes)[keyof typeof EventTypes];

@@ -179,7 +179,7 @@ const TopRightToolbarVM = () => {
   const handleJoinedRoom = ({ roomId }: { roomId: string }) => {
     setRoomId(roomId);
     onlineStatus.inRoom = true;
-
+    addEvent(EventTypes.joinedEvent, "");
     console.log("joined:", roomId);
     document.dispatchEvent(new CustomEvent("clearCanvas"));
     socket.emit("request-state", { to: roomId });
