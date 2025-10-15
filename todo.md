@@ -7,3 +7,7 @@
 - [ ] Add filler (bucket) tool
 - [ ] Add export as PNG/JPEG
 - [ ] Add animations 
+- [ ] Lock layer ability
+- [ ] Change layers position
+- [ ] Change exit button to text exit
+- [ ] Chat ?!

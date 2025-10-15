@@ -43,7 +43,7 @@ const LayersContainer = () => {
               <input
                 type="checkbox"
                 checked={true}
-                className={`${styles.visibilityIcon} ${!layer.visible ? styles.hidden : ""}`}
+                className={`${styles.visibilityIcon} ${layer.visible ?  "" :styles.hidden}`}
                 onChange={(e) => {
                   e.stopPropagation();
                   changeVisible(layer.id);
