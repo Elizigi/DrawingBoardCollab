@@ -15,6 +15,7 @@ body {
   display: flex;
   position: relative;
   align-items: center;
+  font-family: sans-serif;
 }
 
 #rot {
