@@ -13,7 +13,7 @@ $active-color: #6b7280;
   bottom: 10%;
   z-index: 999999;
   left: 0;
-
+  cursor: grab;
   .hideLayersButton {
     all: unset;
     background-color: $bg-medium;
@@ -95,6 +95,7 @@ $active-color: #6b7280;
   }
 
   .layersContainer {
+    cursor: default;
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
@@ -233,4 +234,3 @@ $active-color: #6b7280;
   transform: translateX(-90%);
   transition: transform 0.3s ease-out;
 }
-

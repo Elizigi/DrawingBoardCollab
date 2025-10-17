@@ -11,6 +11,7 @@ const LayersContainer = () => {
     containerVisible,
     layersToolPositionOffset,
     toolbarElement,
+    isDragging,
     deleteLayer,
     handlePlusBtnClick,
     updateText,
@@ -35,7 +36,10 @@ const LayersContainer = () => {
       }
       ref={toolbarElement}
     >
-      <div className={`${styles.layersToolbar}`}>
+      <div
+        style={{ cursor: isDragging ? "grabbing" : "grab" }}
+        className={`${styles.layersToolbar}`}
+      >
         <div className={styles.addNewLayer}>
           <button className={styles.plusBTN} onClick={handlePlusBtnClick}>
             +

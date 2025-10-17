@@ -133,6 +133,7 @@ const LayerContainerVM = () => {
     containerVisible,
     layersToolPositionOffset,
     toolbarElement,
+    isDragging,
     deleteLayer,
     handlePlusBtnClick,
     updateText,
