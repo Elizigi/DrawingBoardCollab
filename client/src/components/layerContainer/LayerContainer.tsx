@@ -9,19 +9,33 @@ const LayersContainer = () => {
     activeLayerId,
     layerNameInputOpen,
     containerVisible,
+    layersToolPositionOffset,
+    toolbarElement,
     deleteLayer,
     handlePlusBtnClick,
     updateText,
     changeLayer,
     changeVisible,
     toggleLayerContainer,
+    handleMouseDown,
   } = LayerContainerVM();
-
   return (
-    <div className={`${styles.layerToolbarContainer}  ${containerVisible ? styles.layerVisible : styles.layerHidden}`}>
-      <div
-        className={`${styles.layersToolbar}`}
-      >
+    <div
+      className={`${styles.layerToolbarContainer}  ${containerVisible ? styles.layerVisible : styles.layerHidden}`}
+      aria-roledescription="draggable item"
+      role="toolbar"
+      onMouseDown={handleMouseDown}
+      style={
+        layersToolPositionOffset.x !== 0 || layersToolPositionOffset.y !== 0
+          ? {
+              top: `${layersToolPositionOffset.y}px`,
+              left: `${layersToolPositionOffset.x}px`,
+            }
+          : undefined
+      }
+      ref={toolbarElement}
+    >
+      <div className={`${styles.layersToolbar}`}>
         <div className={styles.addNewLayer}>
           <button className={styles.plusBTN} onClick={handlePlusBtnClick}>
             +

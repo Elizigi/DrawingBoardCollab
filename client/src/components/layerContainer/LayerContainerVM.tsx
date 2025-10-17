@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useBrushStore } from "../../zustand/useBrushStore";
 import { onlineStatus, socket } from "../../Main";
 type LayerPayload = {
@@ -18,10 +18,19 @@ const LayerContainerVM = () => {
 
   const [newLayerName, setNewLayerName] = useState("");
   const [layerNameInputOpen, setLayerNameInputOpen] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+ 
+  const [isDragging, setIsDragging] = useState(false);
+  const toolbarElement = useRef<HTMLDivElement>(null);
 
   const updateText = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewLayerName(e.target.value);
   };
+   const [layersToolPositionOffset, setLayersToolPositionOffset] = useState({
+    x: 0,
+    y: 0,
+  });
+
   const addNewLayer = () => {
     if (newLayerName.trim().length < 2) return;
     const layerId = crypto.randomUUID();
@@ -68,7 +77,7 @@ const LayerContainerVM = () => {
   const changeLayer = (id: string) => {
     setActiveLayer(id);
   };
-  
+
   const toggleLayerContainer = () => {
     setContainerVisible(!containerVisible);
   };
@@ -77,18 +86,61 @@ const LayerContainerVM = () => {
     if (!layerNameInputOpen) return setLayerNameInputOpen(true);
     addNewLayer();
   };
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!toolbarElement.current) return;
+
+    setIsDragging(true);
+    const rect = toolbarElement.current.getBoundingClientRect();
+    setDragStart({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMouseMove = (e: MouseEvent): void => {
+      if (!toolbarElement.current) return;
+
+      const newX = e.clientX - dragStart.x;
+      const newY = e.clientY - dragStart.y;
+
+      setLayersToolPositionOffset({ x: newX, y: newY });
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging, dragStart]);
   return {
     newLayerName,
     allLayers,
     activeLayerId,
     layerNameInputOpen,
     containerVisible,
+    layersToolPositionOffset,
+    toolbarElement,
     deleteLayer,
     handlePlusBtnClick,
     updateText,
     changeLayer,
     changeVisible,
     toggleLayerContainer,
+    handleMouseDown,
+    handleMouseUp,
   };
 };
 
