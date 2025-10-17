@@ -25,6 +25,7 @@ type LayerMeta = {
   id: string;
   name: string;
   visible: boolean;
+  locked:boolean
 };
 
 export type Stroke = {
@@ -103,7 +104,7 @@ export const useBrushStore = create<BrushState>((set, get) => ({
   brushOpacity: 100,
   setOpacity: (opacity) => set({ brushOpacity: opacity }),
 
-  layers: [{ id: defaultLayer, name: defaultLayer, visible: true }],
+  layers: [{ id: defaultLayer, name: defaultLayer, visible: true,locked:false }],
   activeLayerId: defaultLayer,
 
   pendingPoints: [],
@@ -173,7 +174,7 @@ export const useBrushStore = create<BrushState>((set, get) => ({
 
   addLayer: (name, id) => {
     set((state) => ({
-      layers: [...state.layers, { id, name, visible: true }],
+      layers: [...state.layers, { id, name, visible: true ,locked:false}],
       activeLayerId: state.layers.length === 0 ? id : state.activeLayerId,
     }));
   },
