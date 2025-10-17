@@ -8,68 +8,79 @@ const LayersContainer = () => {
     allLayers,
     activeLayerId,
     layerNameInputOpen,
+    containerVisible,
     deleteLayer,
     handlePlusBtnClick,
     updateText,
     changeLayer,
     changeVisible,
+    toggleLayerContainer,
   } = LayerContainerVM();
 
   return (
-    <div className={styles.layersToolbar}>
-      <div className={styles.addNewLayer}>
-        <button className={styles.plusBTN} onClick={handlePlusBtnClick}>
-          +
-        </button>
-        {layerNameInputOpen && (
-          <input
-            type="text"
-            value={newLayerName}
-            onChange={updateText}
-            className={styles.layerNameInput}
-          />
-        )}
-      </div>
-      <div className={styles.layersContainer}>
-        {allLayers
-          .slice()
-          .reverse()
-          .map((layer) => (
-            <button
-              onClick={() => changeLayer(layer.id)}
-              key={layer.id}
-              className={`${styles.layer} ${layer.id === activeLayerId ? styles.backGReen : ""}`}
-            >
-              <input
-                type="checkbox"
-                checked={true}
-                className={`${styles.visibilityIcon} ${layer.visible ? "" : styles.hidden}`}
-                onChange={(e) => {
-                  e.stopPropagation();
-                  changeVisible(layer.id);
-                }}
-              />
+    <div className={`${styles.layerToolbarContainer}  ${containerVisible ? styles.layerVisible : styles.layerHidden}`}>
+      <div
+        className={`${styles.layersToolbar}`}
+      >
+        <div className={styles.addNewLayer}>
+          <button className={styles.plusBTN} onClick={handlePlusBtnClick}>
+            +
+          </button>
+          {layerNameInputOpen && (
+            <input
+              type="text"
+              value={newLayerName}
+              onChange={updateText}
+              className={styles.layerNameInput}
+            />
+          )}
+        </div>
+        <div className={styles.layersContainer}>
+          {allLayers
+            .slice()
+            .reverse()
+            .map((layer) => (
+              <button
+                onClick={() => changeLayer(layer.id)}
+                key={layer.id}
+                className={`${styles.layer} ${layer.id === activeLayerId ? styles.backGReen : ""}`}
+              >
+                <input
+                  type="checkbox"
+                  checked={true}
+                  className={`${styles.visibilityIcon} ${layer.visible ? "" : styles.hidden}`}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    changeVisible(layer.id);
+                  }}
+                />
 
-              <div className={styles.layerBox}></div>
-              <div className={styles.layerNameContainer}>
-                <h5 className={styles.layerName}>{layer.name}</h5>
-              </div>
-              {(!onlineStatus.inRoom || onlineStatus.isAdmin) &&
-                allLayers.length > 1 && (
-                  <input
-                    type="button"
-                    value="❌"
-                    className={styles.deleteButton}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteLayer(layer.id);
-                    }}
-                  />
-                )}
-            </button>
-          ))}
+                <div className={styles.layerBox}></div>
+                <div className={styles.layerNameContainer}>
+                  <h5 className={styles.layerName}>{layer.name}</h5>
+                </div>
+                {(!onlineStatus.inRoom || onlineStatus.isAdmin) &&
+                  allLayers.length > 1 && (
+                    <input
+                      type="button"
+                      value="❌"
+                      className={styles.deleteButton}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteLayer(layer.id);
+                      }}
+                    />
+                  )}
+              </button>
+            ))}
+        </div>
       </div>
-      <button className={styles.hideLayersButton }>↩</button>
+      <button
+        className={styles.hideLayersButton}
+        onClick={() => toggleLayerContainer()}
+      >
+        {containerVisible ? "↩" : "↪"}
+      </button>
     </div>
   );
 };

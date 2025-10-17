@@ -14,6 +14,8 @@ const LayerContainerVM = () => {
   const allLayers = useBrushStore((state) => state.layers);
   const activeLayerId = useBrushStore((state) => state.activeLayerId);
 
+  const [containerVisible, setContainerVisible] = useState(true);
+
   const [newLayerName, setNewLayerName] = useState("");
   const [layerNameInputOpen, setLayerNameInputOpen] = useState(false);
 
@@ -55,15 +57,22 @@ const LayerContainerVM = () => {
     toggleLayer(id);
 
     if (activeLayerId === id) {
-      const visibleLayer = allLayers.find((layer) => layer.visible === true&&layer.id!==id);
+      const visibleLayer = allLayers.find(
+        (layer) => layer.visible === true && layer.id !== id
+      );
       const newActiveLayerID = visibleLayer ? visibleLayer.id : null;
-    
+
       setActiveLayer(newActiveLayerID);
     }
   };
   const changeLayer = (id: string) => {
     setActiveLayer(id);
   };
+  
+  const toggleLayerContainer = () => {
+    setContainerVisible(!containerVisible);
+  };
+
   const handlePlusBtnClick = () => {
     if (!layerNameInputOpen) return setLayerNameInputOpen(true);
     addNewLayer();
@@ -73,12 +82,13 @@ const LayerContainerVM = () => {
     allLayers,
     activeLayerId,
     layerNameInputOpen,
+    containerVisible,
     deleteLayer,
     handlePlusBtnClick,
     updateText,
     changeLayer,
     changeVisible,
-    addNewLayer,
+    toggleLayerContainer,
   };
 };
 
