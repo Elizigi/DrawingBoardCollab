@@ -13,7 +13,8 @@ const LayersContainer = () => {
     toolbarElement,
     isDragging,
     toTheRight,
-
+    chooseContainerSide,
+    getArrowDir,
     deleteLayer,
     handlePlusBtnClick,
     updateText,
@@ -22,13 +23,10 @@ const LayersContainer = () => {
     toggleLayerContainer,
     handleMouseDown,
   } = LayerContainerVM();
-  const chooseContainerSide = () => {
-    return toTheRight ? styles.layerHiddenLeft : styles.layerHiddenRight;
-  };
-  
+
   return (
     <div
-      className={`${styles.layerToolbarContainer}  ${containerVisible ? styles.layerVisible : chooseContainerSide()} ${toTheRight ? styles.right: styles.left}`}
+      className={`${styles.layerToolbarContainer}  ${containerVisible ? styles.layerVisible : chooseContainerSide(styles)} ${toTheRight ? styles.right : styles.left}`}
       aria-roledescription="draggable item"
       role="toolbar"
       onMouseDown={handleMouseDown}
@@ -105,7 +103,7 @@ const LayersContainer = () => {
         className={`${styles.hideLayersButton} ${toTheRight ? styles.toRight : styles.toLeft}`}
         onClick={() => toggleLayerContainer()}
       >
-        {containerVisible ? "↩" : "↪"}
+        {getArrowDir()}
       </button>
     </div>
   );

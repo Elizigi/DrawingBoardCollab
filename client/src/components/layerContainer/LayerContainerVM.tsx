@@ -83,11 +83,12 @@ const LayerContainerVM = () => {
     setContainerVisible(!containerVisible);
     const box = toolbarElement.current as HTMLDivElement;
     const rect = box.getBoundingClientRect();
+    const bottomMarginPercent = (window.innerHeight * 90) / 100;
 
     if (!containerVisible)
       setLayersToolPositionOffset({
         x: toTheRight ? window.innerWidth - rect.width : 0,
-        y: window.innerHeight - rect.height,
+        y: bottomMarginPercent - rect.height,
       });
   };
 
@@ -106,10 +107,6 @@ const LayerContainerVM = () => {
     });
   };
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
   useEffect(() => {
     if (!isDragging) return;
 
@@ -124,6 +121,16 @@ const LayerContainerVM = () => {
 
     const handleMouseUp = () => {
       setIsDragging(false);
+      const box = toolbarElement.current as HTMLDivElement;
+      const rect = box.getBoundingClientRect();
+     
+      if (
+        rect.right > window.innerWidth ||
+        rect.height <= 0 ||
+        rect.left < 0 ||
+        rect.top < 0
+      )
+        toggleLayerContainer();
     };
 
     document.addEventListener("mousemove", handleMouseMove);
@@ -134,6 +141,20 @@ const LayerContainerVM = () => {
       document.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isDragging, dragStart]);
+
+  const getArrowDir = (): string => {
+    if (
+      (!toTheRight && containerVisible) ||
+      (toTheRight && !containerVisible)
+    ) {
+      return "↩";
+    }
+    return "↪";
+  };
+  const chooseContainerSide = (styles: CSSModuleClasses) => {
+    return toTheRight ? styles.layerHiddenLeft : styles.layerHiddenRight;
+  };
+
   return {
     newLayerName,
     allLayers,
@@ -144,7 +165,8 @@ const LayerContainerVM = () => {
     toolbarElement,
     isDragging,
     toTheRight,
-
+    chooseContainerSide,
+    getArrowDir,
     deleteLayer,
     handlePlusBtnClick,
     updateText,
@@ -152,7 +174,6 @@ const LayerContainerVM = () => {
     changeVisible,
     toggleLayerContainer,
     handleMouseDown,
-    handleMouseUp,
   };
 };
 
