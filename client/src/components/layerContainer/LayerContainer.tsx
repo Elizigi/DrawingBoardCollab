@@ -12,6 +12,8 @@ const LayersContainer = () => {
     layersToolPositionOffset,
     toolbarElement,
     isDragging,
+    toTheRight,
+
     deleteLayer,
     handlePlusBtnClick,
     updateText,
@@ -20,19 +22,25 @@ const LayersContainer = () => {
     toggleLayerContainer,
     handleMouseDown,
   } = LayerContainerVM();
+  const chooseContainerSide = () => {
+    return toTheRight ? styles.layerHiddenLeft : styles.layerHiddenRight;
+  };
+  
   return (
     <div
-      className={`${styles.layerToolbarContainer}  ${containerVisible ? styles.layerVisible : styles.layerHidden}`}
+      className={`${styles.layerToolbarContainer}  ${containerVisible ? styles.layerVisible : chooseContainerSide()} ${toTheRight ? styles.right: styles.left}`}
       aria-roledescription="draggable item"
       role="toolbar"
       onMouseDown={handleMouseDown}
       style={
-        layersToolPositionOffset.x !== 0 || layersToolPositionOffset.y !== 0
+        (layersToolPositionOffset.x !== 0 ||
+          layersToolPositionOffset.y !== 0) &&
+        containerVisible
           ? {
               top: `${layersToolPositionOffset.y}px`,
               left: `${layersToolPositionOffset.x}px`,
             }
-          : undefined
+          : {}
       }
       ref={toolbarElement}
     >
@@ -94,7 +102,7 @@ const LayersContainer = () => {
         </div>
       </div>
       <button
-        className={styles.hideLayersButton}
+        className={`${styles.hideLayersButton} ${toTheRight ? styles.toRight : styles.toLeft}`}
         onClick={() => toggleLayerContainer()}
       >
         {containerVisible ? "↩" : "↪"}

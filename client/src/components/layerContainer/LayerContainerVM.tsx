@@ -19,18 +19,19 @@ const LayerContainerVM = () => {
   const [newLayerName, setNewLayerName] = useState("");
   const [layerNameInputOpen, setLayerNameInputOpen] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
- 
+
   const [isDragging, setIsDragging] = useState(false);
   const toolbarElement = useRef<HTMLDivElement>(null);
+
+  const [layersToolPositionOffset, setLayersToolPositionOffset] = useState({
+    x: 0,
+    y: 0,
+  });
+  const toTheRight = layersToolPositionOffset.x > window.innerWidth / 2;
 
   const updateText = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewLayerName(e.target.value);
   };
-   const [layersToolPositionOffset, setLayersToolPositionOffset] = useState({
-    x: 0,
-    y: 0,
-  });
-
   const addNewLayer = () => {
     if (newLayerName.trim().length < 2) return;
     const layerId = crypto.randomUUID();
@@ -80,6 +81,14 @@ const LayerContainerVM = () => {
 
   const toggleLayerContainer = () => {
     setContainerVisible(!containerVisible);
+    const box = toolbarElement.current as HTMLDivElement;
+    const rect = box.getBoundingClientRect();
+
+    if (!containerVisible)
+      setLayersToolPositionOffset({
+        x: toTheRight ? window.innerWidth - rect.width : 0,
+        y: window.innerHeight - rect.height,
+      });
   };
 
   const handlePlusBtnClick = () => {
@@ -87,7 +96,7 @@ const LayerContainerVM = () => {
     addNewLayer();
   };
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (!toolbarElement.current) return;
+    if (!toolbarElement.current || !containerVisible) return;
 
     setIsDragging(true);
     const rect = toolbarElement.current.getBoundingClientRect();
@@ -134,6 +143,8 @@ const LayerContainerVM = () => {
     layersToolPositionOffset,
     toolbarElement,
     isDragging,
+    toTheRight,
+
     deleteLayer,
     handlePlusBtnClick,
     updateText,
