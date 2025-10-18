@@ -31,7 +31,9 @@ export function addListeners(topInputCanvas: HTMLCanvasElement) {
 
   document.addEventListener("clearCanvas", () => {
     useBrushStore.getState().clearStrokes();
-    Object.keys(layersCanvasMap).forEach((id) => clearLayerCanvas(id));
+    for (const id of Object.keys(layersCanvasMap)) {
+      clearLayerCanvas(id);
+    }
   });
 
   document.addEventListener("keydown", (e) => {

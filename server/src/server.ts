@@ -1,5 +1,5 @@
 import express from "express";
-import http from "http";
+import http from "node:http";
 import cors from "cors";
 import { Server as SocketIOServer } from "socket.io";
 
@@ -41,6 +41,12 @@ io.on("connection", (socket) => {
     const roomId = socket.data.roomId;
     if (!roomId) return;
     socket.broadcast.to(roomId).emit("remove-stroke", { deleteStroke });
+  });
+  socket.on("locked-layer", ({ layerId }) => {
+    const roomId = socket.data.roomId;
+    const hostId = roomsMap.get(roomId);
+    if (socket.id !== hostId) return io.to(socket.id).emit("no-permission");
+    io.to(roomId).emit("lock-layer", { layerId });
   });
 
   socket.on("delete-layer", ({ layerId }) => {

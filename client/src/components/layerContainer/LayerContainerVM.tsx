@@ -8,6 +8,8 @@ type LayerPayload = {
 const LayerContainerVM = () => {
   const setActiveLayer = useBrushStore((state) => state.setActiveLayer);
   const toggleLayer = useBrushStore((state) => state.toggleLayer);
+  const toggleLockLayers = useBrushStore((state) => state.toggleLockLayer);
+
   const addLayer = useBrushStore((state) => state.addLayer);
   const removeLayer = useBrushStore((state) => state.removeLayer);
 
@@ -55,20 +57,34 @@ const LayerContainerVM = () => {
   const removingLayer = ({ layerId }: { layerId: string }) => {
     removeLayer(layerId);
   };
+  const lockALayer = ({ layerId }: { layerId: string }) => {
+    toggleLockLayers(layerId);
+  };
   useEffect(() => {
     socket.on("add-layer", addComingLayer);
     socket.on("remove-layer", removingLayer);
+    socket.on("lock-layer", lockALayer);
+
     return () => {
       socket.off("add-layer", addComingLayer);
+      socket.off("remove-layer", removingLayer);
+      socket.off("lock-layer", lockALayer);
     };
   }, []);
+
+  const toggleLockLayer = (layerId: string) => {
+    if (onlineStatus.inRoom && !onlineStatus.isAdmin) return;
+    toggleLockLayers(layerId);
+    if (onlineStatus.inRoom && onlineStatus.isAdmin)
+      socket.emit("locked-layer", { layerId });
+  };
 
   const changeVisible = (id: string) => {
     toggleLayer(id);
 
     if (activeLayerId === id) {
       const visibleLayer = allLayers.find(
-        (layer) => layer.visible === true && layer.id !== id
+        (layer) => layer.visible === true && layer.id !== id && !layer.locked
       );
       const newActiveLayerID = visibleLayer ? visibleLayer.id : null;
 
@@ -123,7 +139,7 @@ const LayerContainerVM = () => {
       setIsDragging(false);
       const box = toolbarElement.current as HTMLDivElement;
       const rect = box.getBoundingClientRect();
-     
+
       if (
         rect.right > window.innerWidth ||
         rect.height <= 0 ||
@@ -165,6 +181,7 @@ const LayerContainerVM = () => {
     toolbarElement,
     isDragging,
     toTheRight,
+    toggleLockLayer,
     chooseContainerSide,
     getArrowDir,
     deleteLayer,

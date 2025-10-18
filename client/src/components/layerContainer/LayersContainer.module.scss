@@ -14,6 +14,7 @@ $active-color: #6b7280;
   right: 0;
 }
 .layerToolbarContainer {
+  user-select: none;
   display: flex;
   flex-direction: row;
   width: fit-content;
@@ -93,6 +94,7 @@ $active-color: #6b7280;
     }
 
     .layerNameInput {
+      user-select: auto;
       background-color: $bg-light;
       border: $border-color solid 1px;
       border-radius: 6px;
@@ -208,7 +210,7 @@ $active-color: #6b7280;
       }
     }
 
-    .layerBox {
+    .layerLock {
       width: 1.5rem;
       height: 1.5rem;
       border: $border-color solid 1px;
@@ -236,6 +238,46 @@ $active-color: #6b7280;
         line-height: 1.2;
       }
     }
+  }
+}
+.openLock {
+  all: unset;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 1.2rem;
+  height: 1.2rem;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::after {
+    content: "\1F513";
+    font-size: 1rem;
+    transition: all 0.2s ease;
+  }
+}
+.lockedLock {
+  all: unset;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 1.2rem;
+  height: 1.2rem;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::after {
+    content: "\1F512";
+    font-size: 1rem;
+    transition: all 0.2s ease;
   }
 }
 

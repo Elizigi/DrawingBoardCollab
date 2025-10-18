@@ -25,7 +25,7 @@ type LayerMeta = {
   id: string;
   name: string;
   visible: boolean;
-  locked:boolean
+  locked: boolean;
 };
 
 export type Stroke = {
@@ -64,13 +64,12 @@ type BrushState = {
   layers: LayerMeta[];
   activeLayerId: string | null;
   addLayer: (name: string, id: string) => void;
-
+  toggleLockLayer: (layerId: string) => void;
   removeLayer: (id: string) => void;
 
   setLayers: (layers: LayerMeta[]) => void;
   setActiveLayer: (id: string | null) => void;
   toggleLayer: (id: string) => void;
-
   strokes: Stroke[];
   removedStrokesArray: Stroke[];
 
@@ -104,7 +103,9 @@ export const useBrushStore = create<BrushState>((set, get) => ({
   brushOpacity: 100,
   setOpacity: (opacity) => set({ brushOpacity: opacity }),
 
-  layers: [{ id: defaultLayer, name: defaultLayer, visible: true,locked:false }],
+  layers: [
+    { id: defaultLayer, name: defaultLayer, visible: true, locked: false },
+  ],
   activeLayerId: defaultLayer,
 
   pendingPoints: [],
@@ -157,7 +158,7 @@ export const useBrushStore = create<BrushState>((set, get) => ({
 
       return { removedStrokesArray: filteredArray };
     }),
-    
+
   clearStrokes: () => set({ strokes: [] }),
 
   setStrokes: (strokes) => {
@@ -166,17 +167,36 @@ export const useBrushStore = create<BrushState>((set, get) => ({
   setLayers: (layers) => {
     set(() => {
       return {
-        layers: layers,
-        activeLayerId: layers[0].id || null,
+        layers,
+        activeLayerId: helperGetActiveLayerId(layers),
       };
     });
   },
 
   addLayer: (name, id) => {
-    set((state) => ({
-      layers: [...state.layers, { id, name, visible: true ,locked:false}],
-      activeLayerId: state.layers.length === 0 ? id : state.activeLayerId,
-    }));
+    set((state) => {
+      const newLayers = [
+        ...state.layers,
+        { id, name, visible: true, locked: false },
+      ];
+
+      return {
+        layers: newLayers,
+        activeLayerId: helperGetActiveLayerId(newLayers),
+      };
+    });
+  },
+  toggleLockLayer: (layerId) => {
+    set((state) => {
+      const newLayers = state.layers.map((layer) =>
+        layer.id === layerId ? { ...layer, locked: !layer.locked } : layer
+      );
+
+      return {
+        layers: newLayers,
+        activeLayerId: helperGetActiveLayerId(newLayers),
+      };
+    });
   },
 
   removeLayer: (id) => {
@@ -187,21 +207,31 @@ export const useBrushStore = create<BrushState>((set, get) => ({
       return {
         layers: newLayers,
         strokes: state.strokes.filter((stroke) => stroke.layerId !== id),
-        activeLayerId:
-          state.activeLayerId === id ? newLayers[0]?.id : state.activeLayerId,
+        activeLayerId: helperGetActiveLayerId(newLayers),
       };
     });
   },
 
-  setActiveLayer: (id) => set({ activeLayerId: id }),
-
-  toggleLayer: (id) =>
+  setActiveLayer: (id) =>
     set((state) => {
-      const layers = state.layers.map((layer) =>
+      const allowedToChange = state.layers.find(
+        (layer) => layer.id === id && layer.visible && !layer.locked
+      );
+      if (!allowedToChange) return state;
+      return { activeLayerId: id };
+    }),
+
+  toggleLayer: (id) => {
+    set((state) => {
+      const newLayers = state.layers.map((layer) =>
         layer.id === id ? { ...layer, visible: !layer.visible } : layer
       );
-      return { layers };
-    }),
+      return {
+        layers: newLayers,
+        activeLayerId: helperGetActiveLayerId(newLayers),
+      };
+    });
+  },
   events: [],
   addEvent: (eventType, name) =>
     set((state) => {
@@ -220,3 +250,8 @@ export const useBrushStore = create<BrushState>((set, get) => ({
     });
   },
 }));
+
+function helperGetActiveLayerId(layers: LayerMeta[]) {
+  const availableLayer = layers.find((layer) => layer.visible && !layer.locked);
+  return availableLayer?.id || null;
+}

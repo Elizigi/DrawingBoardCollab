@@ -13,6 +13,7 @@ const LayersContainer = () => {
     toolbarElement,
     isDragging,
     toTheRight,
+    toggleLockLayer,
     chooseContainerSide,
     getArrowDir,
     deleteLayer,
@@ -68,6 +69,7 @@ const LayersContainer = () => {
                 onClick={() => changeLayer(layer.id)}
                 key={layer.id}
                 className={`${styles.layer} ${layer.id === activeLayerId ? styles.backGReen : ""}`}
+                style={{cursor:onlineStatus.inRoom && layer.locked &&!onlineStatus.isAdmin ?"not-allowed":"pointer"}}
               >
                 <input
                   type="checkbox"
@@ -79,10 +81,33 @@ const LayersContainer = () => {
                   }}
                 />
 
-                <div className={styles.layerBox}></div>
                 <div className={styles.layerNameContainer}>
                   <h5 className={styles.layerName}>{layer.name}</h5>
                 </div>
+                {onlineStatus.inRoom && !onlineStatus.isAdmin ? (
+                  <input
+                    type="checkbox"
+                    disabled
+                    style={{ display: layer.locked ? "block" : "none" }}
+                    checked={true}
+                    className={layer.locked ? styles.lockedLock : ""}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                    }}
+                  />
+                ) : (
+                  <input
+                    type="checkbox"
+                    checked={true}
+                    className={
+                      layer.locked ? styles.lockedLock : styles.openLock
+                    }
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      toggleLockLayer(layer.id);
+                    }}
+                  />
+                )}
                 {(!onlineStatus.inRoom || onlineStatus.isAdmin) &&
                   allLayers.length > 1 && (
                     <input
