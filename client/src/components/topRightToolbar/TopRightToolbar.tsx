@@ -2,7 +2,6 @@ import styles from "./TopRightToolbar.module.scss";
 import OnlineComponent from "../onlineComponent/OnlineComponent";
 import TopRightToolbarVM from "./TopRightToolbarVM";
 import CopyText from "./copyText/CopyText";
-import LeaveButton from "./leaveButton/LeaveButton";
 import InternetIcon from "./internetIcon/InternetIcon";
 import GuestMouse from "../guestMouse/GuestMouse";
 import UserList from "./userList/UserList";
@@ -40,7 +39,12 @@ const TopRightToolbar = () => {
         </button>
       )}
       {menuOpen && connected && (
-        <LeaveButton handleLeaveRoom={handleLeaveRoom} />
+        <button
+          onClick={() => handleLeaveRoom()}
+          className={`${styles.joinButton} ${styles.connectionButtons}`}
+        >
+          Exit
+        </button>
       )}
       <button className={styles.netMenu} onClick={() => handleOnline()}>
         <InternetIcon connected={isOnline} spinnerStyle={spinnerStyle} />
@@ -48,7 +52,7 @@ const TopRightToolbar = () => {
       {menuOpen && !connected && (
         <button
           onClick={() => handleConnectionWindow()}
-          className={`${styles.joinButton} ${styles.connectionButtons}`}
+          className={`${styles.exitButton} ${styles.connectionButtons}`}
         >
           Join
         </button>
