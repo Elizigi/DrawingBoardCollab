@@ -25,7 +25,10 @@ const LayerContainerVM = () => {
   const [isDragging, setIsDragging] = useState(false);
   const toolbarElement = useRef<HTMLDivElement>(null);
   const dragAreaElement = useRef<HTMLDivElement>(null);
+  const [draggedLayer, setDraggedLayer] = useState("");
+  const [isLayerDrag, setIsLayerDrag] = useState(false);
 
+  const layerRefs = useRef(new Map<string, HTMLButtonElement>());
   const [layersToolPositionOffset, setLayersToolPositionOffset] = useState({
     x: 0,
     y: 0,
@@ -93,6 +96,8 @@ const LayerContainerVM = () => {
     }
   };
   const changeLayer = (id: string) => {
+    setIsLayerDrag(true)
+    setDraggedLayer(id)
     setActiveLayer(id);
   };
 
@@ -183,6 +188,7 @@ const LayerContainerVM = () => {
     dragAreaElement,
     isDragging,
     toTheRight,
+    layerRefs,
     toggleLockLayer,
     chooseContainerSide,
     getArrowDir,

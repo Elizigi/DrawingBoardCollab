@@ -14,6 +14,7 @@ const LayersContainer = () => {
     dragAreaElement,
     isDragging,
     toTheRight,
+    layerRefs,
     toggleLockLayer,
     chooseContainerSide,
     getArrowDir,
@@ -70,6 +71,10 @@ const LayersContainer = () => {
               <button
                 onClick={() => changeLayer(layer.id)}
                 key={layer.id}
+                ref={(el) => {
+                  if (el) layerRefs.current.set(layer.id, el);
+                  else layerRefs.current.delete(layer.id);
+                }}
                 className={`${styles.layer} ${layer.id === activeLayerId ? styles.backGReen : ""}`}
                 style={{
                   cursor:
