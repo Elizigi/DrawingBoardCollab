@@ -1,16 +1,28 @@
-import React, { RefObject, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { onlineStatus, socket } from "../../Main";
 import { EventTypes, useBrushStore } from "../../zustand/useBrushStore";
 
-const OnlineComponentVM = (
-  isHost: boolean,
-  roomId: string,
-  myNameRef: RefObject<string>,
-  connected: boolean,
-  setConnected: (connected: boolean) => void,
-  setOnlineWindowOpen: (windowOpen: boolean) => void,
-  setRoomId: (roomId: string) => void
-) => {
+interface ConnectionParams {
+  isHost: boolean;
+  roomId: string;
+  myNameRef: React.RefObject<string>;
+  connected: boolean;
+  setError: (errorMessage: string) => void;
+  setConnected: (connected: boolean) => void;
+  setOnlineWindowOpen: (windowOpen: boolean) => void;
+  setRoomId: (roomId: string) => void;
+}
+
+const OnlineComponentVM = ({
+  isHost,
+  roomId,
+  myNameRef,
+  connected,
+  setError,
+  setConnected,
+  setOnlineWindowOpen,
+  setRoomId,
+}: ConnectionParams) => {
   const [myName, setMyName] = useState("");
   const addEvent = useBrushStore((state) => state.addEvent);
 
@@ -31,6 +43,7 @@ const OnlineComponentVM = (
   }, [connected]);
 
   const handleSubmit = () => {
+    if (myName.trim().length < 2) return setError("Name too short");
     if (isHost) {
       socket.emit("create-room", { name: myName });
       return;

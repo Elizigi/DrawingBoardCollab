@@ -21,7 +21,6 @@ const BrushToolbarVM = () => {
     brushSize,
     usedColors,
     brushOpacity,
-
     setOpacity,
     setBrushColor,
     setBrushSize,

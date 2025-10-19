@@ -22,6 +22,8 @@ const TopRightToolbarVM = () => {
   const [hideCode, setHideCode] = useState(false);
   const [error, setError] = useState("");
 
+  const isMouseDown = useBrushStore((s) => s.isMouseDown);
+
   const [isOnline, setIsOnline] = useState(false);
   const [selfId, setSelfId] = useState(socket.id);
   const [spinnerStyle, setSpinnerStyle] = useState("");
@@ -121,30 +123,13 @@ const TopRightToolbarVM = () => {
   const handleMenuOpen = () => {
     setMenuOpen(!menuOpen);
   };
-  useEffect(() => {
-    socket.on("user-joined", handleUserJoined);
-    socket.on("add-name", handleAddName);
-    socket.on("joined-room", handleJoinedRoom);
-    socket.on("user-moved", handleUserMoved);
-    socket.on("user-left", handleUserLeft);
-    socket.on("user-removed", handleUserRemoved);
-    socket.on("user-kicked", handleUserKicked);
 
-    return () => {
-      socket.off("user-joined", handleUserJoined);
-      socket.off("add-name", handleAddName);
-      socket.off("joined-room", handleJoinedRoom);
-      socket.off("user-moved", handleUserMoved);
-      socket.off("user-left", handleUserLeft);
-      socket.off("user-removed", handleUserRemoved);
-      socket.off("user-kicked", handleUserKicked);
-    };
-  }, []);
   const handleConnectionWindow = (host = false) => {
     setIsHost(host);
     setHasInteracted(false);
     setOnlineWindowOpen(!onlineWindowOpen);
   };
+
   const cleanup = () => {
     setConnected(false);
     setMenuOpen(false);
@@ -155,21 +140,14 @@ const TopRightToolbarVM = () => {
     onlineStatus.inRoom = false;
     onlineStatus.isAdmin = false;
   };
-  useEffect(() => {
-    if (!hasInteracted) return;
-
-    if (!isOnline) {
-      setSpinnerStyle(styles.spinLoad);
-    } else setSpinnerStyle(styles.spinFinish);
-  }, [isOnline, hasInteracted]);
 
   const handleOnline = () => {
-    if (!isOnline) {
+    if (isOnline) {
+      setMenuOpen(!menuOpen);
+    } else {
       socket.connect();
       setHasInteracted(true);
       onlineStatus.isOnline = true;
-    } else {
-      setMenuOpen(!menuOpen);
     }
   };
   const handleLeaveRoom = () => {
@@ -185,21 +163,47 @@ const TopRightToolbarVM = () => {
     socket.emit("request-state", { to: roomId });
     setConnected(true);
   };
+
+  const disconnected = () => {
+    setIsOnline(false);
+    setConnected(false);
+    setMenuOpen(false);
+    setRoomId("");
+    setIsHost(false);
+    setSpinnerStyle("");
+    setError("");
+    setConnectedUsers([]);
+    onlineStatus.isOnline = false;
+    onlineStatus.inRoom = false;
+    onlineStatus.isAdmin = false;
+    console.log("Disconnected");
+  };
+
   useEffect(() => {
-    socket.on("disconnect", () => {
-      setIsOnline(false);
-      setConnected(false);
+    if (menuOpen) {
       setMenuOpen(false);
-      setRoomId("");
-      setIsHost(false);
-      setSpinnerStyle("");
-      setError("");
-      setConnectedUsers([]);
-      onlineStatus.isOnline = false;
-      onlineStatus.inRoom = false;
-      onlineStatus.isAdmin = false;
-      console.log("Disconnected");
-    });
+    }
+  }, [isMouseDown]);
+  useEffect(() => {
+    setError("");
+  }, [onlineWindowOpen]);
+
+  useEffect(() => {
+    if (!hasInteracted) return;
+    if (isOnline) {
+      setSpinnerStyle(styles.spinFinish);
+    } else setSpinnerStyle(styles.spinLoad);
+  }, [isOnline, hasInteracted]);
+
+  useEffect(() => {
+    socket.on("user-joined", handleUserJoined);
+    socket.on("add-name", handleAddName);
+    socket.on("joined-room", handleJoinedRoom);
+    socket.on("user-moved", handleUserMoved);
+    socket.on("user-left", handleUserLeft);
+    socket.on("user-removed", handleUserRemoved);
+    socket.on("user-kicked", handleUserKicked);
+
     socket.on("room-not-found", () => {
       setError("Room not found");
     });
@@ -212,10 +216,21 @@ const TopRightToolbarVM = () => {
     socket.on("user-id", (userId: string) => {
       setSelfId(userId);
     });
+    socket.on("disconnect", disconnected);
     return () => {
+      socket.off("user-joined", handleUserJoined);
+      socket.off("add-name", handleAddName);
+      socket.off("joined-room", handleJoinedRoom);
+      socket.off("user-moved", handleUserMoved);
+      socket.off("user-left", handleUserLeft);
+      socket.off("user-removed", handleUserRemoved);
+      socket.off("user-kicked", handleUserKicked);
       socket.off("connect");
-      socket.off("disconnect");
+      socket.off("disconnect", disconnected);
       socket.off("user-id");
+      socket.off("room-not-found", () => {
+        setError("Room not found");
+      });
     };
   }, []);
 
@@ -232,6 +247,7 @@ const TopRightToolbarVM = () => {
     connectedUsers,
     myNameRef,
     connected,
+    setError,
     setRoomId,
     setOnlineWindowOpen,
     setConnected,

@@ -6,10 +6,11 @@ interface OnlineComponentProps {
   isHost: boolean;
   setConnected: (connected: boolean) => void;
   myNameRef: RefObject<string>;
-  connected:boolean;
+  connected: boolean;
   setOnlineWindowOpen: (windowOpen: boolean) => void;
   roomId: string;
   setRoomId: (roomId: string) => void;
+  setError: (errorMessage: string) => void;
   error: string;
 }
 
@@ -21,18 +22,20 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
   connected,
   myNameRef,
   setRoomId,
+  setError,
   error,
 }) => {
   const { handleName, myName, handleAddress, handleModalOpen, handleSubmit } =
-    OnlineComponentVM(
+    OnlineComponentVM({
       isHost,
       roomId,
       myNameRef,
       connected,
+      setError,
       setConnected,
       setOnlineWindowOpen,
-      setRoomId
-    );
+      setRoomId,
+    });
   return (
     <div className={styles.onlineContainer}>
       <button className={styles.XBtn} onClick={() => handleModalOpen()}>
@@ -57,9 +60,10 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
             value={roomId}
             required={!roomId.trim()}
           />
-          <h2>{error}</h2>
         </>
       )}
+      <h2>{error}</h2>
+
       <button onClick={() => handleSubmit()} className={styles.submitBtn}>
         <h2> {isHost ? "Host" : "Connect"}</h2>
       </button>

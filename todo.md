@@ -3,8 +3,8 @@
 - [✔] Change layers position
 - [✔] Ability to move layers
 - [✔] Lock layer ability
+- [✔] Validate connecting user names (no empty or too-short names)
 - [ ] Move layer position in list
-- [ ] Validate connecting user names (no empty or too-short names)
 - [ ] Improve mobile integration and touch support
 - [ ] Reorganize file and function structure for clarity
 - [ ] Refine SCSS color variables and theme consistency

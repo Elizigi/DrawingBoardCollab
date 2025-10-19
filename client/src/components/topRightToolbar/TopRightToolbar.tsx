@@ -19,6 +19,7 @@ const TopRightToolbar = () => {
     connectedUsers,
     myNameRef,
     connected,
+    setError,
     setRoomId,
     setOnlineWindowOpen,
     setConnected,
@@ -75,6 +76,7 @@ const TopRightToolbar = () => {
             connected={connected}
             isHost={isHost}
             roomId={roomId}
+            setError={setError}
             error={error}
             setRoomId={setRoomId}
           />

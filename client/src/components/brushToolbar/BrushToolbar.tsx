@@ -9,12 +9,12 @@ const BrushToolbar = () => {
     brushSize,
     usedColors,
     brushOpacity,
-
     setOpacity,
     setBrushColor,
     setBrushSize,
     changeColor,
   } = BrushToolbarVM();
+
   const [isBrushOpen, setIsBrushOpen] = useState(false);
   const colorInputRef = useRef<HTMLInputElement>(null);
   const opacitySliderRef = useRef<HTMLDivElement>(null);
@@ -133,7 +133,7 @@ const BrushToolbar = () => {
         <div className={styles.colorMenu}>
           {usedColors.map(
             (color, index) =>
-              color && (
+              color!==null && (
                 <button
                   key={`${color}-${index}`}
                   className={styles.pastColorElement}
