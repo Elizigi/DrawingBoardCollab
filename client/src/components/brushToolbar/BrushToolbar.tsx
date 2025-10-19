@@ -93,17 +93,7 @@ const BrushToolbar = () => {
         </>
       )}
       <div className={styles.blackBorderWrapper}>
-        {!isBrushOpen ? (
-          <button
-            className={styles.brushIcon}
-            style={{
-              border: `4px solid #${brushColor.toString(16).padStart(6, "0")}`,
-            }}
-            onClick={() => setIsBrushOpen(true)}
-          >
-            <img src="/brushIcon.svg" alt="Brush" />
-          </button>
-        ) : (
+        {isBrushOpen ? (
           <button
             className={styles.brushIcon}
             style={{
@@ -115,6 +105,16 @@ const BrushToolbar = () => {
             <div className={styles.brushSizeDisplay}>
               <h3>{brushOpacity}</h3>
             </div>
+          </button>
+        ) : (
+          <button
+            className={styles.brushIcon}
+            style={{
+              border: `4px solid #${brushColor.toString(16).padStart(6, "0")}`,
+            }}
+            onClick={() => setIsBrushOpen(true)}
+          >
+            <img src="/brushIcon.svg" alt="Brush" />
           </button>
         )}
         {isBrushOpen && (
@@ -131,19 +131,18 @@ const BrushToolbar = () => {
 
       {isBrushOpen && usedColors[0] !== null && (
         <div className={styles.colorMenu}>
-          {usedColors.map((color, index) =>
-            color !== null ? (
-              <button
-                key={`${color}-${index}`}
-                className={styles.pastColorElement}
-                style={{
-                  backgroundColor: `#${color.toString(16).padStart(6, "0")}`,
-                }}
-                onClick={() => setBrushColor(color)}
-              ></button>
-            ) : (
-              ""
-            )
+          {usedColors.map(
+            (color, index) =>
+              color && (
+                <button
+                  key={`${color}-${index}`}
+                  className={styles.pastColorElement}
+                  style={{
+                    backgroundColor: `#${color.toString(16).padStart(6, "0")}`,
+                  }}
+                  onClick={() => setBrushColor(color)}
+                ></button>
+              )
           )}
         </div>
       )}

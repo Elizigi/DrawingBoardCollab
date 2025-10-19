@@ -11,6 +11,7 @@ const LayersContainer = () => {
     containerVisible,
     layersToolPositionOffset,
     toolbarElement,
+    dragAreaElement,
     isDragging,
     toTheRight,
     toggleLockLayer,
@@ -46,6 +47,7 @@ const LayersContainer = () => {
       <div
         style={{ cursor: isDragging ? "grabbing" : "grab" }}
         className={`${styles.layersToolbar}`}
+        ref={dragAreaElement}
       >
         <div className={styles.addNewLayer}>
           <button className={styles.plusBTN} onClick={handlePlusBtnClick}>
@@ -69,7 +71,12 @@ const LayersContainer = () => {
                 onClick={() => changeLayer(layer.id)}
                 key={layer.id}
                 className={`${styles.layer} ${layer.id === activeLayerId ? styles.backGReen : ""}`}
-                style={{cursor:onlineStatus.inRoom && layer.locked &&!onlineStatus.isAdmin ?"not-allowed":"pointer"}}
+                style={{
+                  cursor:
+                    onlineStatus.inRoom && layer.locked && !onlineStatus.isAdmin
+                      ? "not-allowed"
+                      : "pointer",
+                }}
               >
                 <input
                   type="checkbox"

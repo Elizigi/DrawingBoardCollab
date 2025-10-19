@@ -13,7 +13,7 @@ const BrushToolbarVM = () => {
   const usedColors = useBrushStore((state) => state.usedColors);
 
   function changeColor(_: number, e: React.ChangeEvent<HTMLInputElement>) {
-    const newColor = parseInt(e.target.value.slice(1), 16);
+    const newColor = Number.parseInt(e.target.value.slice(1), 16);
     setBrushColor(newColor);
   }
   return  {

@@ -24,6 +24,7 @@ const LayerContainerVM = () => {
 
   const [isDragging, setIsDragging] = useState(false);
   const toolbarElement = useRef<HTMLDivElement>(null);
+  const dragAreaElement = useRef<HTMLDivElement>(null);
 
   const [layersToolPositionOffset, setLayersToolPositionOffset] = useState({
     x: 0,
@@ -112,11 +113,11 @@ const LayerContainerVM = () => {
     if (!layerNameInputOpen) return setLayerNameInputOpen(true);
     addNewLayer();
   };
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!toolbarElement.current || !containerVisible) return;
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!containerVisible || e.target !== dragAreaElement.current) return;
 
     setIsDragging(true);
-    const rect = toolbarElement.current.getBoundingClientRect();
+    const rect = e.currentTarget.getBoundingClientRect();
     setDragStart({
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
@@ -179,6 +180,7 @@ const LayerContainerVM = () => {
     containerVisible,
     layersToolPositionOffset,
     toolbarElement,
+    dragAreaElement,
     isDragging,
     toTheRight,
     toggleLockLayer,
