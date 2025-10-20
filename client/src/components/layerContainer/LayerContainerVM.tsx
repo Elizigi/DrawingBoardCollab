@@ -1,9 +1,15 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useBrushStore } from "../../zustand/useBrushStore";
 import { onlineStatus, socket } from "../../Main";
 type LayerPayload = {
   layerId: string;
   layerName: string;
+};
+type LayerPosition = {
+  top: number;
+  bottom: number;
+  height: number;
+  midpoint: number;
 };
 const LayerContainerVM = () => {
   const setActiveLayer = useBrushStore((state) => state.setActiveLayer);
@@ -25,8 +31,11 @@ const LayerContainerVM = () => {
   const [isDragging, setIsDragging] = useState(false);
   const toolbarElement = useRef<HTMLDivElement>(null);
   const dragAreaElement = useRef<HTMLDivElement>(null);
+  
   const [draggedLayer, setDraggedLayer] = useState("");
   const [isLayerDrag, setIsLayerDrag] = useState(false);
+
+  const layersPosition = useRef(new Map<string, LayerPosition>());
 
   const layerRefs = useRef(new Map<string, HTMLButtonElement>());
   const [layersToolPositionOffset, setLayersToolPositionOffset] = useState({
@@ -35,9 +44,28 @@ const LayerContainerVM = () => {
   });
   const toTheRight = layersToolPositionOffset.x > window.innerWidth / 2;
 
+  useLayoutEffect(() => {
+    layersPosition.current.clear();
+    for (const [id, element] of layerRefs.current.entries()) {
+      if (element) {
+        const rect = element.getBoundingClientRect();
+
+        const midpoint = rect.top + rect.height / 2;
+
+        layersPosition.current.set(id, {
+          top: rect.top,
+          bottom: rect.bottom,
+          height: rect.height,
+          midpoint: midpoint,
+        });
+      }
+    }
+  }, [allLayers]);
+
   const updateText = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewLayerName(e.target.value);
   };
+
   const addNewLayer = () => {
     if (newLayerName.trim().length < 2) return;
     const layerId = crypto.randomUUID();
@@ -51,10 +79,12 @@ const LayerContainerVM = () => {
     setLayerNameInputOpen(false);
     setNewLayerName("");
   };
+
   const deleteLayer = (layerId: string) => {
     if (onlineStatus.inRoom) return socket.emit("delete-layer", { layerId });
     removeLayer(layerId);
   };
+
   const addComingLayer = ({ layerId, layerName }: LayerPayload) => {
     addLayer(layerName, layerId);
   };
@@ -95,9 +125,10 @@ const LayerContainerVM = () => {
       setActiveLayer(newActiveLayerID);
     }
   };
+
   const changeLayer = (id: string) => {
-    setIsLayerDrag(true)
-    setDraggedLayer(id)
+    setIsLayerDrag(true);
+    setDraggedLayer(id);
     setActiveLayer(id);
   };
 
@@ -118,6 +149,7 @@ const LayerContainerVM = () => {
     if (!layerNameInputOpen) return setLayerNameInputOpen(true);
     addNewLayer();
   };
+
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!containerVisible || e.target !== dragAreaElement.current) return;
 
@@ -189,6 +221,7 @@ const LayerContainerVM = () => {
     isDragging,
     toTheRight,
     layerRefs,
+    layersPosition,
     toggleLockLayer,
     chooseContainerSide,
     getArrowDir,
