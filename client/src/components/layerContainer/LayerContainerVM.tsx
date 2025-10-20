@@ -6,6 +6,7 @@ type LayerPayload = {
   layerName: string;
 };
 type LayerPosition = {
+  id: string;
   top: number;
   bottom: number;
   height: number;
@@ -31,11 +32,11 @@ const LayerContainerVM = () => {
   const [isDragging, setIsDragging] = useState(false);
   const toolbarElement = useRef<HTMLDivElement>(null);
   const dragAreaElement = useRef<HTMLDivElement>(null);
-  
+
   const [draggedLayer, setDraggedLayer] = useState("");
   const [isLayerDrag, setIsLayerDrag] = useState(false);
 
-  const layersPosition = useRef(new Map<string, LayerPosition>());
+  const [layersPositions, setLayersPositions] = useState<LayerPosition[]>([]);
 
   const layerRefs = useRef(new Map<string, HTMLButtonElement>());
   const [layersToolPositionOffset, setLayersToolPositionOffset] = useState({
@@ -45,19 +46,22 @@ const LayerContainerVM = () => {
   const toTheRight = layersToolPositionOffset.x > window.innerWidth / 2;
 
   useLayoutEffect(() => {
-    layersPosition.current.clear();
     for (const [id, element] of layerRefs.current.entries()) {
       if (element) {
         const rect = element.getBoundingClientRect();
 
         const midpoint = rect.top + rect.height / 2;
 
-        layersPosition.current.set(id, {
-          top: rect.top,
-          bottom: rect.bottom,
-          height: rect.height,
-          midpoint: midpoint,
-        });
+        setLayersPositions([
+          ...layersPositions,
+          {
+            id: id,
+            top: rect.top,
+            bottom: rect.bottom,
+            height: rect.height,
+            midpoint,
+          },
+        ]);
       }
     }
   }, [allLayers]);
@@ -221,7 +225,7 @@ const LayerContainerVM = () => {
     isDragging,
     toTheRight,
     layerRefs,
-    layersPosition,
+    layersPositions,
     toggleLockLayer,
     chooseContainerSide,
     getArrowDir,
