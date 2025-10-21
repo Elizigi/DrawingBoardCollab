@@ -64,76 +64,71 @@ const LayersContainer = () => {
           )}
         </div>
         <div className={styles.layersContainer}>
-          {allLayers
-            .slice()
-            .reverse()
-            .map((layer) => (
-              <button
-                onClick={() => changeLayer(layer.id)}
-                key={layer.id}
-                ref={(el) => {
-                  if (el) layerRefs.current.set(layer.id, el);
-                  else layerRefs.current.delete(layer.id);
+          {allLayers.map((layer) => (
+            <button
+              onClick={() => changeLayer(layer.id)}
+              key={layer.id}
+              ref={(el) => {
+                if (el) layerRefs.current.set(layer.id, el);
+                else layerRefs.current.delete(layer.id);
+              }}
+              className={`${styles.layer} ${layer.id === activeLayerId ? styles.backGReen : ""}`}
+              style={{
+                cursor:
+                  onlineStatus.inRoom && layer.locked && !onlineStatus.isAdmin
+                    ? "not-allowed"
+                    : "pointer",
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={true}
+                className={`${styles.visibilityIcon} ${layer.visible ? "" : styles.hidden}`}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  changeVisible(layer.id);
                 }}
-                className={`${styles.layer} ${layer.id === activeLayerId ? styles.backGReen : ""}`}
-                style={{
-                  cursor:
-                    onlineStatus.inRoom && layer.locked && !onlineStatus.isAdmin
-                      ? "not-allowed"
-                      : "pointer",
-                }}
-              >
+              />
+
+              <div className={styles.layerNameContainer}>
+                <h5 className={styles.layerName}>{layer.name}</h5>
+              </div>
+              {onlineStatus.inRoom && !onlineStatus.isAdmin ? (
+                <input
+                  type="checkbox"
+                  disabled
+                  style={{ display: layer.locked ? "block" : "none" }}
+                  checked={true}
+                  className={layer.locked ? styles.lockedLock : ""}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                  }}
+                />
+              ) : (
                 <input
                   type="checkbox"
                   checked={true}
-                  className={`${styles.visibilityIcon} ${layer.visible ? "" : styles.hidden}`}
+                  className={layer.locked ? styles.lockedLock : styles.openLock}
                   onChange={(e) => {
                     e.stopPropagation();
-                    changeVisible(layer.id);
+                    toggleLockLayer(layer.id);
                   }}
                 />
-
-                <div className={styles.layerNameContainer}>
-                  <h5 className={styles.layerName}>{layer.name}</h5>
-                </div>
-                {onlineStatus.inRoom && !onlineStatus.isAdmin ? (
+              )}
+              {(!onlineStatus.inRoom || onlineStatus.isAdmin) &&
+                allLayers.length > 1 && (
                   <input
-                    type="checkbox"
-                    disabled
-                    style={{ display: layer.locked ? "block" : "none" }}
-                    checked={true}
-                    className={layer.locked ? styles.lockedLock : ""}
-                    onChange={(e) => {
+                    type="button"
+                    value="❌"
+                    className={styles.deleteButton}
+                    onClick={(e) => {
                       e.stopPropagation();
-                    }}
-                  />
-                ) : (
-                  <input
-                    type="checkbox"
-                    checked={true}
-                    className={
-                      layer.locked ? styles.lockedLock : styles.openLock
-                    }
-                    onChange={(e) => {
-                      e.stopPropagation();
-                      toggleLockLayer(layer.id);
+                      deleteLayer(layer.id);
                     }}
                   />
                 )}
-                {(!onlineStatus.inRoom || onlineStatus.isAdmin) &&
-                  allLayers.length > 1 && (
-                    <input
-                      type="button"
-                      value="❌"
-                      className={styles.deleteButton}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deleteLayer(layer.id);
-                      }}
-                    />
-                  )}
-              </button>
-            ))}
+            </button>
+          ))}
         </div>
       </div>
       <button

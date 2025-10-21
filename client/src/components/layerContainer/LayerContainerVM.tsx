@@ -16,6 +16,7 @@ const LayerContainerVM = () => {
   const setActiveLayer = useBrushStore((state) => state.setActiveLayer);
   const toggleLayer = useBrushStore((state) => state.toggleLayer);
   const toggleLockLayers = useBrushStore((state) => state.toggleLockLayer);
+  const setLayers = useBrushStore((state) => state.setLayers);
 
   const addLayer = useBrushStore((state) => state.addLayer);
   const removeLayer = useBrushStore((state) => state.removeLayer);
@@ -166,10 +167,10 @@ const LayerContainerVM = () => {
   };
 
   useEffect(() => {
-    if (!isDragging) return;
-
+    if (!isDragging && !draggedLayer) return;
     const handleMouseMove = (e: MouseEvent): void => {
       if (!toolbarElement.current) return;
+      if (!isDragging) return;
 
       const newX = e.clientX - dragStart.x;
       const newY = e.clientY - dragStart.y;
@@ -177,18 +178,44 @@ const LayerContainerVM = () => {
       setLayersToolPositionOffset({ x: newX, y: newY });
     };
 
-    const handleMouseUp = () => {
-      setIsDragging(false);
-      const box = toolbarElement.current as HTMLDivElement;
-      const rect = box.getBoundingClientRect();
+    const handleMouseUp = (e: MouseEvent) => {
+      if (draggedLayer) {
+        console.log("aaaaaaaaaaaaaa");
 
-      if (
-        rect.right > window.innerWidth ||
-        rect.height <= 0 ||
-        rect.left < 0 ||
-        rect.top < 0
-      )
-        toggleLayerContainer();
+        setIsLayerDrag(false);
+        const draggedLayerPosition = layersPositions.find(
+          (layer) => layer.id === draggedLayer
+        );
+        if (!draggedLayerPosition) return;
+        const tempLayers = [...allLayers];
+        let newPositionIndex = -1;
+        layersPositions.forEach((layer, index) => {
+          if (layer.bottom > e.clientY) newPositionIndex = index;
+        });
+        const currentLayerIndex = tempLayers.findIndex(
+          (layer) => layer.id === draggedLayer
+        );
+        if (currentLayerIndex === -1) return;
+
+        const finalInsertionIndex =
+          newPositionIndex === -1 ? tempLayers.length : newPositionIndex;
+        const [removedElement] = tempLayers.splice(currentLayerIndex, 1);
+        tempLayers.splice(finalInsertionIndex, 0, removedElement);
+        setLayers([...tempLayers]);
+      }
+      if (isDragging) {
+        setIsDragging(false);
+        const box = toolbarElement.current as HTMLDivElement;
+        const rect = box.getBoundingClientRect();
+
+        if (
+          rect.right > window.innerWidth ||
+          rect.height <= 0 ||
+          rect.left < 0 ||
+          rect.top < 0
+        )
+          toggleLayerContainer();
+      }
     };
 
     document.addEventListener("mousemove", handleMouseMove);
@@ -198,7 +225,7 @@ const LayerContainerVM = () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging, dragStart]);
+  }, [isDragging, dragStart, draggedLayer]);
 
   const getArrowDir = (): string => {
     if (
