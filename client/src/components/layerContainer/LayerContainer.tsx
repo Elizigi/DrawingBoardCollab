@@ -15,6 +15,7 @@ const LayersContainer = () => {
     isDragging,
     toTheRight,
     layerRefs,
+    handleLayerDown,
     toggleLockLayer,
     chooseContainerSide,
     getArrowDir,
@@ -67,6 +68,8 @@ const LayersContainer = () => {
           {allLayers.map((layer) => (
             <button
               onClick={() => changeLayer(layer.id)}
+              onMouseDown={handleLayerDown}
+              id={layer.id}
               key={layer.id}
               ref={(el) => {
                 if (el) layerRefs.current.set(layer.id, el);

@@ -47,24 +47,24 @@ const LayerContainerVM = () => {
   const toTheRight = layersToolPositionOffset.x > window.innerWidth / 2;
 
   useLayoutEffect(() => {
+    const newPositions = [];
+
     for (const [id, element] of layerRefs.current.entries()) {
       if (element) {
         const rect = element.getBoundingClientRect();
-
         const midpoint = rect.top + rect.height / 2;
 
-        setLayersPositions([
-          ...layersPositions,
-          {
-            id: id,
-            top: rect.top,
-            bottom: rect.bottom,
-            height: rect.height,
-            midpoint,
-          },
-        ]);
+        newPositions.push({
+          id: id,
+          top: rect.top,
+          bottom: rect.bottom,
+          height: rect.height,
+          midpoint,
+        });
       }
     }
+
+    setLayersPositions(newPositions);
   }, [allLayers]);
 
   const updateText = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,8 +132,6 @@ const LayerContainerVM = () => {
   };
 
   const changeLayer = (id: string) => {
-    setIsLayerDrag(true);
-    setDraggedLayer(id);
     setActiveLayer(id);
   };
 
@@ -166,6 +164,15 @@ const LayerContainerVM = () => {
     });
   };
 
+  const handleLayerDown = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const id = e.currentTarget.id;
+    console.log(id);
+    setIsLayerDrag(true);
+    setDraggedLayer(id);
+  };
+
   useEffect(() => {
     if (!isDragging && !draggedLayer) return;
     const handleMouseMove = (e: MouseEvent): void => {
@@ -180,7 +187,6 @@ const LayerContainerVM = () => {
 
     const handleMouseUp = (e: MouseEvent) => {
       if (draggedLayer) {
-        console.log("aaaaaaaaaaaaaa");
 
         setIsLayerDrag(false);
         const draggedLayerPosition = layersPositions.find(
@@ -202,6 +208,8 @@ const LayerContainerVM = () => {
         const [removedElement] = tempLayers.splice(currentLayerIndex, 1);
         tempLayers.splice(finalInsertionIndex, 0, removedElement);
         setLayers([...tempLayers]);
+
+        setDraggedLayer("");
       }
       if (isDragging) {
         setIsDragging(false);
@@ -253,6 +261,7 @@ const LayerContainerVM = () => {
     toTheRight,
     layerRefs,
     layersPositions,
+    handleLayerDown,
     toggleLockLayer,
     chooseContainerSide,
     getArrowDir,
