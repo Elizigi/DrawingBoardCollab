@@ -187,7 +187,6 @@ const LayerContainerVM = () => {
 
     const handleMouseUp = (e: MouseEvent) => {
       if (draggedLayer) {
-
         setIsLayerDrag(false);
         const draggedLayerPosition = layersPositions.find(
           (layer) => layer.id === draggedLayer
@@ -195,9 +194,14 @@ const LayerContainerVM = () => {
         if (!draggedLayerPosition) return;
         const tempLayers = [...allLayers];
         let newPositionIndex = -1;
-        layersPositions.forEach((layer, index) => {
-          if (layer.bottom > e.clientY) newPositionIndex = index;
-        });
+        for (let index = 0; index < layersPositions.length; index++) {
+          const layer = layersPositions[index];
+
+          if (layer.bottom > e.clientY) {
+            newPositionIndex = index;
+            if (layer.bottom < e.clientY) break;
+          }
+        }
         const currentLayerIndex = tempLayers.findIndex(
           (layer) => layer.id === draggedLayer
         );
