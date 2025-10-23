@@ -46,21 +46,22 @@ const LayerContainerVM = () => {
   const toTheRight = layersToolPositionOffset.x > window.innerWidth / 2;
 
   useLayoutEffect(() => {
-    const newPositions = [];
+    const newPositions: LayerPosition[] = [];
 
-    for (const [id, element] of layerRefs.current.entries()) {
-      if (element) {
-        const rect = element.getBoundingClientRect();
-        const midpoint = rect.top + rect.height / 2;
+    for (const layer of allLayers) {
+      const element = layerRefs.current.get(layer.id);
+      if (!element) continue;
 
-        newPositions.push({
-          id: id,
-          top: rect.top,
-          bottom: rect.bottom,
-          height: rect.height,
-          midpoint,
-        });
-      }
+      const rect = element.getBoundingClientRect();
+      const midpoint = rect.top + rect.height / 2;
+
+      newPositions.push({
+        id: layer.id,
+        top: rect.top,
+        bottom: rect.bottom,
+        height: rect.height,
+        midpoint,
+      });
     }
 
     setLayersPositions(newPositions);
@@ -162,6 +163,28 @@ const LayerContainerVM = () => {
       y: e.clientY - rect.top,
     });
   };
+  const getNewPositionIndex = (
+    isPointerBelowDragged: boolean,
+    clientY: number
+  ) => {
+    if (draggedLayer === null) return -1;
+    let newPositionIndex = -1;
+    if (isPointerBelowDragged) {
+      for (let i = draggedLayer + 1; i < layersPositions.length; i++) {
+        if (clientY > layersPositions[i].bottom) {
+          newPositionIndex = i;
+        } else break;
+      }
+    } else {
+      for (let i = draggedLayer - 1; i >= 0; i--) {
+        if (clientY < layersPositions[i].bottom) {
+          newPositionIndex = i;
+        } else break;
+      }
+    }
+
+    return newPositionIndex === -1 ? draggedLayer : newPositionIndex;
+  };
 
   const handleLayerDown = (
     index: number,
@@ -170,34 +193,31 @@ const LayerContainerVM = () => {
     e.stopPropagation();
     e.preventDefault();
     setDraggedLayer(index);
+    console.log(index, "this is layer pos");
   };
-
   const layerLand = (e: MouseEvent) => {
-    if (draggedLayer) {
+    if (draggedLayer != null) {
       const draggedLayerPosition = layersPositions[draggedLayer];
       if (!draggedLayerPosition) return;
-      const tempLayers = [...allLayers];
-      let newPositionIndex = -1;
-      
-      for (let index = 0; index < layersPositions.length; index++) {
-        const layer = layersPositions[index];
 
-        if (layer.bottom > e.clientY) {
-          newPositionIndex = index;
-          if (layer.bottom < e.clientY) break;
-        }
-      }
-      const finalInsertionIndex =
-        newPositionIndex === -1 ? tempLayers.length : newPositionIndex;
-      const [removedElement] = tempLayers.splice(draggedLayer, 1);
-      tempLayers.splice(finalInsertionIndex, 0, removedElement);
-      setLayers([...tempLayers]);
+      const clientY = e.clientY;
+      const isPointerBelowDragged = clientY > draggedLayerPosition.bottom;
+      const newPositionIndex = getNewPositionIndex(
+        isPointerBelowDragged,
+        clientY
+      );
 
-      setDraggedLayer(null);
+      const temp = [...allLayers];
+      const [removed] = temp.splice(draggedLayer, 1);
+      const insertAt = newPositionIndex === -1 ? draggedLayer : newPositionIndex;
+      temp.splice(insertAt, 0, removed);
+      setLayers(temp);
+      setDraggedLayer(null)
     }
   };
+
   useEffect(() => {
-    if (!isDragging && !draggedLayer) return;
+    if (!isDragging && draggedLayer === null) return;
     const handleMouseMove = (e: MouseEvent): void => {
       if (!toolbarElement.current) return;
       if (!isDragging) return;
