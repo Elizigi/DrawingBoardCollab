@@ -26,8 +26,6 @@ const LayerContainerVM = () => {
 
   const [containerVisible, setContainerVisible] = useState(true);
 
-  const [newLayerName, setNewLayerName] = useState("");
-  const [layerNameInputOpen, setLayerNameInputOpen] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   const [isDragging, setIsDragging] = useState(false);
@@ -68,28 +66,6 @@ const LayerContainerVM = () => {
     setLayersPositions(newPositions);
   }, [allLayers]);
 
-  const updateText = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewLayerName(e.target.value);
-  };
-
-  const addNewLayer = () => {
-    if (newLayerName.trim().length < 2) return;
-    const layerId = crypto.randomUUID();
-    addLayer(newLayerName, layerId);
-
-    socket.emit("new-layer", {
-      layerId,
-      layerName: newLayerName,
-    });
-
-    setLayerNameInputOpen(false);
-    setNewLayerName("");
-  };
-
-  const deleteLayer = (layerId: string) => {
-    if (onlineStatus.inRoom) return socket.emit("delete-layer", { layerId });
-    removeLayer(layerId);
-  };
 
   const addComingLayer = ({ layerId, layerName }: LayerPayload) => {
     addLayer(layerName, layerId);
@@ -149,10 +125,6 @@ const LayerContainerVM = () => {
       });
   };
 
-  const handlePlusBtnClick = () => {
-    if (!layerNameInputOpen) return setLayerNameInputOpen(true);
-    addNewLayer();
-  };
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!containerVisible || e.target !== dragAreaElement.current) return;
@@ -259,10 +231,8 @@ const LayerContainerVM = () => {
   };
 
   return {
-    newLayerName,
     allLayers,
     activeLayerId,
-    layerNameInputOpen,
     containerVisible,
     layersToolPositionOffset,
     toolbarElement,
@@ -275,9 +245,6 @@ const LayerContainerVM = () => {
     toggleLockLayer,
     chooseContainerSide,
     getArrowDir,
-    deleteLayer,
-    handlePlusBtnClick,
-    updateText,
     changeLayer,
     changeVisible,
     toggleLayerContainer,

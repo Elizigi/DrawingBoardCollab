@@ -1,0 +1,50 @@
+$bg-light: #4a4a5a;
+$border-color: #1f1f20;
+$text-color: #e0e0e0;
+$bg-dark: #2e2e38;
+$bg-medium: #3c3c4a;
+$active-color: #6b7280;
+
+.addNewLayer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .plusBTN {
+    all: unset;
+    background-color: $bg-medium;
+    color: $text-color;
+    cursor: pointer;
+    padding: 0.5rem;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    border: solid $border-color 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: $bg-light;
+      transform: scale(1.05);
+    }
+  }
+
+  .layerNameInput {
+    user-select: auto;
+    background-color: $bg-light;
+    border: $border-color solid 1px;
+    border-radius: 6px;
+    color: $text-color;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
+    outline: none;
+    width: 8rem;
+
+    &:focus {
+      border-color: $active-color;
+    }
+  }
+}

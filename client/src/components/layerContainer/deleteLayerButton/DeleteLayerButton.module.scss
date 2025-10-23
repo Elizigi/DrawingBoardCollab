@@ -1,0 +1,7 @@
+.deleteButton {
+  all: unset;
+  user-select: none;
+  &:hover {
+    scale: 1.1;
+  }
+}

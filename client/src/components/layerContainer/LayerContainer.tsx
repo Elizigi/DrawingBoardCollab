@@ -1,13 +1,13 @@
 import { onlineStatus } from "../../Main";
+import AddLayerButton from "./addLayerButton/AddLayerButton";
+import DeleteLayerButton from "./deleteLayerButton/DeleteLayerButton";
 import LayerContainerVM from "./LayerContainerVM";
 import styles from "./LayersContainer.module.scss";
 
 const LayersContainer = () => {
   const {
-    newLayerName,
     allLayers,
     activeLayerId,
-    layerNameInputOpen,
     containerVisible,
     layersToolPositionOffset,
     toolbarElement,
@@ -19,9 +19,7 @@ const LayersContainer = () => {
     toggleLockLayer,
     chooseContainerSide,
     getArrowDir,
-    deleteLayer,
-    handlePlusBtnClick,
-    updateText,
+
     changeLayer,
     changeVisible,
     toggleLayerContainer,
@@ -51,19 +49,7 @@ const LayersContainer = () => {
         className={`${styles.layersToolbar}`}
         ref={dragAreaElement}
       >
-        <div className={styles.addNewLayer}>
-          <button className={styles.plusBTN} onClick={handlePlusBtnClick}>
-            +
-          </button>
-          {layerNameInputOpen && (
-            <input
-              type="text"
-              value={newLayerName}
-              onChange={updateText}
-              className={styles.layerNameInput}
-            />
-          )}
-        </div>
+        <AddLayerButton />
         <div className={styles.layersContainer}>
           {allLayers.map((layer, index) => (
             <button
@@ -118,18 +104,10 @@ const LayersContainer = () => {
                   }}
                 />
               )}
-              {(!onlineStatus.inRoom || onlineStatus.isAdmin) &&
-                allLayers.length > 1 && (
-                  <input
-                    type="button"
-                    value="❌"
-                    className={styles.deleteButton}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteLayer(layer.id);
-                    }}
-                  />
-                )}
+              <DeleteLayerButton
+                key={`delete-${layer.id}`}
+                layerId={layer.id}
+              />
             </button>
           ))}
         </div>
