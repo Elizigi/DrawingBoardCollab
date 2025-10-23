@@ -65,10 +65,10 @@ const LayersContainer = () => {
           )}
         </div>
         <div className={styles.layersContainer}>
-          {allLayers.map((layer) => (
+          {allLayers.map((layer,index) => (
             <button
               onClick={() => changeLayer(layer.id)}
-              onMouseDown={handleLayerDown}
+              onMouseDown={(e)=>handleLayerDown(index,e)}
               id={layer.id}
               key={layer.id}
               ref={(el) => {

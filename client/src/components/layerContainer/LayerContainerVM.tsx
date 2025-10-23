@@ -34,8 +34,7 @@ const LayerContainerVM = () => {
   const toolbarElement = useRef<HTMLDivElement>(null);
   const dragAreaElement = useRef<HTMLDivElement>(null);
 
-  const [draggedLayer, setDraggedLayer] = useState("");
-  const [isLayerDrag, setIsLayerDrag] = useState(false);
+  const [draggedLayer, setDraggedLayer] = useState<null | number>(null);
 
   const [layersPositions, setLayersPositions] = useState<LayerPosition[]>([]);
 
@@ -164,15 +163,39 @@ const LayerContainerVM = () => {
     });
   };
 
-  const handleLayerDown = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleLayerDown = (
+    index: number,
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
     e.stopPropagation();
     e.preventDefault();
-    const id = e.currentTarget.id;
-    console.log(id);
-    setIsLayerDrag(true);
-    setDraggedLayer(id);
+    setDraggedLayer(index);
   };
 
+  const layerLand = (e: MouseEvent) => {
+    if (draggedLayer) {
+      const draggedLayerPosition = layersPositions[draggedLayer];
+      if (!draggedLayerPosition) return;
+      const tempLayers = [...allLayers];
+      let newPositionIndex = -1;
+      
+      for (let index = 0; index < layersPositions.length; index++) {
+        const layer = layersPositions[index];
+
+        if (layer.bottom > e.clientY) {
+          newPositionIndex = index;
+          if (layer.bottom < e.clientY) break;
+        }
+      }
+      const finalInsertionIndex =
+        newPositionIndex === -1 ? tempLayers.length : newPositionIndex;
+      const [removedElement] = tempLayers.splice(draggedLayer, 1);
+      tempLayers.splice(finalInsertionIndex, 0, removedElement);
+      setLayers([...tempLayers]);
+
+      setDraggedLayer(null);
+    }
+  };
   useEffect(() => {
     if (!isDragging && !draggedLayer) return;
     const handleMouseMove = (e: MouseEvent): void => {
@@ -186,35 +209,7 @@ const LayerContainerVM = () => {
     };
 
     const handleMouseUp = (e: MouseEvent) => {
-      if (draggedLayer) {
-        setIsLayerDrag(false);
-        const draggedLayerPosition = layersPositions.find(
-          (layer) => layer.id === draggedLayer
-        );
-        if (!draggedLayerPosition) return;
-        const tempLayers = [...allLayers];
-        let newPositionIndex = -1;
-        for (let index = 0; index < layersPositions.length; index++) {
-          const layer = layersPositions[index];
-
-          if (layer.bottom > e.clientY) {
-            newPositionIndex = index;
-            if (layer.bottom < e.clientY) break;
-          }
-        }
-        const currentLayerIndex = tempLayers.findIndex(
-          (layer) => layer.id === draggedLayer
-        );
-        if (currentLayerIndex === -1) return;
-
-        const finalInsertionIndex =
-          newPositionIndex === -1 ? tempLayers.length : newPositionIndex;
-        const [removedElement] = tempLayers.splice(currentLayerIndex, 1);
-        tempLayers.splice(finalInsertionIndex, 0, removedElement);
-        setLayers([...tempLayers]);
-
-        setDraggedLayer("");
-      }
+      layerLand(e);
       if (isDragging) {
         setIsDragging(false);
         const box = toolbarElement.current as HTMLDivElement;
