@@ -22,7 +22,6 @@ $active-color: #6b7280;
   bottom: 10%;
   z-index: 999999;
   cursor: grab;
-  
 }
 
 .layersToolbar {
@@ -99,42 +98,6 @@ $active-color: #6b7280;
       border-color: #5a5f6b;
     }
 
-    .visibilityIcon {
-      all: unset;
-      appearance: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      width: 1.2rem;
-      height: 1.2rem;
-      border-radius: 3px;
-      position: relative;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid $border-color;
-
-      background-color: $bg-dark;
-
-      &::after {
-        content: "👁";
-        font-size: 0.8rem;
-        color: white;
-        transition: all 0.2s ease;
-      }
-
-      &.hidden {
-        &::after {
-          color: $bg-dark;
-        }
-      }
-
-      &:hover {
-        transform: scale(1.05);
-      }
-    }
-
     .layerNameContainer {
       flex: 1;
       min-width: 0;
@@ -151,7 +114,6 @@ $active-color: #6b7280;
     }
   }
 }
-
 
 .layerVisible {
   transform: translateX(0);
