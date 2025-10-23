@@ -35,6 +35,7 @@ const LayerContainerVM = () => {
   const dragAreaElement = useRef<HTMLDivElement>(null);
 
   const [draggedLayer, setDraggedLayer] = useState<null | number>(null);
+  const [isLayerDragged, setIsLayerDragged] = useState(false);
 
   const [layersPositions, setLayersPositions] = useState<LayerPosition[]>([]);
 
@@ -163,26 +164,17 @@ const LayerContainerVM = () => {
       y: e.clientY - rect.top,
     });
   };
-  const getNewPositionIndex = (
-    isPointerBelowDragged: boolean,
-    clientY: number
-  ) => {
+  const getNewPositionIndex = (isAbove: boolean, clientY: number) => {
     if (draggedLayer === null) return -1;
     let newPositionIndex = -1;
-    if (isPointerBelowDragged) {
-      for (let i = draggedLayer + 1; i < layersPositions.length; i++) {
+
+      for (let i = 0; i < layersPositions.length; i++) {
         if (clientY > layersPositions[i].bottom) {
           newPositionIndex = i;
-        } else break;
+        }
       }
-    } else {
-      for (let i = draggedLayer - 1; i >= 0; i--) {
-        if (clientY < layersPositions[i].bottom) {
-          newPositionIndex = i;
-        } else break;
-      }
-    }
-
+   
+    console.log(newPositionIndex,"aaaaaaaaaaaa")
     return newPositionIndex === -1 ? draggedLayer : newPositionIndex;
   };
 
@@ -194,30 +186,29 @@ const LayerContainerVM = () => {
     e.preventDefault();
     setDraggedLayer(index);
     console.log(index, "this is layer pos");
+    setIsLayerDragged(true);
   };
   const layerLand = (e: MouseEvent) => {
-    if (draggedLayer != null) {
-      const draggedLayerPosition = layersPositions[draggedLayer];
-      if (!draggedLayerPosition) return;
+    if (!isLayerDragged || draggedLayer === null) return;
 
-      const clientY = e.clientY;
-      const isPointerBelowDragged = clientY > draggedLayerPosition.bottom;
-      const newPositionIndex = getNewPositionIndex(
-        isPointerBelowDragged,
-        clientY
-      );
+    const draggedLayerPosition = layersPositions[draggedLayer];
+    if (!draggedLayerPosition) return;
 
-      const temp = [...allLayers];
-      const [removed] = temp.splice(draggedLayer, 1);
-      const insertAt = newPositionIndex === -1 ? draggedLayer : newPositionIndex;
-      temp.splice(insertAt, 0, removed);
-      setLayers(temp);
-      setDraggedLayer(null)
-    }
+    const clientY = e.clientY;
+    const isAbove = clientY > draggedLayerPosition.bottom;
+    const newPositionIndex = getNewPositionIndex(isAbove, clientY);
+    console.log(newPositionIndex);
+    const temp = [...allLayers];
+    const [removed] = temp.splice(draggedLayer, 1);
+    const insertAt = newPositionIndex === -1 ? draggedLayer : newPositionIndex;
+    temp.splice(insertAt, 0, removed);
+    setLayers(temp);
+    setIsLayerDragged(false);
+    setDraggedLayer(null);
   };
 
   useEffect(() => {
-    if (!isDragging && draggedLayer === null) return;
+    if (!isDragging && !isLayerDragged) return;
     const handleMouseMove = (e: MouseEvent): void => {
       if (!toolbarElement.current) return;
       if (!isDragging) return;
