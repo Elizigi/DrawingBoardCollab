@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useBrushStore } from "../../zustand/useBrushStore";
-import { onlineStatus, socket } from "../../Main";
+import { socket } from "../../Main";
 type LayerPayload = {
   layerId: string;
   layerName: string;
@@ -88,12 +88,6 @@ const LayerContainerVM = () => {
     };
   }, []);
 
-  const toggleLockLayer = (layerId: string) => {
-    if (onlineStatus.inRoom && !onlineStatus.isAdmin) return;
-    toggleLockLayers(layerId);
-    if (onlineStatus.inRoom && onlineStatus.isAdmin)
-      socket.emit("locked-layer", { layerId });
-  };
 
   const changeVisible = (id: string) => {
     toggleLayer(id);
@@ -217,15 +211,7 @@ const LayerContainerVM = () => {
     };
   }, [isDragging, dragStart, draggedLayer]);
 
-  const getArrowDir = (): string => {
-    if (
-      (!toTheRight && containerVisible) ||
-      (toTheRight && !containerVisible)
-    ) {
-      return "↩";
-    }
-    return "↪";
-  };
+
   const chooseContainerSide = (styles: CSSModuleClasses) => {
     return toTheRight ? styles.layerHiddenLeft : styles.layerHiddenRight;
   };
@@ -242,9 +228,7 @@ const LayerContainerVM = () => {
     layerRefs,
     layersPositions,
     handleLayerDown,
-    toggleLockLayer,
     chooseContainerSide,
-    getArrowDir,
     changeLayer,
     changeVisible,
     toggleLayerContainer,

@@ -1,0 +1,49 @@
+$bg-dark: #2e2e38;
+$bg-medium: #3c3c4a;
+$bg-light: #4a4a5a;
+$border-color: #5e5e70;
+$accent: #3877aa;
+$highlight: #cfd8dc;
+$text-color: #e0e0e0;
+
+.lockedLock {
+  all: unset;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 1.2rem;
+  height: 1.2rem;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::after {
+    content: "\1F512";
+    font-size: 1rem;
+    transition: all 0.2s ease;
+  }
+}
+
+.openLock {
+  all: unset;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 1.2rem;
+  height: 1.2rem;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::after {
+    content: "\1F513";
+    font-size: 1rem;
+    transition: all 0.2s ease;
+  }
+}

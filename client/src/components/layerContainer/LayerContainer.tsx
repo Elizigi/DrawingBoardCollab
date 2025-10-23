@@ -1,8 +1,10 @@
 import { onlineStatus } from "../../Main";
 import AddLayerButton from "./addLayerButton/AddLayerButton";
 import DeleteLayerButton from "./deleteLayerButton/DeleteLayerButton";
+import HideLayerButton from "./hideLayersButton/HideLayerButton";
 import LayerContainerVM from "./LayerContainerVM";
 import styles from "./LayersContainer.module.scss";
+import LockLayerButton from "./lockLayerButton/LockLayerButton";
 
 const LayersContainer = () => {
   const {
@@ -16,9 +18,7 @@ const LayersContainer = () => {
     toTheRight,
     layerRefs,
     handleLayerDown,
-    toggleLockLayer,
     chooseContainerSide,
-    getArrowDir,
 
     changeLayer,
     changeVisible,
@@ -82,28 +82,7 @@ const LayersContainer = () => {
               <div className={styles.layerNameContainer}>
                 <h5 className={styles.layerName}>{layer.name}</h5>
               </div>
-              {onlineStatus.inRoom && !onlineStatus.isAdmin ? (
-                <input
-                  type="checkbox"
-                  disabled
-                  style={{ display: layer.locked ? "block" : "none" }}
-                  checked={true}
-                  className={layer.locked ? styles.lockedLock : ""}
-                  onChange={(e) => {
-                    e.stopPropagation();
-                  }}
-                />
-              ) : (
-                <input
-                  type="checkbox"
-                  checked={true}
-                  className={layer.locked ? styles.lockedLock : styles.openLock}
-                  onChange={(e) => {
-                    e.stopPropagation();
-                    toggleLockLayer(layer.id);
-                  }}
-                />
-              )}
+              <LockLayerButton layer={layer} />
               <DeleteLayerButton
                 key={`delete-${layer.id}`}
                 layerId={layer.id}
@@ -112,12 +91,11 @@ const LayersContainer = () => {
           ))}
         </div>
       </div>
-      <button
-        className={`${styles.hideLayersButton} ${toTheRight ? styles.toRight : styles.toLeft}`}
-        onClick={() => toggleLayerContainer()}
-      >
-        {getArrowDir()}
-      </button>
+      <HideLayerButton
+        containerVisible={containerVisible}
+        toTheRight={toTheRight}
+        toggleLayerContainer={toggleLayerContainer}
+      />
     </div>
   );
 };

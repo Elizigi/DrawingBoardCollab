@@ -1,0 +1,35 @@
+$bg-light: #4a4a5a;
+$border-color: #1f1f20;
+$text-color: #e0e0e0;
+$bg-dark: #2e2e38;
+$bg-medium: #3c3c4a;
+$active-color: #6b7280;
+
+.toLeft {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  border-left: none;
+  left: 100%;
+}
+.toRight {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+  border-right: none;
+  right: 100%;
+}
+.hideLayersButton {
+  background-color: $bg-medium;
+  color: $text-color;
+  position: absolute;
+  cursor: pointer;
+  padding: 0.5rem;
+  font-size: 1.2rem;
+
+  height: 4rem;
+  margin-top: 50%;
+
+  border: solid $border-color 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
