@@ -1,0 +1,50 @@
+$bg-light: #4a4a5a;
+$border-color: #1f1f20;
+$text-color: #e0e0e0;
+$bg-dark: #2e2e38;
+$bg-medium: #3c3c4a;
+$active-color: #6b7280;
+
+.layer {
+    all: unset;
+    background-color: $bg-light;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 3rem;
+    width: 12rem;
+    color: $text-color;
+    cursor: pointer;
+    border-radius: 8px;
+    padding: 0.5rem;
+    gap: 0.5rem;
+    border: solid $border-color 1px;
+    transition: all 0.2s ease;
+    position: relative;
+    flex-shrink: 0;
+    &:hover {
+      background-color: #525262;
+      transform: translateY(-1px);
+    }
+
+    &.backGReen {
+      background-color: $active-color;
+      color: $bg-dark;
+      border-color: #5a5f6b;
+    }
+
+    .layerNameContainer {
+      flex: 1;
+      min-width: 0;
+
+      .layerName {
+        margin: 0;
+        font-size: 0.75rem;
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        line-height: 1.2;
+      }
+    }
+  }

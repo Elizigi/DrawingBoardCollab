@@ -13,9 +13,8 @@ const LayersContainer = () => {
     dragAreaElement,
     isDragging,
     toTheRight,
-  
-    chooseContainerSide,
 
+    chooseContainerSide,
     toggleLayerContainer,
     handleMouseDown,
   } = LayerContainerVM();
@@ -46,7 +45,11 @@ const LayersContainer = () => {
         <AddLayerButton />
         <div className={styles.layersContainer}>
           {allLayers.map((layer, index) => (
-            <LayerButton layer={layer} index={index} />
+            <LayerButton
+              key={`layer-button-${layer.id}`}
+              layer={layer}
+              index={index}
+            />
           ))}
         </div>
       </div>
