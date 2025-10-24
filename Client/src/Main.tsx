@@ -46,18 +46,21 @@ export const onlineStatus = {
 
   useBrushStore.subscribe((state, prev) => {
     if (state.layers.length > prev.layers.length) {
+      // eslint-disable-next-line unicorn/prefer-at
       const newLayer = state.layers[state.layers.length - 1];
       createLayerCanvas(newLayer.id);
     }
     if (state.layers.length < prev.layers.length) {
       const prevIds = new Set(prev.layers.map((l) => l.id));
       const newIds = new Set(state.layers.map((l) => l.id));
-      prevIds.forEach((id) => {
-        if (!newIds.has(id)) removeLayerCanvas(id);
-      });
-    }
 
-    state.layers.forEach((layer) => {
+      for (const id of prevIds) {
+        if (!newIds.has(id)) {
+          removeLayerCanvas(id);
+        }
+      }
+    }
+    for (const layer of state.layers) {
       const entry = layersCanvasMap[layer.id];
       const prevLayer = prev.layers.find((l) => l.id === layer.id);
       if (!entry || !prevLayer) return;
@@ -68,7 +71,7 @@ export const onlineStatus = {
       if (layer.visible !== prevLayer.visible) {
         redrawLayer(layer.id);
       }
-    });
+    }
 
     if (state.strokes !== prev.strokes) {
       redrawAllLayers();
@@ -121,10 +124,10 @@ export const onlineStatus = {
     const layers = useBrushStore.getState().layers;
 
     const strokesByLayer: Record<string, Stroke[]> = {};
-    allStrokes.forEach((stroke) => {
+    for (const stroke of allStrokes) {
       if (!strokesByLayer[stroke.layerId]) strokesByLayer[stroke.layerId] = [];
       strokesByLayer[stroke.layerId].push(stroke);
-    });
+    }
 
     socket.emit("send-state", {
       to: from,
@@ -142,9 +145,9 @@ export const onlineStatus = {
 
     if (layers && Array.isArray(layers)) {
       useBrushStore.getState().setLayers(layers);
-      layers.forEach((layer: any) => {
+      for (const layer of layers) {
         if (!layersCanvasMap[layer.id]) createLayerCanvas(layer.id);
-      });
+      }
     }
 
     fillBackgroundWhite();
@@ -155,12 +158,12 @@ export const onlineStatus = {
       for (const [layerId, strokeArray] of Object.entries(strokes)) {
         if (!layersCanvasMap[layerId]) createLayerCanvas(layerId);
         if (Array.isArray(strokeArray)) {
-          strokeArray.forEach((stroke: Stroke) => {
+          for (const stroke of strokeArray) {
             allIncomingStrokes.push({ ...stroke, final: true, isRemote: true });
 
             const entry = layersCanvasMap[layerId];
             if (entry) drawStrokeToCtx(entry.ctx, { ...stroke, final: true });
-          });
+          }
         }
       }
 
@@ -178,7 +181,14 @@ export const onlineStatus = {
     const ctx = remoteTempCanvas.getContext("2d")!;
     ctx.clearRect(0, 0, remoteTempCanvas.width, remoteTempCanvas.height);
 
-    if (!stroke.final) {
+    if (stroke.final) {
+      const entry = layersCanvasMap[stroke.layerId];
+      if (!entry) return;
+
+      useBrushStore.getState().addStroke(stroke);
+
+      drawStrokeToCtx(entry.ctx, stroke);
+    } else {
       const allLayers = useBrushStore.getState().layers;
       const strokeLayer = allLayers.find(
         (layer) => layer.id === stroke.layerId
@@ -187,13 +197,6 @@ export const onlineStatus = {
       const ctx = remoteTempCanvas.getContext("2d")!;
       ctx.clearRect(0, 0, remoteTempCanvas.width, remoteTempCanvas.height);
       drawStrokeToCtx(ctx, stroke);
-    } else {
-      const entry = layersCanvasMap[stroke.layerId];
-      if (!entry) return;
-
-      useBrushStore.getState().addStroke(stroke);
-
-      drawStrokeToCtx(entry.ctx, stroke);
     }
   });
 })();

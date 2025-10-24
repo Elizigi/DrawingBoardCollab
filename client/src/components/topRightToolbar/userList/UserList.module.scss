@@ -1,10 +1,3 @@
-$bg-light: #4a4a5a;
-$border-color: #1f1f20;
-$text-color: #e0e0e0;
-$bg-dark: #2e2e38;
-$bg-medium: #3c3c4a;
-$active-color: #6b7280;
-
 .userList {
   position: fixed;
   top: 9rem;
@@ -46,10 +39,10 @@ $active-color: #6b7280;
   &:hover {
     border-top-color: $bg-dark;
     border-bottom-color: $bg-dark;
-    background-color: #626f8a42;
+    background-color: $bg-harsh;
     text-shadow:
-      0 0 1px #000,
-      0 0 2px #000;
+      0 0 1px $dark,
+      0 0 2px $dark;
   }
 
   display: flex;
@@ -58,7 +51,7 @@ $active-color: #6b7280;
   align-items: center;
   h3 {
     font-size: 1rem;
-    color: white;
+    color: $text-color;
   }
 }
 
@@ -82,8 +75,8 @@ $active-color: #6b7280;
 .removeUser {
   all: unset;
   margin-left: auto;
-  color: rgb(141, 4, 4);
+  color: $dull-red;
   &:hover {
-    color: red;
+    color: $sharp-red;
   }
 }

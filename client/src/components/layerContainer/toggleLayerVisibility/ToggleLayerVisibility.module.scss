@@ -1,42 +1,35 @@
-$bg-light: #4a4a5a;
-$border-color: #1f1f20;
-$text-color: #e0e0e0;
-$bg-dark: #2e2e38;
-$bg-medium: #3c3c4a;
-$active-color: #6b7280;
-
 .visibilityIcon {
-      all: unset;
-      appearance: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      width: 1.2rem;
-      height: 1.2rem;
-      border-radius: 3px;
-      position: relative;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid $border-color;
+  all: unset;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 3px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid $border-color;
 
-      background-color: $bg-dark;
+  background-color: $bg-dark;
 
-      &::after {
-        content: "👁";
-        font-size: 0.8rem;
-        color: white;
-        transition: all 0.2s ease;
-      }
+  &::after {
+    content: "👁";
+    font-size: 0.8rem;
+    color: $text-color;
+    transition: all 0.2s ease;
+  }
 
-      &.hidden {
-        &::after {
-          color: $bg-dark;
-        }
-      }
-
-      &:hover {
-        transform: scale(1.05);
-      }
+  &.hidden {
+    &::after {
+      color: $bg-dark;
     }
+  }
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}

@@ -1,10 +1,3 @@
-$bg-dark: #2e2e38;
-$bg-medium: #3c3c4a;
-$bg-light: #4a4a5a;
-$border-color: #5e5e70;
-$accent: #3877aa;
-$highlight: #cfd8dc;
-$text-color: #e0e0e0;
 .toolbar {
   z-index: 9999999;
   position: absolute;
@@ -64,7 +57,7 @@ $text-color: #e0e0e0;
   height: 40%;
   background-color: $bg-medium;
   border: 1px solid $border-color;
-  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.4);
+  box-shadow: inset 2px 2px 4px $dark;
   border-radius: 2px;
   display: flex;
   flex-direction: column;
@@ -84,8 +77,8 @@ $text-color: #e0e0e0;
   .layerBox {
     width: 40px;
     height: 40px;
-    background-color: aliceblue;
-    border: solid 1px black;
+    background-color: $al-white;
+    border: solid 1px $dark;
     flex-shrink: 0;
   }
   .layerNameContainer {
@@ -107,7 +100,7 @@ $text-color: #e0e0e0;
     justify-content: center;
     .plusBTN {
       background-color: $accent;
-      color: rgb(255, 255, 255);
+      color: $text-color;
       border: none;
       font-weight: bold;
       user-select: none;

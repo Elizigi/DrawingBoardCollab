@@ -1,8 +1,3 @@
-$bg-light: #4a4a5a;
-$border-color: #5e5e70;
-$text-color: #e0e0e0;
-$bg-dark: #2e2e38;
-
 .topRightToolContainer {
   position: fixed;
   width: fit-content;
@@ -29,7 +24,7 @@ $bg-dark: #2e2e38;
 
     border: $border-color 3px solid;
     background-color: $bg-light;
-    color: white;
+    color: $text-color;
     padding: 0.3rem;
     text-align: center;
     font-size: 1.5rem;
@@ -43,8 +38,8 @@ $bg-dark: #2e2e38;
   }
 
   .netMenu {
-    background-color: white;
-    color: white;
+    background-color: $text-color;
+    color: $text-color;
     width: fit-content;
     height: fit-content;
     border-radius: 50%;
@@ -98,14 +93,14 @@ $bg-dark: #2e2e38;
   right: 4rem;
   display: flex;
   flex-direction: row;
-  color: white;
+  color: $text-color;
   pointer-events: auto;
   z-index: 9999;
 
   .roomIdBar {
     border: none;
     text-wrap: nowrap;
-    background-color: #43434b;
+    background-color: $bg-bar;
     cursor: text;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
@@ -114,7 +109,7 @@ $bg-dark: #2e2e38;
   .handle {
     all: unset;
     align-items: center;
-    background-color: #2e2e38;
+    background-color: $bg-dark;
     cursor: pointer;
     border-radius: 20px 0 0 20px;
     width: fit-content;
@@ -123,7 +118,7 @@ $bg-dark: #2e2e38;
     height: 100%;
     z-index: 9999;
 
-    border-right: 1px #1b1b20 solid;
+    border-right: 1px $dark-purple solid;
   }
 }
 .spinLoad {

@@ -5,7 +5,7 @@
   z-index: 999999;
   .blackBorderWrapper {
     position: relative;
-    border: black 1px solid;
+    border: $dark 1px solid;
     width: 4rem;
     height: 4rem;
     z-index: 9999;
@@ -14,7 +14,7 @@
   }
   .brushIcon {
     border-radius: 50%;
-    background-color: rgb(36, 36, 38);
+    background-color: $toolbar-bg;
     width: 4rem;
     border: none;
     padding: 0.2rem;
@@ -25,10 +25,10 @@
   }
   .colorMenu {
     width: 3rem;
-    background: linear-gradient(90deg, #3d3d3d 0%);
+    background: linear-gradient(90deg, $menu-gradient-start 0%);
     box-shadow:
-      inset 3px 3px 8px rgba(0, 0, 0, 0.6),
-      inset -2px -2px 6px rgba(255, 255, 255, 0.1);
+      inset 3px 3px 8px $toolbar-shadow-dark,
+      inset -2px -2px 6px $toolbar-shadow-light;
     height: fit-content;
     margin: 0 auto;
     display: flex;
@@ -39,7 +39,7 @@
     padding-top: 1rem;
     transform: translate(0.5rem, -1rem);
     z-index: 4;
-    border: 2px solid rgb(57, 57, 57);
+    border: 2px solid $toolbar-border;
     position: fixed;
     .pastColorElement {
       width: 2rem;
@@ -48,7 +48,7 @@
       cursor: pointer;
       margin-top: 0.5rem;
 
-      border: 1px black solid;
+      border: 1px $dark solid;
       border-radius: 50%;
     }
   }
@@ -74,8 +74,8 @@
       right: -0.75rem;
       transform: translateY(-50%);
       z-index: 9999;
-      border: 1px solid rgb(179, 179, 179);
-      background-color: #232323;
+      border: 1px solid $handle-border;
+      background-color: $handle-bg;
     }
   }
   .brushSizeInput {
@@ -99,23 +99,22 @@
 
     background: conic-gradient(
       from 0deg,
-      rgb(96, 96, 96) 0deg,
-      rgb(72, 71, 71) 30deg,
-
+      $gradient-second 0deg,
+      $gradient-first 30deg,
       transparent 30deg,
 
       transparent 220deg,
-      rgb(72, 71, 71) 220deg,
+      $gradient-first 220deg,
 
-      rgb(96, 96, 96) 230deg,
+      $gradient-second 230deg,
 
-      rgb(96, 96, 96) 344deg
+      $gradient-second 344deg
     );
   }
   .brushSizeDisplay {
     position: fixed;
     z-index: 99999;
-    color: white;
+    color: $text-color;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scaleX(-1);
@@ -125,9 +124,9 @@
       pointer-events: none;
     }
     text-shadow:
-      -1px -1px 0 black,
-      1px -1px 0 black,
-      -1px 1px 0 black,
-      1px 1px 0 black;
+      -1px -1px 0 $dark,
+      1px -1px 0 $dark,
+      -1px 1px 0 $dark,
+      1px 1px 0 $dark;
   }
 }
