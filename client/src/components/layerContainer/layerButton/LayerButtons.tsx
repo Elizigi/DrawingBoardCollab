@@ -6,8 +6,15 @@ import DeleteLayerButton from "../deleteLayerButton/DeleteLayerButton";
 import LayerButtonMV from "./LayerButtonsMV";
 
 const LayerButtons = () => {
-  const { allLayers, activeLayerId, changeLayer, layerRefs, handleLayerDown } =
-    LayerButtonMV();
+  const {
+    allLayers,
+    activeLayerId,
+    layerRefs,
+    layerOffset,
+    draggedLayer,
+    handleLayerDown,
+    changeLayer,
+  } = LayerButtonMV();
   return (
     <div className={styles.layersContainer}>
       {allLayers.map((layer, index) => (
@@ -22,6 +29,8 @@ const LayerButtons = () => {
           }}
           className={`${styles.layer} ${layer.id === activeLayerId ? styles.backGReen : ""}`}
           style={{
+            top:draggedLayer===index?layerOffset:undefined,
+            zIndex:draggedLayer===index?9999999:99,
             cursor:
               onlineStatus.inRoom && layer.locked && !onlineStatus.isAdmin
                 ? "not-allowed"

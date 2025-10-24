@@ -15,6 +15,11 @@ const LayerButtonsMV = () => {
 
   const [isLayerDragged, setIsLayerDragged] = useState(false);
   const [draggedLayer, setDraggedLayer] = useState<null | number>(null);
+  const [layerOffset, setLayerOffset] = useState(0);
+  const [dragStartOffset, setDragStartOffset] = useState(0);
+
+  const layersPositionsRef = useRef<LayerPosition[]>([]);
+  const layerRefs = useRef(new Map<string, HTMLButtonElement>());
 
   const changeLayer = (id: string) => {
     setActiveLayer(id);
@@ -39,6 +44,10 @@ const LayerButtonsMV = () => {
       });
     }
     layersPositionsRef.current = newPositions;
+
+    const clickedRect = layersPositionsRef.current[index];
+    setDragStartOffset(e.clientY - clickedRect.top);
+
     e.stopPropagation();
     e.preventDefault();
     setDraggedLayer(index);
@@ -64,11 +73,11 @@ const LayerButtonsMV = () => {
     const insertAt = newPositionIndex === -1 ? draggedLayer : newPositionIndex;
     temp.splice(insertAt, 0, removed);
     setLayers(temp);
+    setLayerOffset(0);
+    setDragStartOffset(0);
     setIsLayerDragged(false);
     setDraggedLayer(null);
   };
-  const layersPositionsRef = useRef<LayerPosition[]>([]);
-  const layerRefs = useRef(new Map<string, HTMLButtonElement>());
 
   const findPositionAbove = (clientY: number) => {
     if (draggedLayer === null) return -1;
@@ -101,7 +110,11 @@ const LayerButtonsMV = () => {
     if (!isLayerDragged) return;
 
     const handleMouseMove = (e: MouseEvent) => {
-      return e;
+      if (draggedLayer === null) return;
+      const clientY = e.clientY;
+      const draggedLayerPosition = layersPositionsRef.current[draggedLayer];
+      const offsetY = clientY - draggedLayerPosition.top - dragStartOffset;
+      setLayerOffset(offsetY);
     };
 
     const handleMouseUp = (e: MouseEvent) => {
@@ -119,7 +132,15 @@ const LayerButtonsMV = () => {
     };
   }, [isLayerDragged, draggedLayer]);
 
-  return { allLayers, activeLayerId, changeLayer, layerRefs, handleLayerDown };
+  return {
+    allLayers,
+    activeLayerId,
+    layerRefs,
+    layerOffset,
+    draggedLayer,
+    handleLayerDown,
+    changeLayer,
+  };
 };
 
 export default LayerButtonsMV;

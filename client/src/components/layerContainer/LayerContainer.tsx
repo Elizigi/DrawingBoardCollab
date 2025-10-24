@@ -42,9 +42,9 @@ const LayersContainer = () => {
         ref={dragAreaElement}
       >
         <AddLayerButton />
-            <LayerButtons />
-       
+        <LayerButtons />
       </div>
+
       <HideLayerButton
         containerVisible={containerVisible}
         toTheRight={toTheRight}
