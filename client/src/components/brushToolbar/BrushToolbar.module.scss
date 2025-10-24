@@ -14,7 +14,7 @@
   }
   .brushIcon {
     border-radius: 50%;
-    background-color: $toolbar-bg;
+    background-color: $bg-dark;
     width: 4rem;
     border: none;
     padding: 0.2rem;
@@ -25,10 +25,10 @@
   }
   .colorMenu {
     width: 3rem;
-    background: linear-gradient(90deg, $menu-gradient-start 0%);
+    background: linear-gradient(90deg, $bg-medium 0%);
     box-shadow:
-      inset 3px 3px 8px $toolbar-shadow-dark,
-      inset -2px -2px 6px $toolbar-shadow-light;
+      inset 3px 3px 8px $dark,
+      inset -2px -2px 6px$highlight;
     height: fit-content;
     margin: 0 auto;
     display: flex;
@@ -39,7 +39,7 @@
     padding-top: 1rem;
     transform: translate(0.5rem, -1rem);
     z-index: 4;
-    border: 2px solid $toolbar-border;
+    border: 2px solid $bg-dark;
     position: fixed;
     .pastColorElement {
       width: 2rem;
@@ -74,8 +74,8 @@
       right: -0.75rem;
       transform: translateY(-50%);
       z-index: 9999;
-      border: 1px solid $handle-border;
-      background-color: $handle-bg;
+      border: 1px solid $border-color;
+      background-color: $bg-dark;
     }
   }
   .brushSizeInput {
@@ -99,16 +99,16 @@
 
     background: conic-gradient(
       from 0deg,
-      $gradient-second 0deg,
-      $gradient-first 30deg,
+     $active-color 0deg,
+      $bg-light 30deg,
       transparent 30deg,
 
       transparent 220deg,
-      $gradient-first 220deg,
+      $bg-light 220deg,
 
-      $gradient-second 230deg,
+     $active-color 230deg,
 
-      $gradient-second 344deg
+      $active-color 344deg
     );
   }
   .brushSizeDisplay {

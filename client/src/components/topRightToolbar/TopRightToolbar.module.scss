@@ -100,7 +100,7 @@
   .roomIdBar {
     border: none;
     text-wrap: nowrap;
-    background-color: $bg-bar;
+    background-color: $bg-medium;
     cursor: text;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
@@ -118,7 +118,7 @@
     height: 100%;
     z-index: 9999;
 
-    border-right: 1px $dark-purple solid;
+    border-right: 1px $bg-dark solid;
   }
 }
 .spinLoad {

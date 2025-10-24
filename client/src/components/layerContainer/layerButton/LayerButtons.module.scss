@@ -14,7 +14,7 @@
   }
 
   &::-webkit-scrollbar-track {
-    background: $toolbar-shadow-light;
+    background: $highlight;
     border-radius: 3px;
     margin: 0 0.5rem;
   }
@@ -46,14 +46,14 @@
   position: relative;
   flex-shrink: 0;
   &:hover {
-    background-color: $light-purple;
+    background-color: $bg-light;
     transform: translateY(-1px);
   }
 
   &.backGReen {
     background-color: $active-color;
     color: $bg-dark;
-    border-color: $bright-purple;
+    border-color: $active-color;
   }
 
   .layerNameContainer {
