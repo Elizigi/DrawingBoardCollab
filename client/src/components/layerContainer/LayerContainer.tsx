@@ -1,12 +1,11 @@
 import AddLayerButton from "./addLayerButton/AddLayerButton";
 import HideLayerButton from "./hideLayersButton/HideLayerButton";
-import LayerButton from "./layerButton/LayerButton";
+import LayerButtons from "./layerButton/LayerButtons";
 import LayerContainerVM from "./LayerContainerVM";
 import styles from "./LayersContainer.module.scss";
 
 const LayersContainer = () => {
   const {
-    allLayers,
     containerVisible,
     layersToolPositionOffset,
     toolbarElement,
@@ -43,15 +42,8 @@ const LayersContainer = () => {
         ref={dragAreaElement}
       >
         <AddLayerButton />
-        <div className={styles.layersContainer}>
-          {allLayers.map((layer, index) => (
-            <LayerButton
-              key={`layer-button-${layer.id}`}
-              layer={layer}
-              index={index}
-            />
-          ))}
-        </div>
+            <LayerButtons />
+       
       </div>
       <HideLayerButton
         containerVisible={containerVisible}

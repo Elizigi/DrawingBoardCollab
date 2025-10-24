@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useBrushStore } from "../../../zustand/useBrushStore";
 type LayerPosition = {
   id: string;
@@ -7,7 +7,7 @@ type LayerPosition = {
   height: number;
   midpoint: number;
 };
-const LayerButtonMV = () => {
+const LayerButtonsMV = () => {
   const activeLayerId = useBrushStore((state) => state.activeLayerId);
   const setActiveLayer = useBrushStore((state) => state.setActiveLayer);
   const allLayers = useBrushStore((state) => state.layers);
@@ -27,7 +27,6 @@ const LayerButtonMV = () => {
     e.stopPropagation();
     e.preventDefault();
     setDraggedLayer(index);
-    console.log(index, "this is layer pos");
     setIsLayerDragged(true);
   };
 
@@ -38,7 +37,7 @@ const LayerButtonMV = () => {
     if (!draggedLayerPosition) return;
 
     const clientY = e.clientY;
-    const isAbove = clientY > draggedLayerPosition.bottom;
+    const isAbove = clientY < draggedLayerPosition.bottom;
     const newPositionIndex = getNewPositionIndex(isAbove, clientY);
     console.log(newPositionIndex);
     const temp = [...allLayers];
@@ -59,7 +58,6 @@ const LayerButtonMV = () => {
     for (const layer of allLayers) {
       const element = layerRefs.current.get(layer.id);
       if (!element) continue;
-
       const rect = element.getBoundingClientRect();
       const midpoint = rect.top + rect.height / 2;
 
@@ -71,23 +69,51 @@ const LayerButtonMV = () => {
         midpoint,
       });
     }
-
     setLayersPositions(newPositions);
   }, [allLayers]);
+
   const getNewPositionIndex = (isAbove: boolean, clientY: number) => {
     if (draggedLayer === null) return -1;
     let newPositionIndex = -1;
-
-    for (let i = 0; i < layersPositions.length; i++) {
+    console.log("is mouse above?:",isAbove)
+    if(isAbove){
+    for (let i = draggedLayer; i < layersPositions.length; i++) {
+      if (clientY > layersPositions[i].bottom) {
+        newPositionIndex = i;
+      }
+    }}else{ for (let i = 0; i < draggedLayer; i++) {
       if (clientY > layersPositions[i].bottom) {
         newPositionIndex = i;
       }
     }
+  }
 
-    console.log(newPositionIndex, "aaaaaaaaaaaa");
     return newPositionIndex === -1 ? draggedLayer : newPositionIndex;
   };
-  return { activeLayerId, changeLayer, layerRefs, handleLayerDown };
+
+  useEffect(() => {
+    if (!isLayerDragged) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      return e;
+    };
+
+    const handleMouseUp = (e: MouseEvent) => {
+      console.log("layerRefs:", layerRefs);
+
+      layerLand(e);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isLayerDragged, draggedLayer]);
+
+  return { allLayers, activeLayerId, changeLayer, layerRefs, handleLayerDown };
 };
 
-export default LayerButtonMV;
+export default LayerButtonsMV;

@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useBrushStore } from "../../zustand/useBrushStore";
 import { socket } from "../../Main";
 type LayerPayload = {
@@ -12,7 +12,6 @@ const LayerContainerVM = () => {
   const addLayer = useBrushStore((state) => state.addLayer);
   const removeLayer = useBrushStore((state) => state.removeLayer);
 
-  const allLayers = useBrushStore((state) => state.layers);
   const activeLayerId = useBrushStore((state) => state.activeLayerId);
 
   const [containerVisible, setContainerVisible] = useState(true);
@@ -86,7 +85,7 @@ const LayerContainerVM = () => {
       setLayersToolPositionOffset({ x: newX, y: newY });
     };
 
-    const handleMouseUp = (e: MouseEvent) => {
+    const handleMouseUp = () => {
       if (isDragging) {
         setIsDragging(false);
         const box = toolbarElement.current as HTMLDivElement;
@@ -116,7 +115,6 @@ const LayerContainerVM = () => {
   };
 
   return {
-    allLayers,
     activeLayerId,
     containerVisible,
     layersToolPositionOffset,
