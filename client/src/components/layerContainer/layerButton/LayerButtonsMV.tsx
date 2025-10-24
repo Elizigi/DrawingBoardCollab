@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useBrushStore } from "../../../zustand/useBrushStore";
 type LayerPosition = {
   id: string;
@@ -24,6 +24,21 @@ const LayerButtonsMV = () => {
     index: number,
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
+    const newPositions: LayerPosition[] = [];
+    for (const layer of allLayers) {
+      const element = layerRefs.current.get(layer.id);
+      if (!element) continue;
+      const rect = element.getBoundingClientRect();
+      const midpoint = rect.top + rect.height / 2;
+      newPositions.push({
+        id: layer.id,
+        top: rect.top,
+        bottom: rect.bottom,
+        height: rect.height,
+        midpoint,
+      });
+    }
+    layersPositionsRef.current = newPositions;
     e.stopPropagation();
     e.preventDefault();
     setDraggedLayer(index);
@@ -33,12 +48,16 @@ const LayerButtonsMV = () => {
   const layerLand = (e: MouseEvent) => {
     if (!isLayerDragged || draggedLayer === null) return;
 
-    const draggedLayerPosition = layersPositions[draggedLayer];
+    const draggedLayerPosition = layersPositionsRef.current[draggedLayer];
     if (!draggedLayerPosition) return;
 
     const clientY = e.clientY;
-    const isAbove = clientY < draggedLayerPosition.bottom;
-    const newPositionIndex = getNewPositionIndex(isAbove, clientY);
+    const isAbove = clientY < draggedLayerPosition.midpoint;
+
+    const newPositionIndex = isAbove
+      ? findPositionAbove(clientY)
+      : findPositionBelow(clientY);
+
     console.log(newPositionIndex);
     const temp = [...allLayers];
     const [removed] = temp.splice(draggedLayer, 1);
@@ -48,46 +67,33 @@ const LayerButtonsMV = () => {
     setIsLayerDragged(false);
     setDraggedLayer(null);
   };
-  const [layersPositions, setLayersPositions] = useState<LayerPosition[]>([]);
-
+  const layersPositionsRef = useRef<LayerPosition[]>([]);
   const layerRefs = useRef(new Map<string, HTMLButtonElement>());
 
-  useLayoutEffect(() => {
-    const newPositions: LayerPosition[] = [];
-
-    for (const layer of allLayers) {
-      const element = layerRefs.current.get(layer.id);
-      if (!element) continue;
-      const rect = element.getBoundingClientRect();
-      const midpoint = rect.top + rect.height / 2;
-
-      newPositions.push({
-        id: layer.id,
-        top: rect.top,
-        bottom: rect.bottom,
-        height: rect.height,
-        midpoint,
-      });
-    }
-    setLayersPositions(newPositions);
-  }, [allLayers]);
-
-  const getNewPositionIndex = (isAbove: boolean, clientY: number) => {
+  const findPositionAbove = (clientY: number) => {
     if (draggedLayer === null) return -1;
     let newPositionIndex = -1;
-    console.log("is mouse above?:",isAbove)
-    if(isAbove){
-    for (let i = draggedLayer; i < layersPositions.length; i++) {
-      if (clientY > layersPositions[i].bottom) {
-        newPositionIndex = i;
-      }
-    }}else{ for (let i = 0; i < draggedLayer; i++) {
-      if (clientY > layersPositions[i].bottom) {
-        newPositionIndex = i;
-      }
-    }
-  }
 
+    for (let i = draggedLayer + 1; i < layersPositionsRef.current.length; i++) {
+      if (clientY < layersPositionsRef.current[i].midpoint) {
+        newPositionIndex = i;
+      }
+      if (clientY > layersPositionsRef.current[i].midpoint) break;
+    }
+
+    return newPositionIndex === -1 ? draggedLayer : newPositionIndex;
+  };
+
+  const findPositionBelow = (clientY: number) => {
+    if (draggedLayer === null) return -1;
+    let newPositionIndex = -1;
+
+    for (let i = draggedLayer - 1; i >= 0; i--) {
+      if (clientY > layersPositionsRef.current[i].midpoint) {
+        newPositionIndex = i;
+      }
+      if (clientY < layersPositionsRef.current[i].midpoint) break;
+    }
     return newPositionIndex === -1 ? draggedLayer : newPositionIndex;
   };
 
