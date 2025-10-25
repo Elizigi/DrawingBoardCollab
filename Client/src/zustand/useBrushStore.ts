@@ -39,7 +39,7 @@ export type Stroke = {
   final?: boolean;
 };
 
-type BrushState = {
+export type BrushState = {
   pendingPoints: { x: number; y: number }[];
   lastPoint: { x: number; y: number } | null;
   lastStrokeTime: number;

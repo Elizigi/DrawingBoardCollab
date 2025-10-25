@@ -15,13 +15,14 @@ import {
 import {
   fillBackgroundWhite,
   createLayerCanvas,
-  removeLayerCanvas,
   redrawAllLayers,
   processStrokeToTemp,
   getMousePosPercentOnElement,
   addPoint,
   drawStrokeToCtx,
   redrawLayer,
+  refreshState,
+  loopOverLayers,
 } from "./helpers/drawingHelpers.ts";
 import { addListeners } from "./helpers/eventListenersHelpers.ts";
 
@@ -38,7 +39,7 @@ export const onlineStatus = {
   isAdmin: false,
 };
 
-(async () => {
+function main() {
   setupDOMAndCanvases(rotElement);
   fillBackgroundWhite();
 
@@ -46,20 +47,11 @@ export const onlineStatus = {
 
   useBrushStore.subscribe((state, prev) => {
     if (state.layers.length > prev.layers.length) {
-      // eslint-disable-next-line unicorn/prefer-at
-      const newLayer = state.layers[state.layers.length - 1];
+      const newLayer = state.layers.at(-1);
+      if (!newLayer) return;
       createLayerCanvas(newLayer.id);
     }
-    if (state.layers.length < prev.layers.length) {
-      const prevIds = new Set(prev.layers.map((l) => l.id));
-      const newIds = new Set(state.layers.map((l) => l.id));
-
-      for (const id of prevIds) {
-        if (!newIds.has(id)) {
-          removeLayerCanvas(id);
-        }
-      }
-    }
+    refreshState(state, prev);
     for (const layer of state.layers) {
       const entry = layersCanvasMap[layer.id];
       const prevLayer = prev.layers.find((l) => l.id === layer.id);
@@ -154,19 +146,7 @@ export const onlineStatus = {
 
     if (strokes) {
       const allIncomingStrokes: Stroke[] = [];
-
-      for (const [layerId, strokeArray] of Object.entries(strokes)) {
-        if (!layersCanvasMap[layerId]) createLayerCanvas(layerId);
-        if (Array.isArray(strokeArray)) {
-          for (const stroke of strokeArray) {
-            allIncomingStrokes.push({ ...stroke, final: true, isRemote: true });
-
-            const entry = layersCanvasMap[layerId];
-            if (entry) drawStrokeToCtx(entry.ctx, { ...stroke, final: true });
-          }
-        }
-      }
-
+      loopOverLayers(strokes, allIncomingStrokes);
       useBrushStore.getState().setStrokes(allIncomingStrokes);
     }
   });
@@ -199,8 +179,8 @@ export const onlineStatus = {
       drawStrokeToCtx(ctx, stroke);
     }
   });
-})();
-
+}
+main();
 if (rootElement) {
   ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>

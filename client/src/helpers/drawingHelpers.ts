@@ -1,4 +1,4 @@
-import { Stroke, useBrushStore } from "../zustand/useBrushStore.ts";
+import { BrushState, Stroke, useBrushStore } from "../zustand/useBrushStore.ts";
 import { onlineStatus, socket } from "../Main.tsx";
 import {
   canvasSize,
@@ -128,8 +128,7 @@ export function drawStrokeToCtx(ctx: CanvasRenderingContext2D, stroke: Stroke) {
     }
 
     const last = pixelPoints.at(-1);
-    if(last)
-    ctx.lineTo(last.x, last.y);
+    if (last) ctx.lineTo(last.x, last.y);
     ctx.stroke();
   } else if (points.length === 1) {
     const p = percentToCanvas(points[0].x, points[0].y);
@@ -154,7 +153,7 @@ export function processStrokeToTemp() {
 
   if (pendingPoints.length >= 2) {
     const pixelPoints = pendingPoints.map((p) => percentToCanvas(p.x, p.y));
-    
+
     ctx.save();
     ctx.globalAlpha = brushOpacity / 100;
     ctx.lineCap = "round";
@@ -174,7 +173,7 @@ export function processStrokeToTemp() {
     }
 
     const last = pixelPoints.at(-1);
-    if(!last) return
+    if (!last) return;
     ctx.lineTo(last.x, last.y);
     ctx.stroke();
     ctx.restore();
@@ -264,4 +263,33 @@ export function findLastLocalStroke() {
   if (lastLocalStrokeIndex === -1) return null;
 
   return strokes[lastLocalStrokeIndex];
+}
+
+export function loopOverLayers(
+  strokes: Stroke[],
+  allIncomingStrokes: Stroke[]
+) {
+  for (const [layerId, strokeArray] of Object.entries(strokes)) {
+    if (!layersCanvasMap[layerId]) createLayerCanvas(layerId);
+    if (Array.isArray(strokeArray)) {
+      for (const stroke of strokeArray) {
+        allIncomingStrokes.push({ ...stroke, final: true, isRemote: true });
+
+        const entry = layersCanvasMap[layerId];
+        if (entry) drawStrokeToCtx(entry.ctx, { ...stroke, final: true });
+      }
+    }
+  }
+}
+export function refreshState(state: BrushState, prev: BrushState) {
+  if (state.layers.length < prev.layers.length) {
+    const prevIds = new Set(prev.layers.map((l) => l.id));
+    const newIds = new Set(state.layers.map((l) => l.id));
+
+    for (const id of prevIds) {
+      if (!newIds.has(id)) {
+        removeLayerCanvas(id);
+      }
+    }
+  }
 }
