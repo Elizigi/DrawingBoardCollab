@@ -83,11 +83,11 @@ export function redrawLayer(layerId: string) {
   const strokes = useBrushStore
     .getState()
     .strokes.filter((s) => s.layerId === layerId);
-  strokes.forEach((s) => drawStrokeToCtx(entry.ctx, s));
+  for (const stroke of strokes) drawStrokeToCtx(entry.ctx, stroke);
 }
 
 export function redrawAllLayers() {
-  Object.keys(layersCanvasMap).forEach((id) => redrawLayer(id));
+  for (const id of Object.keys(layersCanvasMap)) redrawLayer(id);
 }
 
 export function fillBackgroundWhite() {
@@ -127,7 +127,8 @@ export function drawStrokeToCtx(ctx: CanvasRenderingContext2D, stroke: Stroke) {
       ctx.quadraticCurveTo(c.x, c.y, midX, midY);
     }
 
-    const last = pixelPoints[pixelPoints.length - 1];
+    const last = pixelPoints.at(-1);
+    if(last)
     ctx.lineTo(last.x, last.y);
     ctx.stroke();
   } else if (points.length === 1) {
@@ -153,6 +154,7 @@ export function processStrokeToTemp() {
 
   if (pendingPoints.length >= 2) {
     const pixelPoints = pendingPoints.map((p) => percentToCanvas(p.x, p.y));
+    
     ctx.save();
     ctx.globalAlpha = brushOpacity / 100;
     ctx.lineCap = "round";
@@ -171,7 +173,8 @@ export function processStrokeToTemp() {
       ctx.quadraticCurveTo(c.x, c.y, midX, midY);
     }
 
-    const last = pixelPoints[pixelPoints.length - 1];
+    const last = pixelPoints.at(-1);
+    if(!last) return
     ctx.lineTo(last.x, last.y);
     ctx.stroke();
     ctx.restore();
@@ -238,7 +241,7 @@ export function addPoint(x: number, y: number) {
   if (lastPoint) {
     const dx = x - lastPoint.x;
     const dy = y - lastPoint.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const distance = Math.hypot(dx * dx + dy * dy);
     const minDistance = Math.max(0.02, brushSize * 0.01);
     if (distance < minDistance) return;
   }

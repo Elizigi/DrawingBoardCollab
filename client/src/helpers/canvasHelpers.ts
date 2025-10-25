@@ -1,5 +1,5 @@
 import { useBrushStore } from "../zustand/useBrushStore.ts";
-import { createLayerCanvas } from "./drawingHelpers.ts"; 
+import { createLayerCanvas } from "./drawingHelpers.ts";
 
 export const canvasSize = { width: 1920, height: 1080 };
 export const STROKE_THROTTLE = 16;
@@ -14,7 +14,6 @@ let topInputCanvas!: HTMLCanvasElement;
 let localTempCanvas: HTMLCanvasElement | null = null;
 let remoteTempCanvas: HTMLCanvasElement | null = null;
 
-
 export function getTopInputCanvas(): HTMLCanvasElement {
   return topInputCanvas;
 }
@@ -27,9 +26,8 @@ export function getRemoteTempCanvas(): HTMLCanvasElement | null {
   return remoteTempCanvas;
 }
 
-
 export function setupDOMAndCanvases(rotElement: HTMLDivElement | null) {
-  if (!rotElement) return; 
+  if (!rotElement) return;
 
   containerEl = document.createElement("div");
   containerEl.style.position = "relative";
@@ -37,8 +35,9 @@ export function setupDOMAndCanvases(rotElement: HTMLDivElement | null) {
   containerEl.style.height = canvasSize.height + "px";
   rotElement.appendChild(containerEl);
 
-  const { layers } = useBrushStore.getState(); 
-  layers.forEach((l) => createLayerCanvas(l.id, containerEl)); 
+  const { layers } = useBrushStore.getState();
+  
+  for (const layer of layers) createLayerCanvas(layer.id, containerEl);
 
   remoteTempCanvas = document.createElement("canvas");
   remoteTempCanvas.width = canvasSize.width;
@@ -56,7 +55,7 @@ export function setupDOMAndCanvases(rotElement: HTMLDivElement | null) {
   localTempCanvas.style.top = "0";
   localTempCanvas.style.left = "0";
   localTempCanvas.style.pointerEvents = "none";
-  containerEl.appendChild(localTempCanvas); 
+  containerEl.appendChild(localTempCanvas);
 
   topInputCanvas = document.createElement("canvas");
   topInputCanvas.width = canvasSize.width;
