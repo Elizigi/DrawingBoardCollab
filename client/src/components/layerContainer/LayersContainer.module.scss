@@ -18,7 +18,8 @@
 }
 
 .layersToolbar {
-  width: fit-content;
+  overflow-x: hidden;
+
   width: 230px;
   display: flex;
   flex-direction: column;

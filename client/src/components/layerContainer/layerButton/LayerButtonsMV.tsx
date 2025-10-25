@@ -21,6 +21,12 @@ const LayerButtonsMV = () => {
   const layersPositionsRef = useRef<LayerPosition[]>([]);
   const layerRefs = useRef(new Map<string, HTMLButtonElement>());
 
+  const layerContainerRef = useRef<HTMLDivElement>(null);
+  const [layersContainerBounds, setLayersContainerBounds] = useState({
+    top: 0,
+    bottom: 0,
+  });
+
   const changeLayer = (id: string) => {
     setActiveLayer(id);
   };
@@ -29,6 +35,7 @@ const LayerButtonsMV = () => {
     index: number,
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
+    if (!layerContainerRef.current) return;
     const newPositions: LayerPosition[] = [];
     for (const layer of allLayers) {
       const element = layerRefs.current.get(layer.id);
@@ -43,6 +50,12 @@ const LayerButtonsMV = () => {
         midpoint,
       });
     }
+    const layersContainerBounding =
+      layerContainerRef.current.getBoundingClientRect();
+    setLayersContainerBounds({
+      top: layersContainerBounding.top,
+      bottom: layersContainerBounding.bottom,
+    });
     layersPositionsRef.current = newPositions;
 
     const clickedRect = layersPositionsRef.current[index];
@@ -67,7 +80,6 @@ const LayerButtonsMV = () => {
       ? findPositionAbove(clientY)
       : findPositionBelow(clientY);
 
-    console.log(newPositionIndex);
     const temp = [...allLayers];
     const [removed] = temp.splice(draggedLayer, 1);
     const insertAt = newPositionIndex === -1 ? draggedLayer : newPositionIndex;
@@ -105,6 +117,25 @@ const LayerButtonsMV = () => {
     }
     return newPositionIndex === -1 ? draggedLayer : newPositionIndex;
   };
+  const checkBoundary = (clientY: number, draggedLayer: number) => {
+    const draggedLayerPosition = layersPositionsRef.current[draggedLayer];
+
+    const layerPositionOffset =
+      clientY - draggedLayerPosition.top - dragStartOffset;
+    if (
+      layerPositionOffset >
+      layersContainerBounds.bottom - draggedLayerPosition.midpoint
+    ) {
+      return layersContainerBounds.bottom - draggedLayerPosition.midpoint;
+    }
+    if (
+      layerPositionOffset <
+      layersContainerBounds.top - draggedLayerPosition.midpoint
+    ) {
+      return layersContainerBounds.top - draggedLayerPosition.midpoint;
+    }
+    return layerPositionOffset;
+  };
 
   useEffect(() => {
     if (!isLayerDragged) return;
@@ -112,14 +143,12 @@ const LayerButtonsMV = () => {
     const handleMouseMove = (e: MouseEvent) => {
       if (draggedLayer === null) return;
       const clientY = e.clientY;
-      const draggedLayerPosition = layersPositionsRef.current[draggedLayer];
-      const offsetY = clientY - draggedLayerPosition.top - dragStartOffset;
+
+      const offsetY = checkBoundary(clientY, draggedLayer);
       setLayerOffset(offsetY);
     };
 
     const handleMouseUp = (e: MouseEvent) => {
-      console.log("layerRefs:", layerRefs);
-
       layerLand(e);
     };
 
@@ -138,6 +167,7 @@ const LayerButtonsMV = () => {
     layerRefs,
     layerOffset,
     draggedLayer,
+    layerContainerRef,
     handleLayerDown,
     changeLayer,
   };
