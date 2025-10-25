@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useBrushStore } from "../../../zustand/useBrushStore";
+import { redrawAllLayers } from "../../../helpers/drawingHelpers";
 type LayerPosition = {
   id: string;
   top: number;
@@ -150,6 +151,7 @@ const LayerButtonsMV = () => {
 
     const handleMouseUp = (e: MouseEvent) => {
       layerLand(e);
+      redrawAllLayers()
     };
 
     document.addEventListener("mousemove", handleMouseMove);

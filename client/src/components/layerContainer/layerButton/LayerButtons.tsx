@@ -31,7 +31,8 @@ const LayerButtons = () => {
           }}
           className={`${styles.layer} ${layer.id === activeLayerId ? styles.backGReen : ""}`}
           style={{
-            top: draggedLayer === index ? layerOffset : undefined,
+            order:allLayers.length -index,
+            top: draggedLayer === index ? layerOffset : 0,
             zIndex: draggedLayer === index ? 9999999 : 99,
             cursor:
               onlineStatus.inRoom && layer.locked && !onlineStatus.isAdmin

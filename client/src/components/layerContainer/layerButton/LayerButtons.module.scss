@@ -1,7 +1,7 @@
 .layersContainer {
   cursor: default;
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   gap: 0.25rem;
   justify-content: flex-start;
   overflow-y: auto;
@@ -30,6 +30,7 @@
     }
   }
 }
+
 .layer {
   all: unset;
   background-color: $bg-light;
