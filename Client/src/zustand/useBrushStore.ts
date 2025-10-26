@@ -67,6 +67,8 @@ export type BrushState = {
   toggleLockLayer: (layerId: string) => void;
   removeLayer: (id: string) => void;
 
+  lockedLayersIds: Map<string, null>;
+
   setLayers: (layers: LayerMeta[]) => void;
   setActiveLayer: (id: string | null) => void;
   toggleLayer: (id: string) => void;
@@ -102,7 +104,7 @@ export const useBrushStore = create<BrushState>((set, get) => ({
 
   brushOpacity: 100,
   setOpacity: (opacity) => set({ brushOpacity: opacity }),
-
+  lockedLayersIds: new Map<string, null>(),
   layers: [
     { id: defaultLayer, name: defaultLayer, visible: true, locked: false },
   ],
@@ -191,9 +193,12 @@ export const useBrushStore = create<BrushState>((set, get) => ({
       const newLayers = state.layers.map((layer) =>
         layer.id === layerId ? { ...layer, locked: !layer.locked } : layer
       );
-
+      const newLockedLayersIds = new Map(state.lockedLayersIds);
+      if (newLockedLayersIds.has(layerId)) newLockedLayersIds.delete(layerId);
+      else newLockedLayersIds.set(layerId, null);
       return {
         layers: newLayers,
+        lockedLayersIds: newLockedLayersIds,
         activeLayerId: helperGetActiveLayerId(newLayers),
       };
     });

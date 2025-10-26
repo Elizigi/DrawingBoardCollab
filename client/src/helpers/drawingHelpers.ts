@@ -250,11 +250,12 @@ export function addPoint(x: number, y: number) {
 
 export function findLastLocalStroke() {
   const strokes = useBrushStore.getState().strokes;
+  const lockedLayersIds = useBrushStore.getState().lockedLayersIds;
 
   let lastLocalStrokeIndex = -1;
 
   for (let i = strokes.length - 1; i >= 0; i--) {
-    if (strokes[i].isRemote !== true) {
+    if (strokes[i].isRemote !== true&&!lockedLayersIds.has(strokes[i].layerId)) {
       lastLocalStrokeIndex = i;
       break;
     }
