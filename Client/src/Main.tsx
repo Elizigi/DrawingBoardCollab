@@ -52,14 +52,15 @@ function main() {
       createLayerCanvas(newLayer.id);
     }
     refreshState(state, prev);
-    for (const layer of state.layers) {
+    for (let i = 0; i < state.layers.length; i++) {
+      const layer = state.layers[i];
       const entry = layersCanvasMap[layer.id];
       const prevLayer = prev.layers.find((l) => l.id === layer.id);
       if (!entry || !prevLayer) return;
 
       entry.canvas.style.display = layer.visible ? "block" : "none";
       entry.canvas.style.opacity = (layer as any).opacity?.toString() ?? "1";
-
+      entry.canvas.style.zIndex = `${i + 1}`;
       if (layer.visible !== prevLayer.visible) {
         redrawLayer(layer.id);
       }

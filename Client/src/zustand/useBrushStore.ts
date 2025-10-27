@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-const defaultLayer = "background-layer";
+export const defaultLayer = "background-layer";
 
 export type EventType = (typeof EventTypes)[keyof typeof EventTypes];
 

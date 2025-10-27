@@ -7,9 +7,10 @@
 - [✔] Change exit button to text exit
 - [✔] Move layer position in list
 - [✔] Refine SCSS color variables and theme consistency
-- [ ] when layer is locked cant undo or redo on it
+- [✔] when layer is locked cant undo or redo on it
+- [✔] fix bug when changing layers positions
+- [ ] fix drawing movement position in layer stack 
 - [ ] zoom in and out feature
-- [ ] fix bug when changing layers positions
 - [ ] Improve mobile integration and touch support
 - [ ] Reorganize file and function structure for clarity
 - [ ] Add filler (bucket) tool
