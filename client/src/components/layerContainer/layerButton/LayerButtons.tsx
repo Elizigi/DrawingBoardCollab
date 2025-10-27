@@ -31,7 +31,7 @@ const LayerButtons = () => {
           }}
           className={`${styles.layer} ${layer.id === activeLayerId ? styles.backGReen : ""}`}
           style={{
-            order:allLayers.length -index,
+            order: allLayers.length - index,
             top: draggedLayer === index ? layerOffset : 0,
             zIndex: draggedLayer === index ? 9999999 : 99,
             cursor:
@@ -46,7 +46,11 @@ const LayerButtons = () => {
             <h5 className={styles.layerName}>{layer.name}</h5>
           </div>
           <LockLayerButton layer={layer} />
-          <DeleteLayerButton key={`delete-${layer.id}`} layerId={layer.id} />
+          <DeleteLayerButton
+            key={`delete-${layer.id}`}
+            layerId={layer.id}
+            isLocked={layer.locked}
+          />
         </button>
       ))}
     </div>
