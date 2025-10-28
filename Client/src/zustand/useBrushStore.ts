@@ -184,7 +184,7 @@ export const useBrushStore = create<BrushState>((set, get) => ({
 
       return {
         layers: newLayers,
-        activeLayerId: helperGetActiveLayerId(newLayers),
+        activeLayerId: state.activeLayerId ?? id,
       };
     });
   },
