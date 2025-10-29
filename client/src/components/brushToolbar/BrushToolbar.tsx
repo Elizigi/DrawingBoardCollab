@@ -84,7 +84,8 @@ const BrushToolbar = () => {
     <div className={styles.brushToolbar}>
       {isBrushOpen && (
         <>
-          <div className={styles.colorOfSlider}></div>
+          <div className={styles.colorOfSlider} style={{opacity:textTarget === TextTarget.Opacity? brushOpacity*.01:1
+          }}></div>
 
           <div className={styles.sizeSetBar} ref={opacitySliderRef}>
             <button
@@ -115,6 +116,7 @@ const BrushToolbar = () => {
             }}
             onClick={handleColorClick}
             aria-label="Open color picker"
+          
           >
             <div className={styles.brushSizeDisplay}>
               <h3>{displayValue()}</h3>
