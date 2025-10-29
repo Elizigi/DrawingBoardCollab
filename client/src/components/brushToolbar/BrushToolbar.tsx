@@ -3,6 +3,10 @@ import styles from "./BrushToolbar.module.scss";
 import { useEffect, useRef, useState } from "react";
 import { useBrushStore } from "../../zustand/useBrushStore";
 
+enum TextTarget {
+  Opacity = "opacity",
+  BrushSize = "brushSize",
+}
 const BrushToolbar = () => {
   const {
     brushColor,
@@ -18,6 +22,7 @@ const BrushToolbar = () => {
   const [isBrushOpen, setIsBrushOpen] = useState(false);
   const colorInputRef = useRef<HTMLInputElement>(null);
   const opacitySliderRef = useRef<HTMLDivElement>(null);
+  const [textTarget, setTextTarget] = useState<null | TextTarget>(null);
 
   const isMouseDown = useBrushStore((s) => s.isMouseDown);
   const handleColorClick = () => {
@@ -70,6 +75,11 @@ const BrushToolbar = () => {
     document.addEventListener("mouseup", handleMouseUp);
   };
 
+  const displayValue = () => {
+    if (textTarget === TextTarget.Opacity) return brushOpacity;
+    if (textTarget === TextTarget.BrushSize) return brushSize;
+    return "";
+  };
   return (
     <div className={styles.brushToolbar}>
       {isBrushOpen && (
@@ -80,6 +90,8 @@ const BrushToolbar = () => {
             <button
               className={styles.sizeHandle}
               onMouseDown={() => handleTransparentAdjustment()}
+              onMouseEnter={() => setTextTarget(TextTarget.Opacity)}
+              onMouseLeave={() => setTextTarget(null)}
             ></button>
           </div>
           <input
@@ -89,6 +101,8 @@ const BrushToolbar = () => {
             max={100}
             value={brushSize}
             onChange={(e) => setBrushSize(Number(e.target.value))}
+            onMouseEnter={() => setTextTarget(TextTarget.BrushSize)}
+            onMouseLeave={() => setTextTarget(null)}
           />
         </>
       )}
@@ -103,7 +117,7 @@ const BrushToolbar = () => {
             aria-label="Open color picker"
           >
             <div className={styles.brushSizeDisplay}>
-              <h3>{brushOpacity}</h3>
+              <h3>{displayValue()}</h3>
             </div>
           </button>
         ) : (
@@ -133,7 +147,7 @@ const BrushToolbar = () => {
         <div className={styles.colorMenu}>
           {usedColors.map(
             (color, index) =>
-              color!==null && (
+              color !== null && (
                 <button
                   key={`${color}-${index}`}
                   className={styles.pastColorElement}

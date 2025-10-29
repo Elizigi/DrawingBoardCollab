@@ -70,11 +70,11 @@
       border-radius: 50%;
       position: absolute;
       top: 50%;
+      border: solid 1px $text-color;
       cursor: pointer;
       right: -0.75rem;
       transform: translateY(-50%);
       z-index: 9999;
-      border: 1px solid $border-color;
       background-color: $bg-dark;
     }
   }
@@ -99,14 +99,14 @@
 
     background: conic-gradient(
       from 0deg,
-     $active-color 0deg,
+      $active-color 0deg,
       $bg-light 30deg,
       transparent 30deg,
 
       transparent 220deg,
       $bg-light 220deg,
 
-     $active-color 230deg,
+      $active-color 230deg,
 
       $active-color 344deg
     );
