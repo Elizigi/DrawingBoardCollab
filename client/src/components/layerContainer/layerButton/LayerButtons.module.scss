@@ -30,7 +30,12 @@
     }
   }
 }
-
+.gapLayer {
+  all: unset;
+  height: 3rem;
+  width: 12rem;
+  background-color: white;
+}
 .layer {
   all: unset;
   background-color: $bg-medium;

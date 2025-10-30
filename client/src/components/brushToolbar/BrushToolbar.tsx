@@ -80,6 +80,7 @@ const BrushToolbar = () => {
     if (textTarget === TextTarget.BrushSize) return brushSize;
     return "";
   };
+  
   return (
     <div className={styles.brushToolbar}>
       {isBrushOpen && (

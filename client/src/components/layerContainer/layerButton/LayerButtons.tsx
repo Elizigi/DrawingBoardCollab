@@ -13,10 +13,17 @@ const LayerButtons = () => {
     layerOffset,
     draggedLayer,
     layerContainerRef,
+    layerPotentialPosition,
     handleLayerDown,
     changeLayer,
   } = LayerButtonMV();
 
+  const topCalculations = (index: number) => {
+    if (draggedLayer === index) return layerOffset;
+    if (draggedLayer !== null && layerPotentialPosition > index) return 60;
+
+    return 0;
+  };
   return (
     <div className={styles.layersContainer} ref={layerContainerRef}>
       {allLayers.map((layer, index) => (
@@ -32,8 +39,9 @@ const LayerButtons = () => {
           className={`${styles.layer} ${layer.id === activeLayerId ? styles.backGReen : ""}`}
           style={{
             order: allLayers.length - index,
-            top: draggedLayer === index ? layerOffset : 0,
+            top: `${topCalculations(index)}px`,
             zIndex: draggedLayer === index ? 9999999 : 99,
+            position:draggedLayer === index?"absolute":"relative",
             cursor:
               onlineStatus.inRoom && layer.locked && !onlineStatus.isAdmin
                 ? "not-allowed"

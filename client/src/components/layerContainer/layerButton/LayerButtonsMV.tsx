@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useBrushStore } from "../../../zustand/useBrushStore";
-import { redrawAllLayers } from "../../../helpers/drawingHelpers";
+
 type LayerPosition = {
   id: string;
   top: number;
@@ -8,6 +8,7 @@ type LayerPosition = {
   height: number;
   midpoint: number;
 };
+
 const LayerButtonsMV = () => {
   const activeLayerId = useBrushStore((state) => state.activeLayerId);
   const setActiveLayer = useBrushStore((state) => state.setActiveLayer);
@@ -18,6 +19,8 @@ const LayerButtonsMV = () => {
   const [draggedLayer, setDraggedLayer] = useState<null | number>(null);
   const [layerOffset, setLayerOffset] = useState(0);
   const [dragStartOffset, setDragStartOffset] = useState(0);
+
+  const [layerPotentialPosition, setLayerPotentialPosition] = useState(0);
 
   const layersPositionsRef = useRef<LayerPosition[]>([]);
   const layerRefs = useRef(new Map<string, HTMLButtonElement>());
@@ -51,12 +54,14 @@ const LayerButtonsMV = () => {
         midpoint,
       });
     }
+
     const layersContainerBounding =
       layerContainerRef.current.getBoundingClientRect();
     setLayersContainerBounds({
       top: layersContainerBounding.top,
       bottom: layersContainerBounding.bottom,
     });
+    
     layersPositionsRef.current = newPositions;
 
     const clickedRect = layersPositionsRef.current[index];
@@ -68,22 +73,14 @@ const LayerButtonsMV = () => {
     setIsLayerDragged(true);
   };
 
-  const layerLand = (e: MouseEvent) => {
+  const layerLand = () => {
     if (!isLayerDragged || draggedLayer === null) return;
-
-    const draggedLayerPosition = layersPositionsRef.current[draggedLayer];
-    if (!draggedLayerPosition) return;
-
-    const clientY = e.clientY;
-    const isAbove = clientY < draggedLayerPosition.midpoint;
-
-    const newPositionIndex = isAbove
-      ? findPositionAbove(clientY)
-      : findPositionBelow(clientY);
 
     const temp = [...allLayers];
     const [removed] = temp.splice(draggedLayer, 1);
-    const insertAt = newPositionIndex === -1 ? draggedLayer : newPositionIndex;
+    const insertAt =
+      layerPotentialPosition === -1 ? draggedLayer : layerPotentialPosition;
+
     temp.splice(insertAt, 0, removed);
     setLayers(temp);
     setLayerOffset(0);
@@ -118,6 +115,7 @@ const LayerButtonsMV = () => {
     }
     return newPositionIndex === -1 ? draggedLayer : newPositionIndex;
   };
+
   const checkBoundary = (clientY: number, draggedLayer: number) => {
     const draggedLayerPosition = layersPositionsRef.current[draggedLayer];
 
@@ -145,13 +143,21 @@ const LayerButtonsMV = () => {
       if (draggedLayer === null) return;
       const clientY = e.clientY;
 
+      const draggedLayerPosition = layersPositionsRef.current[draggedLayer];
+      if (!draggedLayerPosition) return;
+
       const offsetY = checkBoundary(clientY, draggedLayer);
       setLayerOffset(offsetY);
+      const isAbove = clientY < draggedLayerPosition.midpoint;
+
+      const newPositionIndex = isAbove
+        ? findPositionAbove(clientY)
+        : findPositionBelow(clientY);
+      setLayerPotentialPosition(newPositionIndex);
     };
 
-    const handleMouseUp = (e: MouseEvent) => {
-      layerLand(e);
-      redrawAllLayers()
+    const handleMouseUp = () => {
+      layerLand();
     };
 
     document.addEventListener("mousemove", handleMouseMove);
@@ -170,6 +176,7 @@ const LayerButtonsMV = () => {
     layerOffset,
     draggedLayer,
     layerContainerRef,
+    layerPotentialPosition,
     handleLayerDown,
     changeLayer,
   };
