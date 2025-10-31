@@ -41,7 +41,8 @@ const LayerButtons = () => {
             order: allLayers.length - index,
             top: `${topCalculations(index)}px`,
             zIndex: draggedLayer === index ? 9999999 : 99,
-            position:draggedLayer === index?"absolute":"relative",
+            position: draggedLayer === index ? "absolute" : "relative",
+            
             cursor:
               onlineStatus.inRoom && layer.locked && !onlineStatus.isAdmin
                 ? "not-allowed"

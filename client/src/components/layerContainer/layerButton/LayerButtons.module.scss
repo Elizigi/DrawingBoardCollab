@@ -6,7 +6,7 @@
   justify-content: flex-start;
   overflow-y: auto;
   overflow-x: auto;
-
+  position: relative;
   padding: 0.25rem 0.25rem 0.75rem 0.25rem;
   border-top: 2px $text-color solid;
   background-color: $bg-light;

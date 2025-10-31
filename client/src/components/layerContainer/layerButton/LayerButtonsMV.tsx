@@ -40,53 +40,68 @@ const LayerButtonsMV = () => {
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
     if (!layerContainerRef.current) return;
+
+    const layersContainerBounding =
+      layerContainerRef.current.getBoundingClientRect();
+    const containerTop = layersContainerBounding.top;
     const newPositions: LayerPosition[] = [];
     for (const layer of allLayers) {
       const element = layerRefs.current.get(layer.id);
       if (!element) continue;
       const rect = element.getBoundingClientRect();
-      const midpoint = rect.top + rect.height / 2;
+      const topRel = rect.top - containerTop;
+      const midpointRel = topRel + rect.height / 2;
       newPositions.push({
         id: layer.id,
-        top: rect.top,
-        bottom: rect.bottom,
+        top: topRel,
+        bottom: topRel + rect.height,
         height: rect.height,
-        midpoint,
+        midpoint: midpointRel,
       });
     }
 
-    const layersContainerBounding =
-      layerContainerRef.current.getBoundingClientRect();
     setLayersContainerBounds({
       top: layersContainerBounding.top,
       bottom: layersContainerBounding.bottom,
     });
-    
+
     layersPositionsRef.current = newPositions;
 
     const clickedRect = layersPositionsRef.current[index];
-    setDragStartOffset(e.clientY - clickedRect.top);
+    const clientYRel = e.clientY - layersContainerBounding.top;
+    setDragStartOffset(clientYRel - clickedRect.top);
 
     e.stopPropagation();
     e.preventDefault();
     setDraggedLayer(index);
     setIsLayerDragged(true);
+    setLayerOffset(checkBoundary(e.clientY, index));
   };
-
-  const layerLand = () => {
-    if (!isLayerDragged || draggedLayer === null) return;
-
-    const temp = [...allLayers];
-    const [removed] = temp.splice(draggedLayer, 1);
+  const findPositionInsertion = () => {
     const insertAt =
       layerPotentialPosition === -1 ? draggedLayer : layerPotentialPosition;
+    if (insertAt === null || draggedLayer === null) return 0;
+
+    return insertAt > draggedLayer ? insertAt : insertAt + 1;
+  };
+  const layerLand = () => {
+    if (!isLayerDragged || draggedLayer === null) return;
+    console.log(allLayers);
+    const temp = [...allLayers];
+    const [removed] = temp.splice(draggedLayer, 1);
+    const insertAt = findPositionInsertion();
+    console.log(temp);
+    console.log(insertAt);
 
     temp.splice(insertAt, 0, removed);
+    console.log(temp);
     setLayers(temp);
     setLayerOffset(0);
     setDragStartOffset(0);
     setIsLayerDragged(false);
     setDraggedLayer(null);
+    setLayerPotentialPosition(-1);
+    layersPositionsRef.current = [];
   };
 
   const findPositionAbove = (clientY: number) => {
@@ -117,23 +132,19 @@ const LayerButtonsMV = () => {
   };
 
   const checkBoundary = (clientY: number, draggedLayer: number) => {
-    const draggedLayerPosition = layersPositionsRef.current[draggedLayer];
+    const pos = layersPositionsRef.current[draggedLayer];
+    if (!pos) return 0;
+    const clientYRel = clientY - layersContainerBounds.top;
 
-    const layerPositionOffset =
-      clientY - draggedLayerPosition.top - dragStartOffset;
-    if (
-      layerPositionOffset >
-      layersContainerBounds.bottom - draggedLayerPosition.midpoint
-    ) {
-      return layersContainerBounds.bottom - draggedLayerPosition.midpoint;
-    }
-    if (
-      layerPositionOffset <
-      layersContainerBounds.top - draggedLayerPosition.midpoint
-    ) {
-      return layersContainerBounds.top - draggedLayerPosition.midpoint;
-    }
-    return layerPositionOffset;
+    const layerPositionOffset = clientYRel - pos.top - dragStartOffset;
+    const containerHeight =
+      layersContainerBounds.bottom - layersContainerBounds.top;
+    const maxTop = containerHeight - pos.height;
+
+    let newTop = layerPositionOffset;
+    if (newTop < 0) newTop = 0;
+    if (newTop > maxTop) newTop = maxTop;
+    return newTop;
   };
 
   useEffect(() => {
@@ -142,18 +153,21 @@ const LayerButtonsMV = () => {
     const handleMouseMove = (e: MouseEvent) => {
       if (draggedLayer === null) return;
       const clientY = e.clientY;
+      const clientYRel = clientY - layersContainerBounds.top;
 
       const draggedLayerPosition = layersPositionsRef.current[draggedLayer];
       if (!draggedLayerPosition) return;
 
       const offsetY = checkBoundary(clientY, draggedLayer);
+
       setLayerOffset(offsetY);
-      const isAbove = clientY < draggedLayerPosition.midpoint;
+      const isAbove = clientYRel < draggedLayerPosition.midpoint;
 
       const newPositionIndex = isAbove
-        ? findPositionAbove(clientY)
-        : findPositionBelow(clientY);
+        ? findPositionAbove(clientYRel)
+        : findPositionBelow(clientYRel);
       setLayerPotentialPosition(newPositionIndex);
+      console.log(newPositionIndex);
     };
 
     const handleMouseUp = () => {
