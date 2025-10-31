@@ -10,20 +10,14 @@ const LayerButtons = () => {
     allLayers,
     activeLayerId,
     layerRefs,
-    layerOffset,
     draggedLayer,
     layerContainerRef,
-    layerPotentialPosition,
+    topCalculations,
     handleLayerDown,
     changeLayer,
   } = LayerButtonMV();
 
-  const topCalculations = (index: number) => {
-    if (draggedLayer === index) return layerOffset;
-    if (draggedLayer !== null && layerPotentialPosition > index) return 60;
 
-    return 0;
-  };
   return (
     <div className={styles.layersContainer} ref={layerContainerRef}>
       {allLayers.map((layer, index) => (
