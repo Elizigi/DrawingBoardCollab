@@ -40,7 +40,7 @@ const LayerButtonsMV = () => {
     index: number,
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
-    if (!layerContainerRef.current) return;
+    if (!layerContainerRef.current||allLayers.length<=1) return;
 
     const layersContainerBounding =
       layerContainerRef.current.getBoundingClientRect();
