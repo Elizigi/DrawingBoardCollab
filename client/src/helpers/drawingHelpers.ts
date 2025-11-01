@@ -31,7 +31,6 @@ export function getMousePosPercentOnElement(
   const clientX = e.clientX - rect.left;
   const clientY = e.clientY - rect.top;
 
-  // invert camera transform
   const canvasX = (clientX - canvasScale.offsetX) / canvasScale.scale;
   const canvasY = (clientY - canvasScale.offsetY) / canvasScale.scale;
 

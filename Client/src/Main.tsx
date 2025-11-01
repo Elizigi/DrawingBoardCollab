@@ -166,32 +166,42 @@ function main() {
     const remoteTempCanvas = getRemoteTempCanvas();
     if (!remoteTempCanvas) return;
 
- 
-  stroke.isRemote = true;
+    stroke.isRemote = true;
 
-  if (!stroke.final) {
-    const allLayers = useBrushStore.getState().layers;
-    const strokeLayer = allLayers.find((layer) => layer.id === stroke.layerId);
-    if (!remoteTempCanvas || !strokeLayer?.visible) return;
-    const ctx = remoteTempCanvas.getContext("2d")!;
+    if (!stroke.final) {
+      const allLayers = useBrushStore.getState().layers;
+      const strokeLayer = allLayers.find(
+        (layer) => layer.id === stroke.layerId
+      );
+      if (!remoteTempCanvas || !strokeLayer?.visible) return;
+      const ctx = remoteTempCanvas.getContext("2d")!;
 
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, remoteTempCanvas.width, remoteTempCanvas.height);
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, remoteTempCanvas.width, remoteTempCanvas.height);
 
-    ctx.setTransform(canvasScale.scale, 0, 0, canvasScale.scale, canvasScale.offsetX, canvasScale.offsetY);
-    drawStrokeToCtx(ctx, stroke);
-    return;
-  }
+      ctx.setTransform(
+        canvasScale.scale,
+        0,
+        0,
+        canvasScale.scale,
+        canvasScale.offsetX,
+        canvasScale.offsetY
+      );
+      drawStrokeToCtx(ctx, stroke);
+      return;
+    }
+    if (remoteTempCanvas) {
+      const ctx = remoteTempCanvas.getContext("2d")!;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, remoteTempCanvas.width, remoteTempCanvas.height);
+    }
 
-  const entry = layersCanvasMap[stroke.layerId];
-  if (!entry) return;
-
-  useBrushStore.getState().addStroke(stroke);
-  const ctx = entry.ctx;
-
-  ctx.setTransform(1, 0, 0, 1, 0, 0); 
-  ctx.setTransform(canvasScale.scale, 0, 0, canvasScale.scale, canvasScale.offsetX, canvasScale.offsetY);
-  drawStrokeToCtx(ctx, stroke);
+    if (!layersCanvasMap[stroke.layerId]) {
+      createLayerCanvas?.(stroke.layerId);
+    }
+   
+    useBrushStore.getState().addStroke(stroke);
+    redrawLayer(stroke.layerId);
   });
 }
 main();
