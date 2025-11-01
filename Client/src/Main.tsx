@@ -33,6 +33,15 @@ export const socket: Socket = io("http://localhost:3000", {
 const rootElement = document.getElementById("root") as HTMLDivElement;
 const rotElement = document.getElementById("rot") as HTMLDivElement;
 
+export const canvasScale = {
+  scale: 1,
+  offsetX: 0,
+  offsetY: 0,
+  isPanning: false,
+  lastPanX: 0,
+  lastPanY: 0,
+};
+
 export const onlineStatus = {
   isOnline: false,
   inRoom: false,
@@ -157,28 +166,32 @@ function main() {
     const remoteTempCanvas = getRemoteTempCanvas();
     if (!remoteTempCanvas) return;
 
-    stroke.isRemote = true;
+ 
+  stroke.isRemote = true;
 
+  if (!stroke.final) {
+    const allLayers = useBrushStore.getState().layers;
+    const strokeLayer = allLayers.find((layer) => layer.id === stroke.layerId);
+    if (!remoteTempCanvas || !strokeLayer?.visible) return;
     const ctx = remoteTempCanvas.getContext("2d")!;
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, remoteTempCanvas.width, remoteTempCanvas.height);
 
-    if (stroke.final) {
-      const entry = layersCanvasMap[stroke.layerId];
-      if (!entry) return;
+    ctx.setTransform(canvasScale.scale, 0, 0, canvasScale.scale, canvasScale.offsetX, canvasScale.offsetY);
+    drawStrokeToCtx(ctx, stroke);
+    return;
+  }
 
-      useBrushStore.getState().addStroke(stroke);
+  const entry = layersCanvasMap[stroke.layerId];
+  if (!entry) return;
 
-      drawStrokeToCtx(entry.ctx, stroke);
-    } else {
-      const allLayers = useBrushStore.getState().layers;
-      const strokeLayer = allLayers.find(
-        (layer) => layer.id === stroke.layerId
-      );
-      if (!remoteTempCanvas || !strokeLayer?.visible) return;
-      const ctx = remoteTempCanvas.getContext("2d")!;
-      ctx.clearRect(0, 0, remoteTempCanvas.width, remoteTempCanvas.height);
-      drawStrokeToCtx(ctx, stroke);
-    }
+  useBrushStore.getState().addStroke(stroke);
+  const ctx = entry.ctx;
+
+  ctx.setTransform(1, 0, 0, 1, 0, 0); 
+  ctx.setTransform(canvasScale.scale, 0, 0, canvasScale.scale, canvasScale.offsetX, canvasScale.offsetY);
+  drawStrokeToCtx(ctx, stroke);
   });
 }
 main();

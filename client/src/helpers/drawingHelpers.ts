@@ -1,5 +1,10 @@
-import { BrushState, Stroke, useBrushStore } from "../zustand/useBrushStore.ts";
-import { onlineStatus, socket } from "../Main.tsx";
+import {
+  BrushState,
+  defaultLayer,
+  Stroke,
+  useBrushStore,
+} from "../zustand/useBrushStore.ts";
+import { canvasScale, onlineStatus, socket } from "../Main.tsx";
 import {
   canvasSize,
   layersCanvasMap,
@@ -23,9 +28,14 @@ export function getMousePosPercentOnElement(
   el: HTMLCanvasElement
 ) {
   const rect = el.getBoundingClientRect();
-  const x = (e.clientX - rect.left) / rect.width;
-  const y = (e.clientY - rect.top) / rect.height;
-  return { x: x * 100, y: y * 100 };
+  const clientX = e.clientX - rect.left;
+  const clientY = e.clientY - rect.top;
+
+  // invert camera transform
+  const canvasX = (clientX - canvasScale.offsetX) / canvasScale.scale;
+  const canvasY = (clientY - canvasScale.offsetY) / canvasScale.scale;
+
+  return { x: (canvasX / el.width) * 100, y: (canvasY / el.height) * 100 };
 }
 
 export function createLayerCanvas(
@@ -62,6 +72,7 @@ export function removeLayerCanvas(id: string) {
 export function clearLayerCanvas(id: string) {
   const entry = layersCanvasMap[id];
   if (!entry) return;
+  entry.ctx.setTransform(1, 0, 0, 1, 0, 0);
   entry.ctx.clearRect(0, 0, entry.canvas.width, entry.canvas.height);
 }
 
@@ -69,17 +80,26 @@ export function redrawLayer(layerId: string) {
   const entry = layersCanvasMap[layerId];
   if (!entry) return;
 
-  clearLayerCanvas(layerId);
+  entry.ctx.setTransform(1, 0, 0, 1, 0, 0);
+  entry.ctx.clearRect(0, 0, entry.canvas.width, entry.canvas.height);
 
-  const firstLayerId = useBrushStore.getState().layers[0]?.id;
+  const firstLayerId = defaultLayer;
 
   if (layerId === firstLayerId) {
     entry.ctx.save();
+    entry.ctx.setTransform(1, 0, 0, 1, 0, 0);
     entry.ctx.fillStyle = "#ffffff";
     entry.ctx.fillRect(0, 0, entry.canvas.width, entry.canvas.height);
     entry.ctx.restore();
   }
-
+  entry.ctx.setTransform(
+    canvasScale.scale,
+    0,
+    0,
+    canvasScale.scale,
+    canvasScale.offsetX,
+    canvasScale.offsetY
+  );
   const strokes = useBrushStore
     .getState()
     .strokes.filter((s) => s.layerId === layerId);
@@ -144,7 +164,17 @@ export function processStrokeToTemp() {
   const localTempCanvas = getLocalTempCanvas();
   if (!localTempCanvas) return;
   const ctx = localTempCanvas.getContext("2d")!;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, localTempCanvas.width, localTempCanvas.height);
+
+  ctx.setTransform(
+    canvasScale.scale,
+    0,
+    0,
+    canvasScale.scale,
+    canvasScale.offsetX,
+    canvasScale.offsetY
+  );
 
   const state = useBrushStore.getState();
   const { pendingPoints, brushColor, brushSize, brushOpacity } = state;
@@ -212,8 +242,18 @@ export function commitStroke() {
     layerId: activeLayerId,
     final: true,
   };
+  const ctx = entry.ctx;
 
-  drawStrokeToCtx(entry.ctx, newStroke);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.setTransform(
+    canvasScale.scale,
+    0,
+    0,
+    canvasScale.scale,
+    canvasScale.offsetX,
+    canvasScale.offsetY
+  );
+  drawStrokeToCtx(ctx, newStroke);
 
   state.addStroke(newStroke);
 
@@ -225,9 +265,9 @@ export function commitStroke() {
   }
 
   if (localTempCanvas) {
-    localTempCanvas
-      .getContext("2d")!
-      .clearRect(0, 0, localTempCanvas.width, localTempCanvas.height);
+    const tCtx = localTempCanvas.getContext("2d")!;
+    tCtx.setTransform(1, 0, 0, 1, 0, 0); 
+    tCtx.clearRect(0, 0, localTempCanvas.width, localTempCanvas.height);
   }
 
   state.clearPendingStroke();
@@ -255,7 +295,10 @@ export function findLastLocalStroke() {
   let lastLocalStrokeIndex = -1;
 
   for (let i = strokes.length - 1; i >= 0; i--) {
-    if (strokes[i].isRemote !== true&&!lockedLayersIds.has(strokes[i].layerId)) {
+    if (
+      strokes[i].isRemote !== true &&
+      !lockedLayersIds.has(strokes[i].layerId)
+    ) {
       lastLocalStrokeIndex = i;
       break;
     }
@@ -276,8 +319,7 @@ export function loopOverLayers(
       for (const stroke of strokeArray) {
         allIncomingStrokes.push({ ...stroke, final: true, isRemote: true });
 
-        const entry = layersCanvasMap[layerId];
-        if (entry) drawStrokeToCtx(entry.ctx, { ...stroke, final: true });
+        redrawLayer(layerId);
       }
     }
   }
@@ -292,5 +334,35 @@ export function refreshState(state: BrushState, prev: BrushState) {
         removeLayerCanvas(id);
       }
     }
+  }
+}
+export function clampCanvasOffset() {
+  const container = getCanvasContainer();
+  if (!container) return;
+
+  const cw = container.clientWidth;
+  const ch = container.clientHeight;
+
+  const contentW = canvasSize.width * canvasScale.scale;
+  const contentH = canvasSize.height * canvasScale.scale;
+
+
+  if (contentW <= cw) {
+
+    canvasScale.offsetX = (cw - contentW) / 2;
+  } else {
+    const minX = cw - contentW; 
+    const maxX = 0;          
+    if (canvasScale.offsetX < minX) canvasScale.offsetX = minX;
+    if (canvasScale.offsetX > maxX) canvasScale.offsetX = maxX;
+  }
+
+  if (contentH <= ch) {
+    canvasScale.offsetY = (ch - contentH) / 2;
+  } else {
+    const minY = ch - contentH;
+    const maxY = 0;
+    if (canvasScale.offsetY < minY) canvasScale.offsetY = minY;
+    if (canvasScale.offsetY > maxY) canvasScale.offsetY = maxY;
   }
 }
