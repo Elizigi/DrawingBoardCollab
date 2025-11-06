@@ -65,7 +65,7 @@ function main() {
       const layer = state.layers[i];
       const entry = layersCanvasMap[layer.id];
       const prevLayer = prev.layers.find((l) => l.id === layer.id);
-      if (!entry || !prevLayer) return;
+      if (!entry || !prevLayer) continue;
 
       entry.canvas.style.display = layer.visible ? "block" : "none";
       entry.canvas.style.opacity = (layer as any).opacity?.toString() ?? "1";

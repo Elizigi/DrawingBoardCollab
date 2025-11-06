@@ -4,6 +4,7 @@ import { useBrushStore } from "../../zustand/useBrushStore";
 import {
   createLayerCanvas,
   redrawAllLayers,
+  redrawLayer,
 } from "../../helpers/drawingHelpers";
 
 const ContextMenuMV = () => {
@@ -57,28 +58,59 @@ const ContextMenuMV = () => {
     link.click();
     setMenuOpen(false);
   };
+
   const loadImage = async (file: File) => {
     if (!file) return;
+    const store = useBrushStore.getState();
 
     try {
-      const text = await file.text();
-      const data = JSON.parse(text);
+      if (file.type === "application/json") {
+        const text = await file.text();
+        const data = JSON.parse(text);
 
-      const store = useBrushStore.getState();
+        if (Array.isArray(data.layers)) {
+          store.setLayers(data.layers);
+          for (const layer of data.layers) createLayerCanvas(layer.id);
+        }
+        if (Array.isArray(data.strokes)) {
+          store.setStrokes(data.strokes);
+        }
 
-      if (Array.isArray(data.layers)) {
-        store.setLayers(data.layers);
-        for (const layer of data.layers) createLayerCanvas(layer.id);
+        redrawAllLayers();
+        setMenuOpen(false);
+        return;
       }
 
-      if (Array.isArray(data.strokes)) {
-        store.setStrokes(data.strokes);
+      if (file.type.startsWith("image/")) {
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+
+        img.onload = () => {
+          const layerId = "imported-img-" + crypto.randomUUID();
+          store.addLayer("Imported Image", layerId);
+          createLayerCanvas(layerId);
+
+          const layerCanvas = document.getElementById(
+            layerId
+          ) as HTMLCanvasElement;
+          if (!layerCanvas) return;
+          const ctx = layerCanvas.getContext("2d");
+          if (!ctx) return;
+          layerCanvas.width = img.width;
+          layerCanvas.height = img.height;
+          ctx.clearRect(0, 0, layerCanvas.width, layerCanvas.height);
+          ctx.drawImage(img, 0, 0, layerCanvas.width, layerCanvas.height);
+          redrawLayer(layerId);
+
+          URL.revokeObjectURL(img.src);
+          setMenuOpen(false);
+        };
+        return;
       }
 
-      redrawAllLayers();
-      setMenuOpen(false);
+      console.warn("Unsupported file type:", file.type);
     } catch (err) {
-      console.error("Failed to load JSON:", err);
+      console.error("Failed to load file:", err);
     }
   };
 
