@@ -26,8 +26,8 @@ const ContextMenu = () => {
               input.click();
             }}
           >
-            Load JSON
-          </button>{" "}
+            Load JSON / Image
+          </button>
         </div>
       )}
     </>

@@ -80,7 +80,9 @@ export function redrawLayer(layerId: string) {
   if (!entry) return;
 
   entry.ctx.setTransform(1, 0, 0, 1, 0, 0);
-  entry.ctx.clearRect(0, 0, entry.canvas.width, entry.canvas.height);
+  if (!layerId.includes("imported")) {
+    entry.ctx.clearRect(0, 0, entry.canvas.width, entry.canvas.height);
+  }
 
   const firstLayerId = defaultLayer;
 
@@ -265,7 +267,7 @@ export function commitStroke() {
 
   if (localTempCanvas) {
     const tCtx = localTempCanvas.getContext("2d")!;
-    tCtx.setTransform(1, 0, 0, 1, 0, 0); 
+    tCtx.setTransform(1, 0, 0, 1, 0, 0);
     tCtx.clearRect(0, 0, localTempCanvas.width, localTempCanvas.height);
   }
 
@@ -345,13 +347,11 @@ export function clampCanvasOffset() {
   const contentW = canvasSize.width * canvasScale.scale;
   const contentH = canvasSize.height * canvasScale.scale;
 
-
   if (contentW <= cw) {
-
     canvasScale.offsetX = (cw - contentW) / 2;
   } else {
-    const minX = cw - contentW; 
-    const maxX = 0;          
+    const minX = cw - contentW;
+    const maxX = 0;
     if (canvasScale.offsetX < minX) canvasScale.offsetX = minX;
     if (canvasScale.offsetX > maxX) canvasScale.offsetX = maxX;
   }

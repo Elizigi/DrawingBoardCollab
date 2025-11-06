@@ -98,6 +98,9 @@ const ContextMenuMV = () => {
           if (!ctx) return;
           layerCanvas.width = img.width;
           layerCanvas.height = img.height;
+          layerCanvas.style.display = "block";
+          layerCanvas.style.opacity = "1";
+          layerCanvas.style.zIndex = "9999";
           ctx.clearRect(0, 0, layerCanvas.width, layerCanvas.height);
           ctx.drawImage(img, 0, 0, layerCanvas.width, layerCanvas.height);
           redrawLayer(layerId);
