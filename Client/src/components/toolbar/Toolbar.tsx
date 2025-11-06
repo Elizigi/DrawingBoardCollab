@@ -12,7 +12,7 @@ export const Toolbar = () => {
 
       <TopRightToolbar />
       <EventAlert />
-      <ContextMenu></ContextMenu>
+      <ContextMenu />
     </div>
   );
 };

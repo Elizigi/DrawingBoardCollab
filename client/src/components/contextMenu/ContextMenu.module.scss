@@ -26,7 +26,8 @@
       transition: all 0.3s;
     }
     &:active {
-      margin: 1rem;
+      margin: 0 1rem;
+      padding: 1rem 0;
     }
   }
 }
