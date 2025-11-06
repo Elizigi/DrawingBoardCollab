@@ -49,8 +49,10 @@ const LayerButtons = () => {
           }}
         >
           <ToggleLayerVisibility layer={layer} />
-
+          
           <div
+            role="button"
+            tabIndex={0}
             className={styles.layerNameContainer}
             onClick={() =>
               onlineStatus.inRoom && !onlineStatus.isAdmin
@@ -63,8 +65,8 @@ const LayerButtons = () => {
                 type="text"
                 className={styles.layerEdit}
                 placeholder={layer.name}
-                onBlur={(e) => setNewName(layer.id, e.target.value,layer.name)}
-                onKeyDown={(e) => handleKeyPress(layer.id, e,layer.name)}
+                onBlur={(e) => setNewName(layer.id, e.target.value, layer.name)}
+                onKeyDown={(e) => handleKeyPress(layer.id, e, layer.name)}
                 autoFocus
               />
             ) : (
