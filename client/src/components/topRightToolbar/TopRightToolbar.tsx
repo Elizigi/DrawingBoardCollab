@@ -42,7 +42,7 @@ const TopRightToolbar = () => {
       {menuOpen && connected && (
         <button
           onClick={() => handleLeaveRoom()}
-          className={`${styles.joinButton} ${styles.connectionButtons}`}
+          className={`${styles.HostButton} ${styles.connectionButtons}`}
         >
           Exit
         </button>
