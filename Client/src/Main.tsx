@@ -82,6 +82,8 @@ function main() {
 
   if (topInputCanvas) {
     topInputCanvas.addEventListener("mousedown", (e) => {
+      if (e.button !== 0) return;
+      
       const state = useBrushStore.getState();
       state.setMouseDown(true);
       const { x, y } = getMousePosPercentOnElement(e, topInputCanvas);
@@ -199,7 +201,7 @@ function main() {
     if (!layersCanvasMap[stroke.layerId]) {
       createLayerCanvas?.(stroke.layerId);
     }
-   
+
     useBrushStore.getState().addStroke(stroke);
     redrawLayer(stroke.layerId);
   });

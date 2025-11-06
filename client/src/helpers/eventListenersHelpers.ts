@@ -1,6 +1,10 @@
 import { canvasScale, onlineStatus, socket } from "../Main";
 import { useBrushStore } from "../zustand/useBrushStore";
-import { canvasSize, getCanvasContainer, layersCanvasMap } from "./canvasHelpers";
+import {
+  canvasSize,
+  getCanvasContainer,
+  layersCanvasMap,
+} from "./canvasHelpers";
 import {
   addPoint,
   clampCanvasOffset,
@@ -65,7 +69,7 @@ export function addListeners(topInputCanvas: HTMLCanvasElement) {
 
     const minScale = Math.min(1, minScaleToCover);
 
-    const maxScale = 6; 
+    const maxScale = 6;
 
     newScale = Math.max(minScale, Math.min(maxScale, newScale));
     canvasScale.offsetX = mouseX - worldX * newScale;
@@ -73,6 +77,15 @@ export function addListeners(topInputCanvas: HTMLCanvasElement) {
     canvasScale.scale = newScale;
     clampCanvasOffset();
     redrawAllLayers();
+  });
+
+  document.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    globalThis.dispatchEvent(
+      new CustomEvent("canvas-rightclick", {
+        detail: { x: e.clientX, y: e.clientY },
+      })
+    );
   });
 
   topInputCanvas.addEventListener("pointerdown", (e) => {
