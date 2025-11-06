@@ -12,11 +12,15 @@ const LayerButtons = () => {
     layerRefs,
     draggedLayer,
     layerContainerRef,
+    canDrag,
+    isNameEdit,
+    handleKeyPress,
+    setNewName,
+    setIsNameEdit,
     topCalculations,
     handleLayerDown,
     changeLayer,
   } = LayerButtonMV();
-
 
   return (
     <div className={styles.layersContainer} ref={layerContainerRef}>
@@ -35,8 +39,9 @@ const LayerButtons = () => {
             order: allLayers.length - index,
             top: `${topCalculations(index)}px`,
             zIndex: draggedLayer === index ? 9999999 : 99,
-            position: draggedLayer === index ? "absolute" : "relative",
-            
+            position:
+              draggedLayer === index && canDrag ? "absolute" : "relative",
+
             cursor:
               onlineStatus.inRoom && layer.locked && !onlineStatus.isAdmin
                 ? "not-allowed"
@@ -45,8 +50,26 @@ const LayerButtons = () => {
         >
           <ToggleLayerVisibility layer={layer} />
 
-          <div className={styles.layerNameContainer}>
-            <h5 className={styles.layerName}>{layer.name}</h5>
+          <div
+            className={styles.layerNameContainer}
+            onClick={() =>
+              onlineStatus.inRoom && !onlineStatus.isAdmin
+                ? undefined
+                : setIsNameEdit(true)
+            }
+          >
+            {isNameEdit ? (
+              <input
+                type="text"
+                className={styles.layerEdit}
+                placeholder={layer.name}
+                onBlur={(e) => setNewName(layer.id, e.target.value,layer.name)}
+                onKeyDown={(e) => handleKeyPress(layer.id, e,layer.name)}
+                autoFocus
+              />
+            ) : (
+              <h5 className={styles.layerName}>{layer.name}</h5>
+            )}
           </div>
           <LockLayerButton layer={layer} />
           <DeleteLayerButton

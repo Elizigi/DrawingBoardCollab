@@ -71,6 +71,18 @@
     .layerName {
       margin: 0;
       font-size: 0.75rem;
+      cursor: text;
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      line-height: 1.2;
+    }
+    .layerEdit {
+      margin: 0;
+     width: 100%;
+      font-size: 0.75rem;
+      cursor: text;
       font-weight: 500;
       overflow: hidden;
       text-overflow: ellipsis;

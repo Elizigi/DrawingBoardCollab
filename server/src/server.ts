@@ -48,6 +48,18 @@ io.on("connection", (socket) => {
     if (socket.id !== hostId) return io.to(socket.id).emit("no-permission");
     io.to(roomId).emit("lock-layer", { layerId });
   });
+  socket.on("layer-reordered", (draggedLayer, insertAt) => {
+    const roomId = socket.data.roomId;
+    const hostId = roomsMap.get(roomId);
+    if (socket.id !== hostId) return io.to(socket.id).emit("no-permission");
+    socket.to(roomId).emit("reorder-layer", draggedLayer, insertAt);
+  });
+  socket.on("renamed-layer", (layerId, newName) => {
+    const roomId = socket.data.roomId;
+    const hostId = roomsMap.get(roomId);
+    if (socket.id !== hostId) return io.to(socket.id).emit("no-permission");
+    socket.to(roomId).emit("rename-layer", layerId, newName);
+  });
 
   socket.on("delete-layer", ({ layerId }) => {
     const roomId = socket.data.roomId;

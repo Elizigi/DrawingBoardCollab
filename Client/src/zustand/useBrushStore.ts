@@ -66,6 +66,7 @@ export type BrushState = {
   addLayer: (name: string, id: string) => void;
   toggleLockLayer: (layerId: string) => void;
   removeLayer: (id: string) => void;
+  renameLayer: (layerId: string, newName: string) => void;
 
   lockedLayersIds: Map<string, null>;
 
@@ -167,10 +168,12 @@ export const useBrushStore = create<BrushState>((set, get) => ({
     set({ strokes: strokes });
   },
   setLayers: (layers) => {
-    set(() => {
+    set((state) => {
+      const newActiveId =
+        helperGetActiveLayerId(layers) ?? state.activeLayerId ?? null;
       return {
         layers,
-        activeLayerId: helperGetActiveLayerId(layers),
+        activeLayerId: newActiveId,
       };
     });
   },
@@ -186,6 +189,15 @@ export const useBrushStore = create<BrushState>((set, get) => ({
         layers: newLayers,
         activeLayerId: state.activeLayerId ?? id,
       };
+    });
+  },
+  renameLayer: (layerId, newName) => {
+    set((state) => {
+      const newLayers = state.layers.map((layer) =>
+        layer.id === layerId ? { ...layer, name: newName } : layer
+      );
+
+      return { layers: newLayers };
     });
   },
   toggleLockLayer: (layerId) => {

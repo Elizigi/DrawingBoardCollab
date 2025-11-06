@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useBrushStore } from "../../../zustand/useBrushStore";
+import { onlineStatus, socket } from "../../../Main";
 
 type LayerPosition = {
   id: string;
@@ -14,11 +15,14 @@ const LayerButtonsMV = () => {
   const setActiveLayer = useBrushStore((state) => state.setActiveLayer);
   const allLayers = useBrushStore((state) => state.layers);
   const setLayers = useBrushStore((state) => state.setLayers);
+  const renameLayer = useBrushStore((state) => state.renameLayer);
 
   const [isLayerDragged, setIsLayerDragged] = useState(false);
   const [draggedLayer, setDraggedLayer] = useState<null | number>(null);
   const [layerOffset, setLayerOffset] = useState(0);
   const [dragStartOffset, setDragStartOffset] = useState(0);
+
+  const [canDrag, setCanDrag] = useState(false);
 
   const [layerPotentialPosition, setLayerPotentialPosition] = useState(0);
 
@@ -31,17 +35,39 @@ const LayerButtonsMV = () => {
     bottom: 0,
   });
   const layerPotentialPositionRef = useRef(-1);
+  const dragStartY = useRef(0);
+  const dragThreshold = 15;
+
+  const [isNameEdit, setIsNameEdit] = useState(false);
 
   const changeLayer = (id: string) => {
     setActiveLayer(id);
   };
+  const handleKeyPress = (
+    layerId: string,
+    e: React.KeyboardEvent<HTMLInputElement>,
+    oldName: string
+  ) => {
+    if (e.key === "Enter") {
+      setNewName(layerId, e.currentTarget.value, oldName);
+    }
+  };
+  const setNewName = (layerId: string, newName: string, oldName: string) => {
+    setIsNameEdit(false);
+    if (newName.trim().length < 2 || oldName === newName) return;
+    renameLayer(layerId, newName);
 
+    if (onlineStatus.inRoom && onlineStatus.isAdmin) {
+      socket.emit("renamed-layer", layerId, newName);
+    }
+  };
   const handleLayerDown = (
     index: number,
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
-    if (!layerContainerRef.current||allLayers.length<=1) return;
-
+    if (!layerContainerRef.current || allLayers.length <= 1) return;
+    if (onlineStatus.inRoom && !onlineStatus.isAdmin) return;
+    dragStartY.current = e.clientY;
     const layersContainerBounding =
       layerContainerRef.current.getBoundingClientRect();
     const containerTop = layersContainerBounding.top;
@@ -69,13 +95,12 @@ const LayerButtonsMV = () => {
 
     const clickedRect = layersPositionsRef.current[index];
     const clientYRel = e.clientY - layersContainerBounding.top;
-    setDragStartOffset(clientYRel - clickedRect.top);
+    setDragStartOffset(clientYRel - clickedRect.midpoint);
 
     e.stopPropagation();
     e.preventDefault();
     setDraggedLayer(index);
     setIsLayerDragged(true);
-    setLayerOffset(checkBoundary(e.clientY, index));
   };
 
   const findPositionInsertion = () => {
@@ -105,6 +130,10 @@ const LayerButtonsMV = () => {
     setIsLayerDragged(false);
     setDraggedLayer(null);
     setLayerPotentialPosition(-1);
+    setCanDrag(false);
+    if (onlineStatus.isAdmin) {
+      socket.emit("layer-reordered", draggedLayer, insertAt);
+    }
   };
 
   const findPositionAbove = (clientY: number) => {
@@ -146,7 +175,7 @@ const LayerButtonsMV = () => {
     if (!pos) return 0;
     const clientYRel = clientY - layersContainerBounds.top;
 
-    const layerPositionOffset = clientYRel - pos.top - dragStartOffset;
+    const layerPositionOffset = clientYRel - dragStartOffset;
     const containerHeight =
       layersContainerBounds.bottom - layersContainerBounds.top;
     const maxTop = containerHeight - pos.height;
@@ -165,7 +194,14 @@ const LayerButtonsMV = () => {
 
     const handleMouseMove = (e: MouseEvent) => {
       if (draggedLayer === null) return;
+
       const clientY = e.clientY;
+      const deltaY = e.clientY - dragStartY.current;
+
+      if (Math.abs(deltaY) < dragThreshold) {
+        return;
+      }
+      setCanDrag(true);
       const clientYRel = clientY - layersContainerBounds.top;
 
       const draggedLayerPosition = layersPositionsRef.current[draggedLayer];
@@ -195,14 +231,51 @@ const LayerButtonsMV = () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isLayerDragged, draggedLayer]);
+  }, [
+    isLayerDragged,
+    draggedLayer,
+    allLayers,
+    layersPositionsRef,
+    layerOffset,
+  ]);
+  const reorderLayers = (draggedLayer: number, insertAt: number) => {
+    const freshLayers = useBrushStore.getState().layers;
+    if (
+      draggedLayer < 0 ||
+      draggedLayer >= freshLayers.length ||
+      insertAt < 0 ||
+      insertAt > freshLayers.length
+    )
+      return;
+    const temp = [...freshLayers];
+    console.log({ draggedLayer, insertAt, temp, allLayers });
 
+    const [removed] = temp.splice(draggedLayer, 1);
+    if (!removed) return;
+    temp.splice(insertAt, 0, removed);
+    setLayers(temp);
+  };
+
+  useEffect(() => {
+    socket.on("reorder-layer", reorderLayers);
+    socket.on("rename-layer", renameLayer);
+
+    return () => {
+      socket.off("reorder-layer", reorderLayers);
+      socket.off("rename-layer", renameLayer);
+    };
+  }, []);
   return {
     allLayers,
     activeLayerId,
     layerRefs,
     draggedLayer,
     layerContainerRef,
+    canDrag,
+    isNameEdit,
+    handleKeyPress,
+    setNewName,
+    setIsNameEdit,
     topCalculations,
     handleLayerDown,
     changeLayer,
