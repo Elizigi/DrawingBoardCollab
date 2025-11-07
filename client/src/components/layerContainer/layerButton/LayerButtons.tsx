@@ -49,18 +49,19 @@ const LayerButtons = () => {
           }}
         >
           <ToggleLayerVisibility layer={layer} />
-          
+
           <div
-            role="button"
+            role="toolbar"
             tabIndex={0}
             className={styles.layerNameContainer}
-            onClick={() =>
-              onlineStatus.inRoom && !onlineStatus.isAdmin
-                ? undefined
-                : setIsNameEdit(true)
-            }
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              if (onlineStatus.inRoom && !onlineStatus.isAdmin) return;
+              setIsNameEdit(layer.id);
+            }}
           >
-            {isNameEdit ? (
+            {isNameEdit===layer.id ? (
               <input
                 type="text"
                 className={styles.layerEdit}

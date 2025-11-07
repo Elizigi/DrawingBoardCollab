@@ -38,7 +38,7 @@ const LayerButtonsMV = () => {
   const dragStartY = useRef(0);
   const dragThreshold = 15;
 
-  const [isNameEdit, setIsNameEdit] = useState(false);
+  const [isNameEdit, setIsNameEdit] = useState<string | null>(null);
 
   const changeLayer = (id: string) => {
     setActiveLayer(id);
@@ -53,7 +53,7 @@ const LayerButtonsMV = () => {
     }
   };
   const setNewName = (layerId: string, newName: string, oldName: string) => {
-    setIsNameEdit(false);
+    setIsNameEdit(null);
     if (newName.trim().length < 2 || oldName === newName) return;
     renameLayer(layerId, newName);
 
