@@ -74,25 +74,23 @@ export function clearLayerCanvas(id: string) {
   entry.ctx.setTransform(1, 0, 0, 1, 0, 0);
   entry.ctx.clearRect(0, 0, entry.canvas.width, entry.canvas.height);
 }
-
 export function redrawLayer(layerId: string) {
   const entry = layersCanvasMap[layerId];
   if (!entry) return;
 
+  // Clear non-imported layers
   entry.ctx.setTransform(1, 0, 0, 1, 0, 0);
-  if (!layerId.includes("imported")) {
-    entry.ctx.clearRect(0, 0, entry.canvas.width, entry.canvas.height);
-  }
+  entry.ctx.clearRect(0, 0, entry.canvas.width, entry.canvas.height);
 
-  const firstLayerId = defaultLayer;
-
-  if (layerId === firstLayerId) {
+  // Default layer white background
+  if (layerId === defaultLayer) {
     entry.ctx.save();
-    entry.ctx.setTransform(1, 0, 0, 1, 0, 0);
     entry.ctx.fillStyle = "#ffffff";
     entry.ctx.fillRect(0, 0, entry.canvas.width, entry.canvas.height);
     entry.ctx.restore();
   }
+
+  // Apply zoom & pan
   entry.ctx.setTransform(
     canvasScale.scale,
     0,
@@ -101,6 +99,16 @@ export function redrawLayer(layerId: string) {
     canvasScale.offsetX,
     canvasScale.offsetY
   );
+
+  // Draw imported image at original position
+  if (layerId.includes("imported") && entry.image) {
+    const img = entry.image;
+    const offsetX = (entry.canvas.width - img.width) / 2;
+    const offsetY = (entry.canvas.height - img.height) / 2;
+    entry.ctx.drawImage(img, offsetX, offsetY);
+  }
+
+  // Draw strokes
   const strokes = useBrushStore
     .getState()
     .strokes.filter((s) => s.layerId === layerId);

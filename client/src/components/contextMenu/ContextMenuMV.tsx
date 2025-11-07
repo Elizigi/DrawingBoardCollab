@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { layersCanvasMap } from "../../helpers/canvasHelpers";
+import { canvasSize, layersCanvasMap } from "../../helpers/canvasHelpers";
 import { useBrushStore } from "../../zustand/useBrushStore";
 import {
   createLayerCanvas,
@@ -86,24 +86,27 @@ const ContextMenuMV = () => {
         img.src = URL.createObjectURL(file);
 
         img.onload = () => {
-          const layerId = "imported-img-" + crypto.randomUUID();
+          const layerId = `imported-${crypto.randomUUID()}`;
           store.addLayer("Imported Image", layerId);
           createLayerCanvas(layerId);
 
-          const layerCanvas = document.getElementById(
-            layerId
-          ) as HTMLCanvasElement;
-          if (!layerCanvas) return;
-          const ctx = layerCanvas.getContext("2d");
-          if (!ctx) return;
-          layerCanvas.width = img.width;
-          layerCanvas.height = img.height;
-          layerCanvas.style.display = "block";
-          layerCanvas.style.opacity = "1";
-          layerCanvas.style.zIndex = "9999";
-          ctx.clearRect(0, 0, layerCanvas.width, layerCanvas.height);
-          ctx.drawImage(img, 0, 0, layerCanvas.width, layerCanvas.height);
-          redrawLayer(layerId);
+          const entry = layersCanvasMap[layerId];
+          if (!entry) return;
+          entry.image = img; // store for redraws
+
+          const canvas = entry.canvas;
+          const ctx = entry.ctx;
+
+          canvas.width = canvasSize.width;
+          canvas.height = canvasSize.height;
+
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          const offsetX = (canvas.width - img.width) / 2;
+          const offsetY = (canvas.height - img.height) / 2;
+          ctx.drawImage(img, offsetX, offsetY);
+
+          redrawLayer(layerId); 
 
           URL.revokeObjectURL(img.src);
           setMenuOpen(false);

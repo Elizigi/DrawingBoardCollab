@@ -6,7 +6,7 @@ export const STROKE_THROTTLE = 16;
 
 export const layersCanvasMap: Record<
   string,
-  { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D }
+  { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D,  image?: HTMLImageElement; }
 > = {};
 
 let containerEl: HTMLDivElement | null = null;
