@@ -78,11 +78,9 @@ export function redrawLayer(layerId: string) {
   const entry = layersCanvasMap[layerId];
   if (!entry) return;
 
-  // Clear non-imported layers
   entry.ctx.setTransform(1, 0, 0, 1, 0, 0);
   entry.ctx.clearRect(0, 0, entry.canvas.width, entry.canvas.height);
 
-  // Default layer white background
   if (layerId === defaultLayer) {
     entry.ctx.save();
     entry.ctx.fillStyle = "#ffffff";
@@ -90,7 +88,6 @@ export function redrawLayer(layerId: string) {
     entry.ctx.restore();
   }
 
-  // Apply zoom & pan
   entry.ctx.setTransform(
     canvasScale.scale,
     0,
@@ -100,7 +97,6 @@ export function redrawLayer(layerId: string) {
     canvasScale.offsetY
   );
 
-  // Draw imported image at original position
   if (layerId.includes("imported") && entry.image) {
     const img = entry.image;
     const offsetX = (entry.canvas.width - img.width) / 2;
@@ -108,7 +104,6 @@ export function redrawLayer(layerId: string) {
     entry.ctx.drawImage(img, offsetX, offsetY);
   }
 
-  // Draw strokes
   const strokes = useBrushStore
     .getState()
     .strokes.filter((s) => s.layerId === layerId);

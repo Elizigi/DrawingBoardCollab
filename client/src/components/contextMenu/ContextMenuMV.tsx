@@ -92,7 +92,7 @@ const ContextMenuMV = () => {
 
           const entry = layersCanvasMap[layerId];
           if (!entry) return;
-          entry.image = img; // store for redraws
+          entry.image = img; 
 
           const canvas = entry.canvas;
           const ctx = entry.ctx;

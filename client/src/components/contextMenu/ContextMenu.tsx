@@ -1,3 +1,4 @@
+import { onlineStatus } from "../../Main";
 import styles from "./ContextMenu.module.scss";
 import ContextMenuMV from "./ContextMenuMV";
 
@@ -15,6 +16,7 @@ const ContextMenu = () => {
           <button onClick={saveAsJson}>Save As JSON</button>
           <button
             onClick={() => {
+              if (onlineStatus.inRoom && !onlineStatus.isAdmin) return;
               const input = document.createElement("input");
               input.type = "file";
               input.accept = ".json,image/*";

@@ -26,6 +26,7 @@ type LayerMeta = {
   name: string;
   visible: boolean;
   locked: boolean;
+  imageDataUrl?: string;
 };
 
 export type Stroke = {
