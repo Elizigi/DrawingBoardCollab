@@ -47,6 +47,7 @@ export function setupDOMAndCanvases(rotElement: HTMLDivElement | null) {
   remoteTempCanvas.style.left = "0";
   remoteTempCanvas.style.pointerEvents = "none";
   containerEl.appendChild(remoteTempCanvas);
+  
 
   localTempCanvas = document.createElement("canvas");
   localTempCanvas.width = canvasSize.width;
