@@ -70,7 +70,21 @@ const ContextMenuMV = () => {
 
         if (Array.isArray(data.layers)) {
           store.setLayers(data.layers);
-          for (const layer of data.layers) createLayerCanvas(layer.id);
+          for (const layer of data.layers) {
+            createLayerCanvas(layer.id);
+
+            if (layer.imageDataUrl) {
+              const img = new Image();
+              img.src = layer.imageDataUrl;
+              img.onload = () => {
+                const entry = layersCanvasMap[layer.id];
+                if (entry) {
+                  entry.image = img;
+                  redrawLayer(layer.id);
+                }
+              };
+            }
+          }
         }
         if (Array.isArray(data.strokes)) {
           store.setStrokes(data.strokes);
@@ -92,22 +106,30 @@ const ContextMenuMV = () => {
 
           const entry = layersCanvasMap[layerId];
           if (!entry) return;
-          entry.image = img; 
+          entry.image = img;
 
           const canvas = entry.canvas;
           const ctx = entry.ctx;
 
           canvas.width = canvasSize.width;
           canvas.height = canvasSize.height;
-
           ctx.clearRect(0, 0, canvas.width, canvas.height);
 
           const offsetX = (canvas.width - img.width) / 2;
           const offsetY = (canvas.height - img.height) / 2;
           ctx.drawImage(img, offsetX, offsetY);
 
-          redrawLayer(layerId); 
+          const tempCanvas = document.createElement("canvas");
+          tempCanvas.width = img.width;
+          tempCanvas.height = img.height;
+          const tempCtx = tempCanvas.getContext("2d");
+          if (tempCtx) {
+            tempCtx.drawImage(img, 0, 0);
+            const imageDataUrl = tempCanvas.toDataURL("image/png");
+            store.setLayerImage(layerId, imageDataUrl);
+          }
 
+          redrawLayer(layerId);
           URL.revokeObjectURL(img.src);
           setMenuOpen(false);
         };
