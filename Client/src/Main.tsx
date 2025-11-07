@@ -23,6 +23,7 @@ import {
   redrawLayer,
   refreshState,
   loopOverLayers,
+  restoreLayerImage
 } from "./helpers/drawingHelpers.ts";
 import { addListeners } from "./helpers/eventListenersHelpers.ts";
 
@@ -145,22 +146,24 @@ function main() {
 
   socket.on("init", (data) => {
     if (!data) return;
-    const { strokes, layers } = data;
+  const { strokes, layers } = data;
 
-    if (layers && Array.isArray(layers)) {
-      useBrushStore.getState().setLayers(layers);
-      for (const layer of layers) {
-        if (!layersCanvasMap[layer.id]) createLayerCanvas(layer.id);
-      }
+  if (layers && Array.isArray(layers)) {
+    useBrushStore.getState().setLayers(layers);
+    for (const layer of layers) {
+      if (!layersCanvasMap[layer.id]) createLayerCanvas(layer.id);
+      restoreLayerImage(layer);
     }
+  }
 
-    fillBackgroundWhite();
+  fillBackgroundWhite();
 
-    if (strokes) {
-      const allIncomingStrokes: Stroke[] = [];
-      loopOverLayers(strokes, allIncomingStrokes);
-      useBrushStore.getState().setStrokes(allIncomingStrokes);
-    }
+  if (strokes) {
+    const allIncomingStrokes: Stroke[] = [];
+    loopOverLayers(strokes, allIncomingStrokes);
+    useBrushStore.getState().setStrokes(allIncomingStrokes);
+    redrawAllLayers();
+  }
   });
 
   socket.on("draw-progress", (stroke: any) => {

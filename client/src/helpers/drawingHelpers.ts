@@ -36,6 +36,19 @@ export function getMousePosPercentOnElement(
 
   return { x: (canvasX / el.width) * 100, y: (canvasY / el.height) * 100 };
 }
+export function restoreLayerImage(layer: any) {
+  if (!layer.imageDataUrl) return;
+  
+  const img = new Image();
+  img.src = layer.imageDataUrl;
+  img.onload = () => {
+    const entry = layersCanvasMap[layer.id];
+    if (entry) {
+      entry.image = img;
+      redrawLayer(layer.id);
+    }
+  };
+}
 
 export function createLayerCanvas(
   id: string,
@@ -314,16 +327,19 @@ export function findLastLocalStroke() {
 }
 
 export function loopOverLayers(
-  strokes: Stroke[],
+  strokes: Record<string, Stroke[]>,
   allIncomingStrokes: Stroke[]
 ) {
   for (const [layerId, strokeArray] of Object.entries(strokes)) {
     if (!layersCanvasMap[layerId]) createLayerCanvas(layerId);
     if (Array.isArray(strokeArray)) {
       for (const stroke of strokeArray) {
-        allIncomingStrokes.push({ ...stroke, final: true, isRemote: true });
-
-        redrawLayer(layerId);
+        allIncomingStrokes.push({ 
+          ...stroke, 
+          final: true, 
+          isRemote: true,
+          layerId: layerId 
+        });
       }
     }
   }
