@@ -11,9 +11,9 @@
 - [✔] fix bug when changing layers positions
 - [✔] fix drawing movement position in layer stack
 - [✔] zoom in and out feature
+- [✔] Add export as PNG/JPEG
 - [ ] Improve mobile integration and touch support
 - [ ] Reorganize file and function structure for clarity
 - [ ] Add filler (bucket) tool
-- [ ] Add export as PNG/JPEG
 - [ ] Add animations
 - [ ] Chat ?!

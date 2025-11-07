@@ -24,7 +24,7 @@ const LayerButtonsMV = () => {
 
   const [canDrag, setCanDrag] = useState(false);
 
-  const [layerPotentialPosition, setLayerPotentialPosition] = useState(0);
+  const [layerPotentialPosition, setLayerPotentialPosition] = useState(-1);
 
   const layersPositionsRef = useRef<LayerPosition[]>([]);
   const layerRefs = useRef(new Map<string, HTMLButtonElement>());
