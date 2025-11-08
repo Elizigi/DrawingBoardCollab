@@ -1,33 +1,35 @@
 .contextMenuContainer {
   border-top: $border-color 3px solid;
+  border-bottom: $border-color 3px solid;
 
   position: fixed;
   width: 9rem;
-  height: 15rem;
+  height: fit-content;
   background-color: $bg-dark;
   z-index: 9999999;
-  border-radius: 10px;
   overflow: hidden;
+  padding: 0.4rem 0.4rem  0rem 0.4rem;
 
   button {
     border: $border-color 3px solid;
-    border-top: none;
-
+    margin-bottom: 0.5rem;
     background-color: $bg-light;
     color: $text-color;
     padding: 0.3rem;
     text-align: center;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
+    width: 100%;
     pointer-events: auto;
     cursor: pointer;
     user-select: none;
+    transition: all 0.3s;
+
     &:hover {
-      scale: 1.1;
-      transition: all 0.3s;
+      padding-left: 1rem;
+      background-color: $bg-harsh;
     }
     &:active {
-      margin: 0 1rem;
-      padding: 1rem 0;
+      scale: 0.9rem 0;
     }
   }
 }
