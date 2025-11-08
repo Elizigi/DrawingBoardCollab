@@ -9,29 +9,59 @@ const io = new SocketIOServer(server, {
   cors: {
     origin: "*",
   },
+  pingTimeout: 60000,
+  pingInterval: 25000,
 });
 
 app.use(cors());
 
 const roomsMap = new Map<string, string>();
-
+const rateLimitMap = new Map();
 io.on("connection", (socket) => {
   console.log("User connected to server:", socket.id);
   socket.emit("user-id", socket.id);
 
   socket.on("create-room", ({ name }) => {
+    if (!name || typeof name !== "string" || name.trim().length === 0) {
+      return socket.emit("error", "Invalid name");
+    }
+    if (name.length > 30) {
+      return socket.emit("error", "Name too long");
+    }
+    const sanitizedName = name.trim().replaceAll("<", "").replaceAll(">", "");
     const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
     socket.join(roomId);
     roomsMap.set(roomId, socket.id);
     socket.data.isHost = true;
-    socket.data.name = name;
+    socket.data.name = sanitizedName;
     socket.data.roomId = roomId;
     socket.emit("room-created", roomId);
   });
 
   socket.on("draw-progress", (stroke) => {
+    const now = Date.now();
+    const limit = rateLimitMap.get(socket.id) || {
+      count: 0,
+      resetTime: now + 1000,
+    };
+
+    if (now > limit.resetTime) {
+      limit.count = 0;
+      limit.resetTime = now + 1000;
+    }
+
+    limit.count++;
+    if (limit.count > 100) {
+      return;
+    }
+    rateLimitMap.set(socket.id, limit);
+
     const roomId = socket.data.roomId;
     if (!roomId) return;
+    const room = io.sockets.adapter.rooms.get(roomId);
+    if (!room?.has(socket.id)) {
+      return socket.emit("error", "Not in room");
+    }
     socket.broadcast
       .to(roomId)
       .emit("draw-progress", { ...stroke, senderId: socket.id });
@@ -39,12 +69,17 @@ io.on("connection", (socket) => {
 
   socket.on("delete-stroke", ({ deleteStroke }) => {
     const roomId = socket.data.roomId;
+    const room = io.sockets.adapter.rooms.get(roomId);
+    if (!room?.has(socket.id)) {
+      return socket.emit("error", "Not in room");
+    }
     if (!roomId) return;
     socket.broadcast.to(roomId).emit("remove-stroke", { deleteStroke });
   });
   socket.on("locked-layer", ({ layerId }) => {
     const roomId = socket.data.roomId;
     const hostId = roomsMap.get(roomId);
+
     if (socket.id !== hostId) return io.to(socket.id).emit("no-permission");
     io.to(roomId).emit("lock-layer", { layerId });
   });
@@ -72,14 +107,31 @@ io.on("connection", (socket) => {
     const guestId = socket.id;
 
     if (!roomId || !guestId) return;
-
+    const room = io.sockets.adapter.rooms.get(roomId);
+    if (!room?.has(socket.id)) {
+      return socket.emit("error", "Not in room");
+    }
     socket.broadcast.to(roomId).emit("user-moved", { guestId, position });
   });
 
   socket.on("join-room", ({ roomId, name }) => {
+    if (
+      !roomId ||
+      typeof roomId !== "string" ||
+      !/^[A-Z0-9]{6}$/.test(roomId)
+    ) {
+      return socket.emit("error", "Invalid room ID");
+    }
+    if (!name || typeof name !== "string" || name.trim().length === 0) {
+      return socket.emit("error", "Invalid name");
+    }
     if (!roomsMap.has(roomId)) {
       socket.emit("room-not-found");
       return;
+    }
+    const room = io.sockets.adapter.rooms.get(roomId);
+    if (room && room.size >= 20) {
+      return socket.emit("error", { reason: "Room is full" });
     }
     socket.join(roomId);
     socket.data.roomId = roomId;
@@ -96,22 +148,39 @@ io.on("connection", (socket) => {
   });
 
   socket.on("new-layer", ({ layerId, layerName }) => {
+    if (!layerId || typeof layerId !== "string") return;
+    if (!layerName || typeof layerName !== "string") return;
+    if (layerName.length > 50) return;
     const roomId = socket.data.roomId;
+    const room = io.sockets.adapter.rooms.get(roomId);
+    if (!room?.has(socket.id)) {
+      return socket.emit("error", "Not in room");
+    }
     socket.broadcast.to(roomId).emit("add-layer", { layerId, layerName });
   });
   socket.on("send-name", ({ name, userId, guestId }) => {
     console.log("name Sent:", name, userId);
     const username = name;
+
     socket.to(guestId).emit("add-name", { username, userId });
   });
 
   socket.on("request-state", ({ to }) => {
+    const roomId = socket.data.roomId;
+    const room = io.sockets.adapter.rooms.get(roomId);
+    if (!room?.has(socket.id)) {
+      return socket.emit("error", "Not in room");
+    }
     io.to(to).emit("request-state", { from: socket.id });
   });
 
   socket.on("send-state", ({ to, strokes, layers }) => {
     if (socket.id === to) return;
-
+    const roomId = socket.data.roomId;
+    const room = io.sockets.adapter.rooms.get(roomId);
+    if (!room?.has(socket.id)) {
+      return socket.emit("error", "Not in room");
+    }
     io.to(to).emit("init", { strokes, layers });
   });
 
@@ -168,7 +237,7 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     const roomId = socket.data.roomId;
     const name = socket.data.name;
-
+    rateLimitMap.delete(socket.id);
     if (!roomId) return;
 
     const hostId = roomsMap.get(roomId);
