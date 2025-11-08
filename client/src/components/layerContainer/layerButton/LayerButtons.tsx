@@ -54,7 +54,7 @@ const LayerButtons = () => {
             role="toolbar"
             tabIndex={0}
             className={styles.layerNameContainer}
-            onMouseDown={(e) => {
+            onDoubleClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
               if (onlineStatus.inRoom && !onlineStatus.isAdmin) return;
