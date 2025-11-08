@@ -108,7 +108,7 @@ const LayerContainerVM = () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging, dragStart]);
+  }, [isDragging, dragStart,toggleLayerContainer]);
 
   const chooseContainerSide = (styles: CSSModuleClasses) => {
     return toTheRight ? styles.layerHiddenLeft : styles.layerHiddenRight;

@@ -65,14 +65,17 @@ const LayerButtonsMV = () => {
     index: number,
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
-    if (!layerContainerRef.current || allLayers.length <= 1) return;
+    const freshLayers = useBrushStore.getState().layers;
+
+    if (!layerContainerRef.current || freshLayers.length <= 1) return;
     if (onlineStatus.inRoom && !onlineStatus.isAdmin) return;
     dragStartY.current = e.clientY;
     const layersContainerBounding =
       layerContainerRef.current.getBoundingClientRect();
     const containerTop = layersContainerBounding.top;
     const newPositions: LayerPosition[] = [];
-    for (const layer of allLayers) {
+
+    for (const layer of freshLayers) {
       const element = layerRefs.current.get(layer.id);
       if (!element) continue;
       const rect = element.getBoundingClientRect();
