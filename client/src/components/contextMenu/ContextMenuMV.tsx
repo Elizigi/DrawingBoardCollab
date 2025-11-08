@@ -10,6 +10,7 @@ import {
 const ContextMenuMV = () => {
   const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
   const [menuOpen, setMenuOpen] = useState(false);
+  const isMouseDown = useBrushStore((s) => s.isMouseDown);
 
   const saveAsJson = () => {
     const state = useBrushStore.getState();
@@ -120,7 +121,7 @@ const ContextMenuMV = () => {
           ctx.drawImage(img, offsetX, offsetY);
 
           const tempCanvas = document.createElement("canvas");
-          const maxDimension = 1920; 
+          const maxDimension = 1920;
           let width = img.width;
           let height = img.height;
 
@@ -173,6 +174,11 @@ const ContextMenuMV = () => {
         handleCanvasRightClick as EventListener
       );
   }, [menuOpen]);
+  useEffect(() => {
+    if (menuOpen && isMouseDown) {
+      setMenuOpen(false);
+    }
+  }, [isMouseDown]);
 
   return { menuPos, menuOpen, saveAsJson, saveAsPng, loadImage };
 };
