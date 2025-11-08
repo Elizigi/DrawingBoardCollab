@@ -95,7 +95,7 @@ function main() {
     });
   }
 
-  addListeners(topInputCanvas);
+  addListeners(topInputCanvas,rotElement);
 
   (function tick() {
     const now = Date.now();

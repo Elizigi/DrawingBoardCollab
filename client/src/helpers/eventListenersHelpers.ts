@@ -17,7 +17,10 @@ import {
 
 const allowedKeys = { ctrl: "ControlLeft", z: "KeyZ", y: "KeyY" };
 const keysDown = { ctrl: false, z: false };
-export function addListeners(topInputCanvas: HTMLCanvasElement) {
+export function addListeners(
+  topInputCanvas: HTMLCanvasElement,
+  rotElement: HTMLDivElement
+) {
   document.addEventListener("mouseup", () => {
     useBrushStore.getState().setMouseDown(false);
     commitStroke();
@@ -79,7 +82,7 @@ export function addListeners(topInputCanvas: HTMLCanvasElement) {
     redrawAllLayers();
   });
 
-  document.addEventListener("contextmenu", (e) => {
+  rotElement.addEventListener("contextmenu", (e) => {
     e.preventDefault();
     globalThis.dispatchEvent(
       new CustomEvent("canvas-rightclick", {
