@@ -120,12 +120,26 @@ const ContextMenuMV = () => {
           ctx.drawImage(img, offsetX, offsetY);
 
           const tempCanvas = document.createElement("canvas");
-          tempCanvas.width = img.width;
-          tempCanvas.height = img.height;
+          const maxDimension = 1920; 
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxDimension || height > maxDimension) {
+            if (width > height) {
+              height = (height / width) * maxDimension;
+              width = maxDimension;
+            } else {
+              width = (width / height) * maxDimension;
+              height = maxDimension;
+            }
+          }
+
+          tempCanvas.width = width;
+          tempCanvas.height = height;
           const tempCtx = tempCanvas.getContext("2d");
           if (tempCtx) {
-            tempCtx.drawImage(img, 0, 0);
-            const imageDataUrl = tempCanvas.toDataURL("image/png");
+            tempCtx.drawImage(img, 0, 0, width, height);
+            const imageDataUrl = tempCanvas.toDataURL("image/jpeg", 0.8);
             store.setLayerImage(layerId, imageDataUrl);
           }
 
