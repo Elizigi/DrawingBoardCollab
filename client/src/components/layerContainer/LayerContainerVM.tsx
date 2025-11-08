@@ -28,6 +28,11 @@ const LayerContainerVM = () => {
   });
   const toTheRight = layersToolPositionOffset.x > window.innerWidth / 2;
 
+  const [velocity, setVelocity] = useState({ x: 0, y: 0 });
+  const [rotation, setRotation] = useState(0);
+  const lastPosition = useRef({ x: 0, y: 0 });
+  const animationFrame = useRef<null | number>(null);
+
   const addComingLayer = ({ layerId, layerName }: LayerPayload) => {
     addLayer(layerName, layerId);
   };
@@ -72,7 +77,42 @@ const LayerContainerVM = () => {
       y: e.clientY - rect.top,
     });
   };
+  const animateSpring = () => {
+    const friction = 0.22;
+    const springStrength = 0.1;
 
+    let currentVelocity = { ...velocity };
+    let currentRotation = rotation;
+
+    const animate = () => {
+      currentVelocity.x += -currentRotation * springStrength;
+
+      currentVelocity.x *= friction;
+
+      currentRotation += currentVelocity.x;
+
+      if (
+        Math.abs(currentVelocity.x) < 0.01 &&
+        Math.abs(currentRotation) < 0.1
+      ) {
+        setRotation(0);
+        setVelocity({ x: 0, y: 0 });
+        return;
+      }
+
+      setRotation(currentRotation);
+      animationFrame.current = requestAnimationFrame(animate);
+    };
+
+    animationFrame.current = requestAnimationFrame(animate);
+  };
+  useEffect(() => {
+    return () => {
+      if (animationFrame.current) {
+        cancelAnimationFrame(animationFrame.current);
+      }
+    };
+  }, []);
   useEffect(() => {
     if (!isDragging) return;
     const handleMouseMove = (e: MouseEvent): void => {
@@ -82,6 +122,14 @@ const LayerContainerVM = () => {
       const newX = e.clientX - dragStart.x;
       const newY = e.clientY - dragStart.y;
 
+      const vx = e.clientX - lastPosition.current.x;
+      const vy = e.clientY - lastPosition.current.y;
+      setVelocity({ x: vx, y: vy });
+
+      const rotationAmount = Math.max(-15, Math.min(15, vx * 0.5));
+      setRotation(rotationAmount);
+
+      lastPosition.current = { x: e.clientX, y: e.clientY };
       setLayersToolPositionOffset({ x: newX, y: newY });
     };
 
@@ -96,8 +144,11 @@ const LayerContainerVM = () => {
           rect.height <= 0 ||
           rect.left < 0 ||
           rect.top < 0
-        )
+        ) {
           toggleLayerContainer();
+        } else {
+          animateSpring();
+        }
       }
     };
 
@@ -108,7 +159,7 @@ const LayerContainerVM = () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging, dragStart,toggleLayerContainer]);
+  }, [isDragging, dragStart, toggleLayerContainer]);
 
   const chooseContainerSide = (styles: CSSModuleClasses) => {
     return toTheRight ? styles.layerHiddenLeft : styles.layerHiddenRight;
@@ -122,7 +173,7 @@ const LayerContainerVM = () => {
     dragAreaElement,
     isDragging,
     toTheRight,
-
+    rotation,
     chooseContainerSide,
     toggleLayerContainer,
     handleMouseDown,

@@ -14,7 +14,6 @@
 - [✔] Add export as PNG/JPEG
 - [ ] Improve mobile integration and touch support
 - [ ] Reorganize file and function structure for clarity
-- [ ] Add filler (bucket) tool
 - [ ] Add animations
 - [ ] Add image Movement and drag
 - [ ] Chat ?!

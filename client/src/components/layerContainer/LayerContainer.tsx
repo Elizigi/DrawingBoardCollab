@@ -12,7 +12,7 @@ const LayersContainer = () => {
     dragAreaElement,
     isDragging,
     toTheRight,
-
+    rotation,
     chooseContainerSide,
     toggleLayerContainer,
     handleMouseDown,
@@ -31,6 +31,9 @@ const LayersContainer = () => {
           ? {
               top: `${layersToolPositionOffset.y}px`,
               left: `${layersToolPositionOffset.x}px`,
+              transform: `rotate(${rotation}deg)`,
+              transformOrigin: "top center",
+              transition: isDragging ? "none" : "transform 0.3s ease-out",
             }
           : {}
       }
