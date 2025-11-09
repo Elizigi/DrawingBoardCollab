@@ -1,3 +1,18 @@
+.settingIcon {
+  position: fixed;
+  font-size: 2rem;
+  color: $bg-dark;
+  top: 1rem;
+  right: 2rem;
+  background-color: transparent;
+  border: none;
+  transition: all 0.3;
+  font-weight: bolder;
+  &:hover {
+    rotate: 30deg;
+  }
+  cursor: pointer;
+}
 .openingContainer {
   position: fixed;
   top: 0;

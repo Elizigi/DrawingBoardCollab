@@ -6,7 +6,7 @@ const SettingScreenMV = () => {
     height: canvasSize.height,
     width: canvasSize.width,
   });
-  const [modalOpen, setModalOpen] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
   const setCanvasSize = () => {
     canvasSize.height = canvasSizeValue.height;
     canvasSize.width = canvasSizeValue.width;
@@ -14,7 +14,13 @@ const SettingScreenMV = () => {
     resizeAllCanvases(canvasSizeValue.width, canvasSizeValue.height);
   };
 
-  return { canvasSizeValue, modalOpen, setCanvasSize, setCanvasSizeValue };
+  return {
+    canvasSizeValue,
+    modalOpen,
+    setModalOpen,
+    setCanvasSize,
+    setCanvasSizeValue,
+  };
 };
 
 export default SettingScreenMV;

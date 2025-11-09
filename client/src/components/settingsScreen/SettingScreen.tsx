@@ -2,13 +2,25 @@ import style from "./SettingScreen.module.scss";
 import SettingScreenMV from "./SettingScreenMV";
 
 const SettingScreen = () => {
-  const { canvasSizeValue, modalOpen, setCanvasSize, setCanvasSizeValue } =
-    SettingScreenMV();
+  const {
+    canvasSizeValue,
+    modalOpen,
+    setModalOpen,
+    setCanvasSize,
+    setCanvasSizeValue,
+  } = SettingScreenMV();
   return (
     <>
+      <button className={style.settingIcon} onClick={() => setModalOpen(true)}>
+        ⚙
+      </button>
       {modalOpen && (
         <div className={style.openingContainer}>
-          <div className={style.openingBackground}></div>
+          <div
+            aria-label="toolbar"
+            className={style.openingBackground}
+            onPointerDown={() => setModalOpen(false)}
+          ></div>
           <div className={style.openingModal}>
             <div className={style.inputContainer}>
               <h2>Canvas Size:</h2>
