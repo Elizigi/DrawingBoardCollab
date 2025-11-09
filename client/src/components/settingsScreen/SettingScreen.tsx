@@ -1,5 +1,3 @@
-import { canvasSize } from "../../helpers/canvasHelpers";
-import { onlineStatus } from "../../Main";
 import style from "./SettingScreen.module.scss";
 import SettingScreenMV from "./SettingScreenMV";
 
@@ -7,8 +5,11 @@ const SettingScreen = () => {
   const {
     canvasSizeValue,
     modalOpen,
+    maxUsersInRoom,
+    noChange,
+    setMaxUsersInRoom,
     setModalOpen,
-    setCanvasSize,
+    changSettings,
     setCanvasSizeValue,
   } = SettingScreenMV();
   return (
@@ -21,10 +22,7 @@ const SettingScreen = () => {
           <div
             aria-label="toolbar"
             className={style.openingBackground}
-            onPointerDown={() => {
-              setModalOpen(false);
-              setCanvasSizeValue(canvasSize);
-            }}
+            onPointerDown={noChange}
           ></div>
           <div className={style.openingModal}>
             <div className={style.form}>
@@ -59,12 +57,18 @@ const SettingScreen = () => {
               </div>
               <h2>Connected Users limit:</h2>
               <div className={style.inputContainer}>
-                <input type="number" max={20} min={2} value={onlineStatus.maxUsers} />
+                <input
+                  type="number"
+                  max={20}
+                  min={2}
+                  value={maxUsersInRoom}
+                  onChange={(e) => setMaxUsersInRoom(Number(e.target.value))}
+                />
                 <h2>users</h2>
               </div>
             </div>
 
-            <button onClick={setCanvasSize}>OKAY!</button>
+            <button onClick={changSettings}>OKAY!</button>
           </div>
         </div>
       )}

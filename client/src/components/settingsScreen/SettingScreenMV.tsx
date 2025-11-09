@@ -1,32 +1,41 @@
 import { useState } from "react";
 import { canvasSize, resizeAllCanvases } from "../../helpers/canvasHelpers";
+import { onlineStatus } from "../../Main";
 
 const SettingScreenMV = () => {
-  const [canvasSizeValue, setCanvasSizeValue] = useState({
-    height: canvasSize.height,
-    width: canvasSize.width,
-  });
+  const [canvasSizeValue, setCanvasSizeValue] = useState(canvasSize);
+  const [maxUsersInRoom, setMaxUsersInRoom] = useState(onlineStatus.maxUsers);
   const [modalOpen, setModalOpen] = useState(false);
-  const setCanvasSize = () => {
+  const changSettings = () => {
     if (
-      canvasSize.height === canvasSizeValue.height &&
-      canvasSize.width === canvasSizeValue.width
+      canvasSize.height !== canvasSizeValue.height ||
+      canvasSize.width !== canvasSizeValue.width
     ) {
+      canvasSize.height = canvasSizeValue.height;
+      canvasSize.width = canvasSizeValue.width;
       setModalOpen(false);
-      return;
+      resizeAllCanvases(canvasSizeValue.width, canvasSizeValue.height);
     }
-
-    canvasSize.height = canvasSizeValue.height;
-    canvasSize.width = canvasSizeValue.width;
+    if (maxUsersInRoom !== onlineStatus.maxUsers) {
+      onlineStatus.maxUsers = maxUsersInRoom;
+    }
     setModalOpen(false);
-    resizeAllCanvases(canvasSizeValue.width, canvasSizeValue.height);
+  };
+
+  const noChange = () => {
+    setModalOpen(false);
+    setCanvasSizeValue(canvasSize);
+    setMaxUsersInRoom(onlineStatus.maxUsers);
   };
 
   return {
     canvasSizeValue,
     modalOpen,
+    maxUsersInRoom,
+    noChange,
+    setMaxUsersInRoom,
     setModalOpen,
-    setCanvasSize,
+    changSettings,
     setCanvasSizeValue,
   };
 };
