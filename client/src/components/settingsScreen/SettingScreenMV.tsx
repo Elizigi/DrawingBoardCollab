@@ -1,20 +1,34 @@
 import { useState } from "react";
 import { canvasSize, resizeAllCanvases } from "../../helpers/canvasHelpers";
 
-const OpeningScreenMV = () => {
+const SettingScreenMV = () => {
   const [canvasSizeValue, setCanvasSizeValue] = useState({
     height: canvasSize.height,
     width: canvasSize.width,
   });
-  const [modalOpen, setModalOpen] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
   const setCanvasSize = () => {
+    if (
+      canvasSize.height === canvasSizeValue.height &&
+      canvasSize.width === canvasSizeValue.width
+    ) {
+      setModalOpen(false);
+      return;
+    }
+
     canvasSize.height = canvasSizeValue.height;
     canvasSize.width = canvasSizeValue.width;
     setModalOpen(false);
     resizeAllCanvases(canvasSizeValue.width, canvasSizeValue.height);
   };
 
-  return { canvasSizeValue, modalOpen, setCanvasSize, setCanvasSizeValue };
+  return {
+    canvasSizeValue,
+    modalOpen,
+    setModalOpen,
+    setCanvasSize,
+    setCanvasSizeValue,
+  };
 };
 
-export default OpeningScreenMV;
+export default SettingScreenMV;
