@@ -147,7 +147,7 @@ io.on("connection", (socket) => {
       .emit("user-joined", { name, guestId: socket.id });
   });
 
-  socket.on("new-layer", ({ layerId, layerName, imageDataUrl  }) => {
+  socket.on("new-layer", ({ layerId, layerName, imageDataUrl }) => {
     if (!layerId || typeof layerId !== "string") return;
     if (!layerName || typeof layerName !== "string") return;
     if (layerName.length > 50) return;
@@ -156,7 +156,9 @@ io.on("connection", (socket) => {
     if (!room?.has(socket.id)) {
       return socket.emit("error", "Not in room");
     }
-    socket.broadcast.to(roomId).emit("add-layer", { layerId, layerName,imageDataUrl  });
+    socket.broadcast
+      .to(roomId)
+      .emit("add-layer", { layerId, layerName, imageDataUrl });
   });
   socket.on("send-name", ({ name, userId, guestId }) => {
     console.log("name Sent:", name, userId);
@@ -174,7 +176,7 @@ io.on("connection", (socket) => {
     io.to(to).emit("request-state", { from: socket.id });
   });
 
-  socket.on("send-state", ({ to, strokes, layers,canvasSize }) => {
+  socket.on("send-state", ({ to, strokes, layers, canvasSize }) => {
     if (socket.id === to) return;
     const roomId = socket.data.roomId;
     const room = io.sockets.adapter.rooms.get(roomId);
@@ -182,10 +184,25 @@ io.on("connection", (socket) => {
       return socket.emit("error", "Not in room");
     }
     if (to === "all") {
-      socket.broadcast.to(roomId).emit("init", { strokes, layers,canvasSize });
+      socket.broadcast.to(roomId).emit("init", { strokes, layers, canvasSize });
     } else {
-      io.to(to).emit("init", { strokes, layers,canvasSize });
+      io.to(to).emit("init", { strokes, layers, canvasSize });
     }
+  });
+  socket.on("new-size", (canvasSize) => {
+    const roomId = socket.data.roomId;
+    const room = io.sockets.adapter.rooms.get(roomId);
+    if (!room?.has(socket.id)) {
+      return socket.emit("error", "Not in room");
+    }
+    const hostId = roomsMap.get(roomId);
+
+    if (socket.id !== hostId) {
+      return io
+        .to(socket.id)
+        .emit("no-permission", "Only the host can change canvas size.");
+    }
+    socket.broadcast.to(roomId).emit("canvas-size", canvasSize);
   });
 
   socket.on("remove-user", ({ guestId }) => {
