@@ -1,9 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useBrushStore } from "../../zustand/useBrushStore";
 import { socket } from "../../Main";
+import { createLayerCanvas, redrawLayer } from "../../helpers/drawingHelpers";
+import { layersCanvasMap } from "../../helpers/canvasHelpers";
 type LayerPayload = {
   layerId: string;
   layerName: string;
+  imageDataUrl: string;
 };
 
 const LayerContainerVM = () => {
@@ -11,6 +14,7 @@ const LayerContainerVM = () => {
 
   const addLayer = useBrushStore((state) => state.addLayer);
   const removeLayer = useBrushStore((state) => state.removeLayer);
+  const setLayerImage = useBrushStore((state) => state.setLayerImage);
 
   const activeLayerId = useBrushStore((state) => state.activeLayerId);
 
@@ -33,8 +37,25 @@ const LayerContainerVM = () => {
   const lastPosition = useRef({ x: 0, y: 0 });
   const animationFrame = useRef<null | number>(null);
 
-  const addComingLayer = ({ layerId, layerName }: LayerPayload) => {
+  const addComingLayer = ({
+    layerId,
+    layerName,
+    imageDataUrl,
+  }: LayerPayload) => {
     addLayer(layerName, layerId);
+    createLayerCanvas(layerId);
+    setLayerImage(layerId, imageDataUrl);
+    if (imageDataUrl) {
+      const img = new Image();
+      img.src = imageDataUrl;
+      img.onload = () => {
+        const entry = layersCanvasMap[layerId];
+        if (entry) {
+          entry.image = img;
+          redrawLayer(layerId);
+        }
+      };
+    }
   };
   const removingLayer = ({ layerId }: { layerId: string }) => {
     removeLayer(layerId);
