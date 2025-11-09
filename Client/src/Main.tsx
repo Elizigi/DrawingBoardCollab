@@ -155,7 +155,18 @@ function main() {
   socket.on("remove-stroke", ({ deleteStroke }) => {
     useBrushStore.getState().removeStroke(deleteStroke);
   });
+  socket.on("canvas-size", (data) => {
+    if (!data) return;
+    canvasSize.height = data.height;
+    canvasSize.width = data.width;
+    resizeAllCanvases(canvasSize.width, canvasSize.height);
+  });
+  socket.on("user-updated", (data) => {
+    if (!data) return;
+    const { setMaxUsers } = useOnlineStatus.getState();
 
+    setMaxUsers(data);
+  });
   socket.on("init", (data) => {
     if (!data) return;
     const { strokes, layers, canvasSize: newCanvasSize } = data;

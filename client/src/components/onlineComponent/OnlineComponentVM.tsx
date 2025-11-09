@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {  socket } from "../../Main";
+import { socket } from "../../Main";
 import { EventTypes, useBrushStore } from "../../zustand/useBrushStore";
 import { useOnlineStatus } from "../../zustand/useOnlineStatus";
 
@@ -26,7 +26,7 @@ const OnlineComponentVM = ({
 }: ConnectionParams) => {
   const [myName, setMyName] = useState("");
   const addEvent = useBrushStore((state) => state.addEvent);
-    const {setInRoom,setIsAdmin } = useOnlineStatus.getState();
+  const { setInRoom, setIsAdmin, maxUsers } = useOnlineStatus.getState();
 
   const handleModalOpen = () => {
     setOnlineWindowOpen(false);
@@ -47,7 +47,10 @@ const OnlineComponentVM = ({
   const handleSubmit = () => {
     if (myName.trim().length < 2) return setError("Name too short");
     if (isHost) {
-      socket.emit("create-room", { name: myName });
+      socket.emit("create-room", {
+        name: myName,
+        userLimit: maxUsers === 20 ? undefined : maxUsers,
+      });
       return;
     }
     if (!roomId) return;

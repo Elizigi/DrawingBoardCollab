@@ -1,5 +1,7 @@
 import { create } from "zustand";
 
+export const defaultMaxUsers = 20;
+
 export interface OnlineStatusState {
   inRoom: boolean;
   isAdmin: boolean;
@@ -14,7 +16,7 @@ export const useOnlineStatus = create<OnlineStatusState>((set) => ({
   inRoom: false,
   isAdmin: false,
   isOnline: false,
-  maxUsers: 20,
+  maxUsers: defaultMaxUsers,
   setOnline: (val) => set({ isOnline: val }),
   setInRoom: (val) => set({ inRoom: val }),
   setIsAdmin: (val) => set({ isAdmin: val }),
