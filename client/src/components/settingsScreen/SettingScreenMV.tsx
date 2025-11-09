@@ -8,6 +8,14 @@ const SettingScreenMV = () => {
   });
   const [modalOpen, setModalOpen] = useState(false);
   const setCanvasSize = () => {
+    if (
+      canvasSize.height === canvasSizeValue.height &&
+      canvasSize.width === canvasSizeValue.width
+    ) {
+      setModalOpen(false);
+      return;
+    }
+
     canvasSize.height = canvasSizeValue.height;
     canvasSize.width = canvasSizeValue.width;
     setModalOpen(false);
