@@ -14,7 +14,7 @@ const ContextMenu = () => {
         >
           <button onClick={saveAsPng}>💾Save As PNG</button>
           <button onClick={saveAsJson}>📃Save As JSON</button>
-          <button
+        { onlineStatus.inRoom&&!onlineStatus.isAdmin? "":<button
             onClick={() => {
               if (onlineStatus.inRoom && !onlineStatus.isAdmin) return;
               const input = document.createElement("input");
@@ -29,7 +29,7 @@ const ContextMenu = () => {
             }}
           >
            💻Load JSON / Image
-          </button>
+          </button>}
         </div>
       )}
     </>

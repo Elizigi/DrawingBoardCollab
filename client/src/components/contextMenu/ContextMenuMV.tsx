@@ -6,12 +6,22 @@ import {
   redrawAllLayers,
   redrawLayer,
 } from "../../helpers/drawingHelpers";
+import { onlineStatus, socket } from "../../Main";
 
 const ContextMenuMV = () => {
   const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
   const [menuOpen, setMenuOpen] = useState(false);
   const isMouseDown = useBrushStore((s) => s.isMouseDown);
+  const sendData = () => {
+    const store = useBrushStore.getState();
 
+    if (onlineStatus.inRoom && onlineStatus.isAdmin)
+      socket.emit("send-state", {
+        to: "all",
+        strokes: store.strokes,
+        layers: store.layers,
+      });
+  };
   const saveAsJson = () => {
     const state = useBrushStore.getState();
     const data = {
@@ -93,6 +103,7 @@ const ContextMenuMV = () => {
 
         redrawAllLayers();
         setMenuOpen(false);
+        sendData();
         return;
       }
 

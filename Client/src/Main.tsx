@@ -159,6 +159,7 @@ function main() {
   });
 
   socket.on("init", (data) => {
+    console.log("aaaaaaaaaa", data);
     if (!data) return;
     const { strokes, layers } = data;
 
@@ -175,6 +176,7 @@ function main() {
     if (strokes) {
       const allIncomingStrokes: Stroke[] = [];
       loopOverLayers(strokes, allIncomingStrokes);
+      console.log("after loop:", allIncomingStrokes.length);
       useBrushStore.getState().setStrokes(allIncomingStrokes);
       redrawAllLayers();
     }
