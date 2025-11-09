@@ -15,13 +15,15 @@ const io = new SocketIOServer(server, {
 
 app.use(cors());
 
+const maxUserLimit=20;
+const roomLimitsMap = new Map<string, number>();
 const roomsMap = new Map<string, string>();
 const rateLimitMap = new Map();
 io.on("connection", (socket) => {
   console.log("User connected to server:", socket.id);
   socket.emit("user-id", socket.id);
 
-  socket.on("create-room", ({ name }) => {
+  socket.on("create-room", ({ name, userLimit }) => {
     if (!name || typeof name !== "string" || name.trim().length === 0) {
       return socket.emit("error", "Invalid name");
     }
@@ -31,7 +33,17 @@ io.on("connection", (socket) => {
     const sanitizedName = name.trim().replaceAll("<", "").replaceAll(">", "");
     const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
     socket.join(roomId);
+
+    if (userLimit !== undefined) {
+      roomLimitsMap.set(roomId, userLimit);
+    }
+
     roomsMap.set(roomId, socket.id);
+    if (userLimit !== undefined) {
+      if (typeof userLimit !== "number" || userLimit < 2 || userLimit > maxUserLimit) {
+        return socket.emit("error", "User limit must be between 2 and 20");
+      }
+    }
     socket.data.isHost = true;
     socket.data.name = sanitizedName;
     socket.data.roomId = roomId;
@@ -130,9 +142,11 @@ io.on("connection", (socket) => {
       return;
     }
     const room = io.sockets.adapter.rooms.get(roomId);
-    if (room && room.size >= 20) {
+    const userLimit = roomLimitsMap.get(roomId) || maxUserLimit;
+    if (room && room.size >= userLimit) {
       return socket.emit("error", { reason: "Room is full" });
     }
+
     socket.join(roomId);
     socket.data.roomId = roomId;
     socket.data.name = name;
@@ -145,6 +159,30 @@ io.on("connection", (socket) => {
     socket.broadcast
       .to(roomId)
       .emit("user-joined", { name, guestId: socket.id });
+  });
+  socket.on("update-limit", ( newLimit ) => {
+    const roomId = socket.data.roomId;
+    const hostId = roomsMap.get(roomId);
+console.log("updating limit",newLimit)
+    if (socket.id !== hostId) {
+      return io
+        .to(socket.id)
+        .emit("no-permission", "Only the host can change user limit.");
+    }
+
+    if (typeof newLimit !== "number" || newLimit < 2 || newLimit > maxUserLimit) {
+      return socket.emit("error", "User limit must be between 2 and 20");
+    }
+
+    const room = io.sockets.adapter.rooms.get(roomId);
+    const currentUsers = room ? room.size : 0;
+
+    if (newLimit < currentUsers) {
+      return socket.emit("error", "Cannot set limit below current user count");
+    }
+
+    roomLimitsMap.set(roomId, newLimit);
+    io.to(roomId).emit("user-updated", { userLimit: newLimit });
   });
 
   socket.on("new-layer", ({ layerId, layerName, imageDataUrl }) => {

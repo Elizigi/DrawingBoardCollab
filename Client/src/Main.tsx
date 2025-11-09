@@ -161,6 +161,12 @@ function main() {
     canvasSize.width = data.width;
     resizeAllCanvases(canvasSize.width, canvasSize.height);
   });
+  socket.on("user-updated", (data) => {
+    if (!data) return;
+    const { setMaxUsers } = useOnlineStatus.getState();
+
+    setMaxUsers(data);
+  });
   socket.on("init", (data) => {
     if (!data) return;
     const { strokes, layers, canvasSize: newCanvasSize } = data;

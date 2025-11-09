@@ -32,6 +32,10 @@ const SettingScreenMV = () => {
     }
     if (maxUsersInRoom !== maxUsers) {
       setMaxUsers(maxUsersInRoom);
+      if (inRoom && isAdmin) {
+        const newLimit = maxUsersInRoom;
+        socket.emit("update-limit", newLimit);
+      }
     }
     setModalOpen(false);
   };
