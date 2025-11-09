@@ -11,6 +11,7 @@ const OpeningScreen = () => {
           <div className={style.openingBackground}></div>
           <div className={style.openingModal}>
             <div className={style.inputContainer}>
+              <h2>Canvas Size:</h2>
               <input
                 onChange={(e) =>
                   setCanvasSizeValue({
@@ -22,6 +23,7 @@ const OpeningScreen = () => {
                 value={canvasSizeValue.height}
                 placeholder={`${canvasSizeValue.height}`}
               />
+              <h2>px X </h2>
               <input
                 type="number"
                 onChange={(e) =>
@@ -33,6 +35,7 @@ const OpeningScreen = () => {
                 value={canvasSizeValue.width}
                 placeholder={`${canvasSizeValue.width}`}
               />
+              <h2>px</h2>
             </div>
             <button onClick={setCanvasSize}>OKAY!</button>
           </div>
