@@ -52,8 +52,8 @@ A real-time collaborative drawing application that allows multiple users to draw
 
 1. **Clone the repository**
 ```bash
-git clone <repository-url>
-cd collaborative-drawing-board
+git clone https://github.com/Elizigi/DrawingBoardCollab.git
+cd DrawingBoardCollab
 ```
 
 2. **Install backend dependencies**
@@ -62,9 +62,9 @@ cd backend
 npm install
 ```
 
-3. **Install frontend dependencies**
+3. **Install client dependencies**
 ```bash
-cd ../frontend
+cd ../client
 npm install
 ```
 
@@ -79,7 +79,7 @@ The server will start on `http://localhost:3000`
 
 2. **Start the frontend development server**
 ```bash
-cd frontend
+cd client
 npm run dev
 ```
 The application will be available at `http://localhost:5173` (or your configured port)
@@ -124,7 +124,7 @@ As the room creator, you can:
 .
 ├── backend/
 │   └── server.ts          # Express + Socket.IO server
-├── frontend/
+├── client/
 │   ├── src/
 │   │   ├── components/    # React components
 │   │   ├── helpers/       # Canvas and drawing utilities
