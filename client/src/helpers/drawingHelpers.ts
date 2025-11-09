@@ -325,20 +325,30 @@ export function findLastLocalStroke() {
 
   return strokes[lastLocalStrokeIndex];
 }
-
 export function loopOverLayers(
-  strokes: Record<string, Stroke[]>,
+  strokes: Record<string, Stroke[]> | Stroke[],
   allIncomingStrokes: Stroke[]
 ) {
+  if (Array.isArray(strokes)) {
+    for (const stroke of strokes) {
+      allIncomingStrokes.push({
+        ...stroke,
+        final: true,
+        isRemote: true,
+      });
+    }
+    return;
+  }
+
   for (const [layerId, strokeArray] of Object.entries(strokes)) {
     if (!layersCanvasMap[layerId]) createLayerCanvas(layerId);
     if (Array.isArray(strokeArray)) {
       for (const stroke of strokeArray) {
-        allIncomingStrokes.push({ 
-          ...stroke, 
-          final: true, 
+        allIncomingStrokes.push({
+          ...stroke,
+          final: true,
           isRemote: true,
-          layerId: layerId 
+          layerId,
         });
       }
     }

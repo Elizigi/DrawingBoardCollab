@@ -11,6 +11,7 @@ import {
   STROKE_THROTTLE,
   getTopInputCanvas,
   getRemoteTempCanvas,
+  getLocalTempCanvas,
 } from "./helpers/canvasHelpers.ts";
 import {
   fillBackgroundWhite,
@@ -23,7 +24,7 @@ import {
   redrawLayer,
   refreshState,
   loopOverLayers,
-  restoreLayerImage
+  restoreLayerImage,
 } from "./helpers/drawingHelpers.ts";
 import { addListeners } from "./helpers/eventListenersHelpers.ts";
 
@@ -61,6 +62,9 @@ function main() {
       if (!newLayer) return;
       createLayerCanvas(newLayer.id);
     }
+    const activeLayerIndex = state.layers.findIndex(
+      (l) => l.id === state.activeLayerId
+    );
     refreshState(state, prev);
     for (let i = 0; i < state.layers.length; i++) {
       const layer = state.layers[i];
@@ -70,10 +74,20 @@ function main() {
 
       entry.canvas.style.display = layer.visible ? "block" : "none";
       entry.canvas.style.opacity = (layer as any).opacity?.toString() ?? "1";
-      entry.canvas.style.zIndex = `${i + 1}`;
+      entry.canvas.style.zIndex = `${(i + 1) * 10}`;
       if (layer.visible !== prevLayer.visible) {
         redrawLayer(layer.id);
       }
+    }
+    const localTemp = getLocalTempCanvas();
+    const remoteTemp = getRemoteTempCanvas();
+
+    if (localTemp && activeLayerIndex !== -1) {
+      localTemp.style.zIndex = `${(activeLayerIndex + 1) * 10 + 2}`;
+    }
+
+    if (remoteTemp && activeLayerIndex !== -1) {
+      remoteTemp.style.zIndex = `${(activeLayerIndex + 1) * 10 + 1}`;
     }
 
     if (state.strokes !== prev.strokes) {
@@ -84,7 +98,7 @@ function main() {
   if (topInputCanvas) {
     topInputCanvas.addEventListener("mousedown", (e) => {
       if (e.button !== 0) return;
-      
+
       const state = useBrushStore.getState();
       state.setMouseDown(true);
       const { x, y } = getMousePosPercentOnElement(e, topInputCanvas);
@@ -95,7 +109,7 @@ function main() {
     });
   }
 
-  addListeners(topInputCanvas,rotElement);
+  addListeners(topInputCanvas, rotElement);
 
   (function tick() {
     const now = Date.now();
@@ -146,24 +160,24 @@ function main() {
 
   socket.on("init", (data) => {
     if (!data) return;
-  const { strokes, layers } = data;
+    const { strokes, layers } = data;
 
-  if (layers && Array.isArray(layers)) {
-    useBrushStore.getState().setLayers(layers);
-    for (const layer of layers) {
-      if (!layersCanvasMap[layer.id]) createLayerCanvas(layer.id);
-      restoreLayerImage(layer);
+    if (layers && Array.isArray(layers)) {
+      useBrushStore.getState().setLayers(layers);
+      for (const layer of layers) {
+        if (!layersCanvasMap[layer.id]) createLayerCanvas(layer.id);
+        restoreLayerImage(layer);
+      }
     }
-  }
 
-  fillBackgroundWhite();
+    fillBackgroundWhite();
 
-  if (strokes) {
-    const allIncomingStrokes: Stroke[] = [];
-    loopOverLayers(strokes, allIncomingStrokes);
-    useBrushStore.getState().setStrokes(allIncomingStrokes);
-    redrawAllLayers();
-  }
+    if (strokes) {
+      const allIncomingStrokes: Stroke[] = [];
+      loopOverLayers(strokes, allIncomingStrokes);
+      useBrushStore.getState().setStrokes(allIncomingStrokes);
+      redrawAllLayers();
+    }
   });
 
   socket.on("draw-progress", (stroke: any) => {
