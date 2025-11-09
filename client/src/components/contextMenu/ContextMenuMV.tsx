@@ -153,10 +153,18 @@ const ContextMenuMV = () => {
             tempCtx.drawImage(img, 0, 0, width, height);
             const imageDataUrl = tempCanvas.toDataURL("image/jpeg", 0.8);
             store.setLayerImage(layerId, imageDataUrl);
+            if (onlineStatus.inRoom && onlineStatus.isAdmin) {
+              socket.emit("new-layer", {
+                layerId,
+                layerName: "Imported Image",
+                imageDataUrl,
+              });
+            }
           }
 
           redrawLayer(layerId);
           URL.revokeObjectURL(img.src);
+
           setMenuOpen(false);
         };
         return;

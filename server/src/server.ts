@@ -147,7 +147,7 @@ io.on("connection", (socket) => {
       .emit("user-joined", { name, guestId: socket.id });
   });
 
-  socket.on("new-layer", ({ layerId, layerName, img }) => {
+  socket.on("new-layer", ({ layerId, layerName, imageDataUrl  }) => {
     if (!layerId || typeof layerId !== "string") return;
     if (!layerName || typeof layerName !== "string") return;
     if (layerName.length > 50) return;
@@ -156,7 +156,7 @@ io.on("connection", (socket) => {
     if (!room?.has(socket.id)) {
       return socket.emit("error", "Not in room");
     }
-    socket.broadcast.to(roomId).emit("add-layer", { layerId, layerName });
+    socket.broadcast.to(roomId).emit("add-layer", { layerId, layerName,imageDataUrl  });
   });
   socket.on("send-name", ({ name, userId, guestId }) => {
     console.log("name Sent:", name, userId);
