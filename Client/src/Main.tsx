@@ -50,6 +50,7 @@ export const onlineStatus = {
   isOnline: false,
   inRoom: false,
   isAdmin: false,
+  maxUsers:20,
 };
 
 function main() {
