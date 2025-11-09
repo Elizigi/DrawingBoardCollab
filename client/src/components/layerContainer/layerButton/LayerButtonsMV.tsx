@@ -251,7 +251,6 @@ const LayerButtonsMV = () => {
     )
       return;
     const temp = [...freshLayers];
-    console.log({ draggedLayer, insertAt, temp, allLayers });
 
     const [removed] = temp.splice(draggedLayer, 1);
     if (!removed) return;
