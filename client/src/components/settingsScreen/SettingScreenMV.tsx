@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { canvasSize, resizeAllCanvases } from "../../helpers/canvasHelpers";
 
-const OpeningScreenMV = () => {
+const SettingScreenMV = () => {
   const [canvasSizeValue, setCanvasSizeValue] = useState({
     height: canvasSize.height,
     width: canvasSize.width,
@@ -17,4 +17,4 @@ const OpeningScreenMV = () => {
   return { canvasSizeValue, modalOpen, setCanvasSize, setCanvasSizeValue };
 };
 
-export default OpeningScreenMV;
+export default SettingScreenMV;

@@ -1,9 +1,9 @@
-import style from "./OpeningScreen.module.scss";
-import OpeningScreenMV from "./OpeningScreenMV";
+import style from "./SettingScreen.module.scss";
+import SettingScreenMV from "./SettingScreenMV";
 
-const OpeningScreen = () => {
+const SettingScreen = () => {
   const { canvasSizeValue, modalOpen, setCanvasSize, setCanvasSizeValue } =
-    OpeningScreenMV();
+    SettingScreenMV();
   return (
     <>
       {modalOpen && (
@@ -45,4 +45,4 @@ const OpeningScreen = () => {
   );
 };
 
-export default OpeningScreen;
+export default SettingScreen;
