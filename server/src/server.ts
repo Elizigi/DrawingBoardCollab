@@ -174,7 +174,7 @@ io.on("connection", (socket) => {
     io.to(to).emit("request-state", { from: socket.id });
   });
 
-  socket.on("send-state", ({ to, strokes, layers }) => {
+  socket.on("send-state", ({ to, strokes, layers,canvasSize }) => {
     if (socket.id === to) return;
     const roomId = socket.data.roomId;
     const room = io.sockets.adapter.rooms.get(roomId);
@@ -182,9 +182,9 @@ io.on("connection", (socket) => {
       return socket.emit("error", "Not in room");
     }
     if (to === "all") {
-      socket.broadcast.to(roomId).emit("init", { strokes, layers });
+      socket.broadcast.to(roomId).emit("init", { strokes, layers,canvasSize });
     } else {
-      io.to(to).emit("init", { strokes, layers });
+      io.to(to).emit("init", { strokes, layers,canvasSize });
     }
   });
 

@@ -12,6 +12,8 @@ import {
   getTopInputCanvas,
   getRemoteTempCanvas,
   getLocalTempCanvas,
+  canvasSize,
+  resizeAllCanvases,
 } from "./helpers/canvasHelpers.ts";
 import {
   fillBackgroundWhite,
@@ -152,6 +154,7 @@ function main() {
       to: from,
       strokes: strokesByLayer,
       layers: layers,
+      canvasSize: canvasSize,
     });
   });
   socket.on("remove-stroke", ({ deleteStroke }) => {
@@ -160,7 +163,7 @@ function main() {
 
   socket.on("init", (data) => {
     if (!data) return;
-    const { strokes, layers } = data;
+    const { strokes, layers, canvasSize: newCanvasSize } = data;
 
     if (layers && Array.isArray(layers)) {
       useBrushStore.getState().setLayers(layers);
@@ -169,6 +172,9 @@ function main() {
         restoreLayerImage(layer);
       }
     }
+    canvasSize.height = newCanvasSize.height;
+    canvasSize.width = newCanvasSize.width;
+    resizeAllCanvases(newCanvasSize.width, newCanvasSize.height);
 
     fillBackgroundWhite();
 

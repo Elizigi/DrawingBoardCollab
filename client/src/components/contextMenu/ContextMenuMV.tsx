@@ -20,6 +20,7 @@ const ContextMenuMV = () => {
         to: "all",
         strokes: store.strokes,
         layers: store.layers,
+        canvasSize:canvasSize
       });
   };
   const saveAsJson = () => {
