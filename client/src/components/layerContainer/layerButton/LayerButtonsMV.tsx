@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useBrushStore } from "../../../zustand/useBrushStore";
-import { onlineStatus, socket } from "../../../Main";
+import { socket } from "../../../Main";
+import { useOnlineStatus } from "../../../zustand/useOnlineStatus";
 
 type LayerPosition = {
   id: string;
@@ -16,6 +17,7 @@ const LayerButtonsMV = () => {
   const allLayers = useBrushStore((state) => state.layers);
   const setLayers = useBrushStore((state) => state.setLayers);
   const renameLayer = useBrushStore((state) => state.renameLayer);
+  const { inRoom, isAdmin } = useOnlineStatus.getState();
 
   const [isLayerDragged, setIsLayerDragged] = useState(false);
   const [draggedLayer, setDraggedLayer] = useState<null | number>(null);
@@ -57,7 +59,7 @@ const LayerButtonsMV = () => {
     if (newName.trim().length < 2 || oldName === newName) return;
     renameLayer(layerId, newName);
 
-    if (onlineStatus.inRoom && onlineStatus.isAdmin) {
+    if (inRoom && isAdmin) {
       socket.emit("renamed-layer", layerId, newName);
     }
   };
@@ -68,7 +70,7 @@ const LayerButtonsMV = () => {
     const freshLayers = useBrushStore.getState().layers;
 
     if (!layerContainerRef.current || freshLayers.length <= 1) return;
-    if (onlineStatus.inRoom && !onlineStatus.isAdmin) return;
+    if (inRoom && !isAdmin) return;
     dragStartY.current = e.clientY;
     const layersContainerBounding =
       layerContainerRef.current.getBoundingClientRect();
@@ -134,7 +136,7 @@ const LayerButtonsMV = () => {
     setDraggedLayer(null);
     setLayerPotentialPosition(-1);
     setCanDrag(false);
-    if (onlineStatus.isAdmin) {
+    if (isAdmin) {
       socket.emit("layer-reordered", draggedLayer, insertAt);
     }
   };

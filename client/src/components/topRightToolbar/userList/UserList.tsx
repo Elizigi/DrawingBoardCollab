@@ -1,7 +1,8 @@
 import { FC } from "react";
 import { ConnectedUser } from "../TopRightToolbarVM";
 import styles from "./UserList.module.scss";
-import { onlineStatus, socket } from "../../../Main";
+import { socket } from "../../../Main";
+import { useOnlineStatus } from "../../../zustand/useOnlineStatus";
 interface UserListProps {
   connectedUsers: ConnectedUser[];
   menuOpen: boolean;
@@ -10,6 +11,7 @@ const UserList: FC<UserListProps> = ({ connectedUsers, menuOpen }) => {
   const removeUser = (guestId: string) => {
     socket.emit("remove-user", { guestId });
   };
+  const { isAdmin } = useOnlineStatus.getState();
 
   return (
     <>
@@ -36,7 +38,7 @@ const UserList: FC<UserListProps> = ({ connectedUsers, menuOpen }) => {
                   style={{ backgroundColor: user.color }}
                 ></div>
                 <h2 className={styles.userName}> {user.name}</h2>
-                {onlineStatus.isAdmin && menuOpen && (
+                {isAdmin && menuOpen && (
                   <button
                     className={styles.removeUser}
                     onClick={() => removeUser(user.guestId)}

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { onlineStatus, socket } from "../../Main";
+import {  socket } from "../../Main";
 import { EventTypes, useBrushStore } from "../../zustand/useBrushStore";
+import { useOnlineStatus } from "../../zustand/useOnlineStatus";
 
 interface ConnectionParams {
   isHost: boolean;
@@ -25,6 +26,7 @@ const OnlineComponentVM = ({
 }: ConnectionParams) => {
   const [myName, setMyName] = useState("");
   const addEvent = useBrushStore((state) => state.addEvent);
+    const {setInRoom,setIsAdmin } = useOnlineStatus.getState();
 
   const handleModalOpen = () => {
     setOnlineWindowOpen(false);
@@ -55,8 +57,8 @@ const OnlineComponentVM = ({
   const handleRoomCreated = (roomId: string) => {
     console.log("Room ID to share:", roomId);
     setRoomId(roomId);
-    onlineStatus.inRoom = true;
-    onlineStatus.isAdmin = true;
+    setInRoom(true);
+    setIsAdmin(true);
     addEvent(EventTypes.roomCreatedEvent, "");
     handleModalOpen();
 

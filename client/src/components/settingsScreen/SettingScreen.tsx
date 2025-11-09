@@ -5,10 +5,16 @@ const SettingScreen = () => {
   const {
     canvasSizeValue,
     modalOpen,
+    maxUsersInRoom,
+    shouldSeeIcon,
+    noChange,
+    setMaxUsersInRoom,
     setModalOpen,
-    setCanvasSize,
+    changSettings,
     setCanvasSizeValue,
   } = SettingScreenMV();
+  if (!shouldSeeIcon) return null;
+
   return (
     <>
       <button className={style.settingIcon} onClick={() => setModalOpen(true)}>
@@ -19,7 +25,7 @@ const SettingScreen = () => {
           <div
             aria-label="toolbar"
             className={style.openingBackground}
-            onPointerDown={() => setModalOpen(false)}
+            onPointerDown={noChange}
           ></div>
           <div className={style.openingModal}>
             <div className={style.form}>
@@ -52,8 +58,20 @@ const SettingScreen = () => {
                 />
                 <h2>px</h2>
               </div>
+              <h2>Connected Users limit:</h2>
+              <div className={style.inputContainer}>
+                <input
+                  type="number"
+                  max={20}
+                  min={2}
+                  value={maxUsersInRoom}
+                  onChange={(e) => setMaxUsersInRoom(Number(e.target.value))}
+                />
+                <h2>users</h2>
+              </div>
             </div>
-            <button onClick={setCanvasSize}>OKAY!</button>
+
+            <button onClick={changSettings}>OKAY!</button>
           </div>
         </div>
       )}

@@ -1,5 +1,6 @@
-import { canvasScale, onlineStatus, socket } from "../Main";
+import { canvasScale, socket } from "../Main";
 import { useBrushStore } from "../zustand/useBrushStore";
+import { useOnlineStatus } from "../zustand/useOnlineStatus";
 import {
   canvasSize,
   getCanvasContainer,
@@ -21,6 +22,8 @@ export function addListeners(
   topInputCanvas: HTMLCanvasElement,
   rotElement: HTMLDivElement
 ) {
+  const { inRoom } = useOnlineStatus.getState();
+
   document.addEventListener("mouseup", () => {
     useBrushStore.getState().setMouseDown(false);
     commitStroke();
@@ -29,7 +32,7 @@ export function addListeners(
   document.addEventListener("mousemove", (e) => {
     if (!topInputCanvas) return;
 
-    if (onlineStatus.inRoom)
+    if (inRoom)
       socket.emit("user-move", {
         position: getMousePosPercentOnElement(e, topInputCanvas),
       });
@@ -129,14 +132,14 @@ export function addListeners(
       if (!lastLocalStroke) return;
 
       useBrushStore.getState().removeStroke(lastLocalStroke);
-      if (onlineStatus.inRoom)
+      if (inRoom)
         socket.emit("delete-stroke", { deleteStroke: lastLocalStroke });
     } else if (e.code === allowedKeys.y && keysDown.ctrl) {
       const reAssignedStroke = findStrokeToReassign();
       if (!reAssignedStroke) return;
       useBrushStore.getState().reAssignStroke(reAssignedStroke.strokeId);
       useBrushStore.getState().addStroke(reAssignedStroke);
-      if (onlineStatus.inRoom)
+      if (inRoom)
         socket.emit("draw-progress", { ...reAssignedStroke });
     }
   });

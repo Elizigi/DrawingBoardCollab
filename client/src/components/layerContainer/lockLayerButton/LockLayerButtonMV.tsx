@@ -1,13 +1,15 @@
-import { onlineStatus, socket } from "../../../Main";
+import {  socket } from "../../../Main";
 import { useBrushStore } from "../../../zustand/useBrushStore";
+import { useOnlineStatus } from "../../../zustand/useOnlineStatus";
 
 const LockLayerButtonMV = () => {
   const toggleLockLayers = useBrushStore((state) => state.toggleLockLayer);
+    const { inRoom, isAdmin } = useOnlineStatus.getState();
 
   const toggleLockLayer = (layerId: string) => {
-    if (onlineStatus.inRoom && !onlineStatus.isAdmin) return;
+    if (inRoom && !isAdmin) return;
     toggleLockLayers(layerId);
-    if (onlineStatus.inRoom && onlineStatus.isAdmin)
+    if (inRoom && isAdmin)
       socket.emit("locked-layer", { layerId });
   };
   return { toggleLockLayer };

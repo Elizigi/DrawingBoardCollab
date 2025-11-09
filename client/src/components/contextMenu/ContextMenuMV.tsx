@@ -6,7 +6,8 @@ import {
   redrawAllLayers,
   redrawLayer,
 } from "../../helpers/drawingHelpers";
-import { onlineStatus, socket } from "../../Main";
+import { socket } from "../../Main";
+import { useOnlineStatus } from "../../zustand/useOnlineStatus";
 
 const ContextMenuMV = () => {
   const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
@@ -14,13 +15,14 @@ const ContextMenuMV = () => {
   const isMouseDown = useBrushStore((s) => s.isMouseDown);
   const sendData = () => {
     const store = useBrushStore.getState();
+    const { inRoom, isAdmin } = useOnlineStatus.getState();
 
-    if (onlineStatus.inRoom && onlineStatus.isAdmin)
+    if (inRoom && isAdmin)
       socket.emit("send-state", {
         to: "all",
         strokes: store.strokes,
         layers: store.layers,
-        canvasSize:canvasSize
+        canvasSize: canvasSize,
       });
   };
   const saveAsJson = () => {
@@ -74,6 +76,7 @@ const ContextMenuMV = () => {
   const loadImage = async (file: File) => {
     if (!file) return;
     const store = useBrushStore.getState();
+    const { inRoom, isAdmin } = useOnlineStatus.getState();
 
     try {
       if (file.type === "application/json") {
@@ -154,7 +157,8 @@ const ContextMenuMV = () => {
             tempCtx.drawImage(img, 0, 0, width, height);
             const imageDataUrl = tempCanvas.toDataURL("image/jpeg", 0.8);
             store.setLayerImage(layerId, imageDataUrl);
-            if (onlineStatus.inRoom && onlineStatus.isAdmin) {
+
+            if (inRoom && isAdmin) {
               socket.emit("new-layer", {
                 layerId,
                 layerName: "Imported Image",

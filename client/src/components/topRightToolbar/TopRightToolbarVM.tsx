@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { onlineStatus, socket } from "../../Main";
+import { socket } from "../../Main";
 import styles from "./TopRightToolbar.module.scss";
 import { EventTypes, useBrushStore } from "../../zustand/useBrushStore";
+import { useOnlineStatus } from "../../zustand/useOnlineStatus";
 
 export interface ConnectedUser {
   name: string;
@@ -21,6 +22,7 @@ const TopRightToolbarVM = () => {
   const [roomId, setRoomId] = useState("");
   const [hideCode, setHideCode] = useState(false);
   const [error, setError] = useState("");
+  const {  setOnline,setInRoom,setIsAdmin } = useOnlineStatus.getState();
 
   const isMouseDown = useBrushStore((s) => s.isMouseDown);
 
@@ -137,8 +139,8 @@ const TopRightToolbarVM = () => {
     setIsHost(false);
     setError("");
     setConnectedUsers([]);
-    onlineStatus.inRoom = false;
-    onlineStatus.isAdmin = false;
+    setInRoom(false);
+    setIsAdmin(false);
   };
 
   const handleOnline = () => {
@@ -147,7 +149,7 @@ const TopRightToolbarVM = () => {
     } else {
       socket.connect();
       setHasInteracted(true);
-      onlineStatus.isOnline = true;
+      setOnline(true);
     }
   };
   const handleLeaveRoom = () => {
@@ -156,7 +158,7 @@ const TopRightToolbarVM = () => {
 
   const handleJoinedRoom = ({ roomId }: { roomId: string }) => {
     setRoomId(roomId);
-    onlineStatus.inRoom = true;
+    setInRoom(true);
     addEvent(EventTypes.joinedEvent, "");
     console.log("joined:", roomId);
     document.dispatchEvent(new CustomEvent("clearCanvas"));
@@ -173,9 +175,9 @@ const TopRightToolbarVM = () => {
     setSpinnerStyle("");
     setError("");
     setConnectedUsers([]);
-    onlineStatus.isOnline = false;
-    onlineStatus.inRoom = false;
-    onlineStatus.isAdmin = false;
+    setIsAdmin(false);
+    setInRoom(false);
+    setOnline(false);
     console.log("Disconnected");
   };
 
