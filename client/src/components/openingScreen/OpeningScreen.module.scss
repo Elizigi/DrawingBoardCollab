@@ -1,0 +1,49 @@
+.openingContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100svh;
+  z-index: 999999999;
+  button {
+    bottom: 0;
+    margin-bottom: 20%;
+
+    z-index: 999999;
+
+    border: $border-color 3px solid;
+    background-color: $bg-light;
+    color: $text-color;
+    padding: 0.3rem;
+    text-align: center;
+    font-size: 1.5rem;
+    position: absolute;
+    left: 50%;
+    pointer-events: auto;
+    transform: translateX(-50%);
+    border-radius: 10px;
+    animation: moveToCenter 0.3s ease-in reverse;
+    cursor: pointer;
+  }
+}
+.openingBackground {
+  background-color: rgba(0, 0, 0, 0.392);
+  width: 100%;
+  height: 100%;
+  position: fixed;
+}
+.openingModal {
+  background-color: $bg-dark;
+  width: 40%;
+  height: 60%;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.inputContainer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+}
