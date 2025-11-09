@@ -1,5 +1,5 @@
 import { useBrushStore } from "../zustand/useBrushStore.ts";
-import { createLayerCanvas } from "./drawingHelpers.ts";
+import { createLayerCanvas, redrawAllLayers } from "./drawingHelpers.ts";
 
 export const canvasSize = { width: 1920, height: 1080 };
 export const STROKE_THROTTLE = 16;
@@ -26,6 +26,34 @@ export function getRemoteTempCanvas(): HTMLCanvasElement | null {
   return remoteTempCanvas;
 }
 
+export function resizeAllCanvases(width: number, height: number) {
+  if (containerEl) {
+    containerEl.style.width = width + "px";
+    containerEl.style.height = height + "px";
+  }
+
+  for (const entry of Object.values(layersCanvasMap)) {
+    entry.canvas.width = width;
+    entry.canvas.height = height;
+  }
+
+  if (localTempCanvas) {
+    localTempCanvas.width = width;
+    localTempCanvas.height = height;
+  }
+
+  if (remoteTempCanvas) {
+    remoteTempCanvas.width = width;
+    remoteTempCanvas.height = height;
+  }
+
+  if (topInputCanvas) {
+    topInputCanvas.width = width;
+    topInputCanvas.height = height;
+  }
+
+  redrawAllLayers();
+}
 export function setupDOMAndCanvases(rotElement: HTMLDivElement | null) {
   if (!rotElement) return;
 
