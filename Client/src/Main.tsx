@@ -29,6 +29,7 @@ import {
   restoreLayerImage,
 } from "./helpers/drawingHelpers.ts";
 import { addListeners } from "./helpers/eventListenersHelpers.ts";
+import { useOnlineStatus } from "./zustand/useOnlineStatus.ts";
 
 export const socket: Socket = io("http://localhost:3000", {
   autoConnect: false,
@@ -44,13 +45,6 @@ export const canvasScale = {
   isPanning: false,
   lastPanX: 0,
   lastPanY: 0,
-};
-
-export const onlineStatus = {
-  isOnline: false,
-  inRoom: false,
-  isAdmin: false,
-  maxUsers:20,
 };
 
 function main() {
@@ -122,9 +116,9 @@ function main() {
 
     if (pendingPoints.length > 0 && now - lastStrokeTime > STROKE_THROTTLE) {
       processStrokeToTemp();
-
+      const { inRoom } = useOnlineStatus.getState();
       const brush = brushState;
-      if (onlineStatus.inRoom) {
+      if (inRoom) {
         socket.emit("draw-progress", {
           points: [...pendingPoints],
           color: brush.brushColor,

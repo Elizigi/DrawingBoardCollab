@@ -1,9 +1,9 @@
 import styles from "./LayerButtons.module.scss";
-import { onlineStatus } from "../../../Main";
 import ToggleLayerVisibility from "../toggleLayerVisibility/ToggleLayerVisibility";
 import LockLayerButton from "../lockLayerButton/LockLayerButton";
 import DeleteLayerButton from "../deleteLayerButton/DeleteLayerButton";
 import LayerButtonMV from "./LayerButtonsMV";
+import { useOnlineStatus } from "../../../zustand/useOnlineStatus";
 
 const LayerButtons = () => {
   const {
@@ -21,6 +21,7 @@ const LayerButtons = () => {
     handleLayerDown,
     changeLayer,
   } = LayerButtonMV();
+    const { inRoom, isAdmin } = useOnlineStatus.getState();
 
   return (
     <div className={styles.layersContainer} ref={layerContainerRef}>
@@ -43,7 +44,7 @@ const LayerButtons = () => {
               draggedLayer === index && canDrag ? "absolute" : "relative",
 
             cursor:
-              onlineStatus.inRoom && layer.locked && !onlineStatus.isAdmin
+              inRoom && layer.locked && !isAdmin
                 ? "not-allowed"
                 : "pointer",
           }}
@@ -57,7 +58,7 @@ const LayerButtons = () => {
             onDoubleClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
-              if (onlineStatus.inRoom && !onlineStatus.isAdmin) return;
+              if (inRoom && !isAdmin) return;
               setIsNameEdit(layer.id);
             }}
           >

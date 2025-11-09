@@ -4,13 +4,14 @@ import {
   Stroke,
   useBrushStore,
 } from "../zustand/useBrushStore.ts";
-import { canvasScale, onlineStatus, socket } from "../Main.tsx";
+import { canvasScale, socket } from "../Main.tsx";
 import {
   canvasSize,
   layersCanvasMap,
   getCanvasContainer,
   getLocalTempCanvas,
 } from "./canvasHelpers.ts";
+import { useOnlineStatus } from "../zustand/useOnlineStatus.ts";
 
 export function numToHexColor(num: number) {
   return "#" + num.toString(16).padStart(6, "0");
@@ -273,8 +274,9 @@ export function commitStroke() {
   drawStrokeToCtx(ctx, newStroke);
 
   state.addStroke(newStroke);
+  const { inRoom } = useOnlineStatus.getState();
 
-  if (onlineStatus.inRoom) {
+  if (inRoom) {
     socket.emit("draw-progress", {
       ...newStroke,
       senderId: socket.id,

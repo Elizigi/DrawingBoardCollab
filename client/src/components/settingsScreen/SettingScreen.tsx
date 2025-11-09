@@ -6,12 +6,15 @@ const SettingScreen = () => {
     canvasSizeValue,
     modalOpen,
     maxUsersInRoom,
+    shouldSeeIcon,
     noChange,
     setMaxUsersInRoom,
     setModalOpen,
     changSettings,
     setCanvasSizeValue,
   } = SettingScreenMV();
+  if (!shouldSeeIcon) return null;
+
   return (
     <>
       <button className={style.settingIcon} onClick={() => setModalOpen(true)}>

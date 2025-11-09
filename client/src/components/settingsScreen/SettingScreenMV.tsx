@@ -1,11 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { canvasSize, resizeAllCanvases } from "../../helpers/canvasHelpers";
-import { onlineStatus } from "../../Main";
+import { socket } from "../../Main";
+import { useOnlineStatus } from "../../zustand/useOnlineStatus";
 
 const SettingScreenMV = () => {
+  const { inRoom, isAdmin, maxUsers, setMaxUsers } = useOnlineStatus();
+
   const [canvasSizeValue, setCanvasSizeValue] = useState(canvasSize);
-  const [maxUsersInRoom, setMaxUsersInRoom] = useState(onlineStatus.maxUsers);
+  const [maxUsersInRoom, setMaxUsersInRoom] = useState(maxUsers);
   const [modalOpen, setModalOpen] = useState(false);
+  const [shouldSeeIcon, setShouldSeeIcon] = useState(true);
+  useEffect(() => {
+    if (inRoom && !isAdmin) {
+      setShouldSeeIcon(false);
+    } else {
+      setShouldSeeIcon(true);
+    }
+  }, [inRoom, isAdmin]);
   const changSettings = () => {
     if (
       canvasSize.height !== canvasSizeValue.height ||
@@ -15,9 +26,12 @@ const SettingScreenMV = () => {
       canvasSize.width = canvasSizeValue.width;
       setModalOpen(false);
       resizeAllCanvases(canvasSizeValue.width, canvasSizeValue.height);
+      if (inRoom && isAdmin) {
+        socket.emit("new-size", canvasSize);
+      }
     }
-    if (maxUsersInRoom !== onlineStatus.maxUsers) {
-      onlineStatus.maxUsers = maxUsersInRoom;
+    if (maxUsersInRoom !== maxUsers) {
+      setMaxUsers(maxUsersInRoom);
     }
     setModalOpen(false);
   };
@@ -25,13 +39,14 @@ const SettingScreenMV = () => {
   const noChange = () => {
     setModalOpen(false);
     setCanvasSizeValue(canvasSize);
-    setMaxUsersInRoom(onlineStatus.maxUsers);
+    setMaxUsersInRoom(maxUsers);
   };
 
   return {
     canvasSizeValue,
     modalOpen,
     maxUsersInRoom,
+    shouldSeeIcon,
     noChange,
     setMaxUsersInRoom,
     setModalOpen,

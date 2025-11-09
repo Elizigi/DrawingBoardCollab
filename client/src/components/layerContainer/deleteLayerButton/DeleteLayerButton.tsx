@@ -1,7 +1,7 @@
 import { FC } from "react";
-import { onlineStatus } from "../../../Main";
 import styles from "./DeleteLayerButton.module.scss";
 import DeleteLayerButtonMV from "./DeleteLayerButtonMV";
+import { useOnlineStatus } from "../../../zustand/useOnlineStatus";
 
 interface DeleteLayerButtonProps {
   layerId: string;
@@ -11,10 +11,12 @@ const DeleteLayerButton: FC<DeleteLayerButtonProps> = ({
   layerId,
   isLocked,
 }) => {
+  const { inRoom, isAdmin } = useOnlineStatus.getState();
+
   const { allLayers, deleteLayer } = DeleteLayerButtonMV();
   return (
     <div>
-      {(!onlineStatus.inRoom || onlineStatus.isAdmin) &&
+      {(!inRoom || isAdmin) &&
         allLayers.length > 1 &&
         !isLocked && (
           <input
