@@ -12,7 +12,7 @@
 - [✔] fix drawing movement position in layer stack
 - [✔] zoom in and out feature
 - [✔] Add export as PNG/JPEG
-- [ ] Improve mobile integration and touch support
+- [✔] Improve mobile integration and touch support
 - [ ] Reorganize file and function structure for clarity
 - [ ] Add animations
 - [ ] Add image Movement and drag
