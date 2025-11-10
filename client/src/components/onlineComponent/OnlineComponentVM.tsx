@@ -26,7 +26,10 @@ const OnlineComponentVM = ({
 }: ConnectionParams) => {
   const [myName, setMyName] = useState("");
   const addEvent = useBrushStore((state) => state.addEvent);
-  const { setInRoom, setIsAdmin, maxUsers } = useOnlineStatus.getState();
+  const { setInRoom, setIsAdmin, maxUsers, setMaxUsers } =
+    useOnlineStatus.getState();
+
+  const [userLimitValue, setUserLimitValue] = useState(maxUsers);
 
   const handleModalOpen = () => {
     setOnlineWindowOpen(false);
@@ -34,6 +37,12 @@ const OnlineComponentVM = ({
   const handleName = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
     setMyName(name);
+  };
+
+  const isSetMaxUsers = () => {
+    if (userLimitValue !== maxUsers) {
+      setMaxUsers(userLimitValue);
+    }
   };
 
   const handleAddress = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,9 +56,10 @@ const OnlineComponentVM = ({
   const handleSubmit = () => {
     if (myName.trim().length < 2) return setError("Name too short");
     if (isHost) {
+      isSetMaxUsers();
       socket.emit("create-room", {
         name: myName,
-        userLimit: maxUsers === 20 ? undefined : maxUsers,
+        userLimit: userLimitValue === 20 ? undefined : userLimitValue,
       });
       return;
     }
@@ -80,12 +90,12 @@ const OnlineComponentVM = ({
   }, []);
 
   return {
+    myName,
+    userLimitValue,
+    setUserLimitValue,
+    handleAddress,
     handleModalOpen,
     handleName,
-    myName,
-    isHost,
-    handleAddress,
-    roomId,
     handleSubmit,
   };
 };

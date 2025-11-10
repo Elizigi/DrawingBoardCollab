@@ -25,17 +25,24 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
   setError,
   error,
 }) => {
-  const { handleName, myName, handleAddress, handleModalOpen, handleSubmit } =
-    OnlineComponentVM({
-      isHost,
-      roomId,
-      myNameRef,
-      connected,
-      setError,
-      setConnected,
-      setOnlineWindowOpen,
-      setRoomId,
-    });
+  const {
+    myName,
+    userLimitValue,
+    setUserLimitValue,
+    handleAddress,
+    handleModalOpen,
+    handleName,
+    handleSubmit,
+  } = OnlineComponentVM({
+    isHost,
+    roomId,
+    myNameRef,
+    connected,
+    setError,
+    setConnected,
+    setOnlineWindowOpen,
+    setRoomId,
+  });
   return (
     <div className={styles.onlineContainer}>
       <button className={styles.XBtn} onClick={() => handleModalOpen()}>
@@ -59,6 +66,17 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
             onChange={(e) => handleAddress(e)}
             value={roomId}
             required={!roomId.trim()}
+          />
+        </>
+      )}
+      {isHost && (
+        <>
+          <h2>User Limit:</h2>
+          <input
+            type="number"
+            accept="number"
+            onChange={(e) => setUserLimitValue(Number(e.target.value))}
+            value={userLimitValue}
           />
         </>
       )}
