@@ -66,6 +66,7 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
             type="text"
             onChange={(e) => handleAddress(e)}
             value={roomId}
+            maxLength={10}
             required={!roomId.trim()}
           />
         </>
