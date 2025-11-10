@@ -33,7 +33,7 @@ const TopRightToolbar = () => {
     <div className={styles.topRightToolContainer}>
       {menuOpen && !connected && (
         <button
-          onClick={() => handleConnectionWindow(true)}
+          onClick={() => handleConnectionWindow("host")}
           className={`${styles.HostButton} ${styles.connectionButtons}`}
         >
           Host
@@ -52,7 +52,7 @@ const TopRightToolbar = () => {
       </button>
       {menuOpen && !connected && (
         <button
-          onClick={() => handleConnectionWindow()}
+          onClick={() => handleConnectionWindow("guest")}
           className={`${styles.exitButton} ${styles.connectionButtons}`}
         >
           Join

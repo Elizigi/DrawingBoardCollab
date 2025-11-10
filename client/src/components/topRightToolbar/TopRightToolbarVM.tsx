@@ -10,7 +10,12 @@ export interface ConnectedUser {
   guestId: string;
   color: string;
 }
-
+type ConnectionType = "host" | "guest" | null;
+const ConnectionTypes = {
+  host: "host",
+  guest: "guest",
+  null: null,
+};
 const TopRightToolbarVM = () => {
   const addEvent = useBrushStore((state) => state.addEvent);
 
@@ -126,10 +131,18 @@ const TopRightToolbarVM = () => {
     setMenuOpen(!menuOpen);
   };
 
-  const handleConnectionWindow = (host = false) => {
-    setIsHost(host);
+  const handleConnectionWindow = (connectionType: ConnectionType) => {
+    if (connectionType === null) return;
+    if (
+      (connectionType === ConnectionTypes.host && isHost) ||
+      (!isHost && connectionType===ConnectionTypes.guest)
+    ) {
+      setOnlineWindowOpen(!onlineWindowOpen);
+      return;
+    }
+    setIsHost(connectionType === ConnectionTypes.host);
     setHasInteracted(false);
-    setOnlineWindowOpen(!onlineWindowOpen);
+    setOnlineWindowOpen(true)
   };
 
   const cleanup = () => {
