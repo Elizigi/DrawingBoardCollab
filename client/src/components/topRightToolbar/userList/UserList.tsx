@@ -13,6 +13,7 @@ const UserList: FC<UserListProps> = ({ connectedUsers, menuOpen }) => {
   };
   const { isAdmin } = useOnlineStatus.getState();
 
+  if (!menuOpen && window.innerWidth < 600) return null;
   return (
     <>
       {connectedUsers.length > 0 && (

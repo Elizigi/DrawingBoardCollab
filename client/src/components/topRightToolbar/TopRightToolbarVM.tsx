@@ -204,7 +204,7 @@ const TopRightToolbarVM = () => {
     setMaxUsers(userLimit);
     addEvent(EventTypes.userLimitUpdated, `${userLimit}`);
   };
-  
+
   useEffect(() => {
     socket.on("user-joined", handleUserJoined);
     socket.on("add-name", handleAddName);

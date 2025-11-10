@@ -21,6 +21,7 @@ const GuestMouse = ({ name, position, color }: ConnectedUser) => {
     const b = Number.parseInt(hex.slice(5, 7), 16);
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   };
+  if (!rect) return null;
   return (
     <div
       className={styles.guestMouseContainer}

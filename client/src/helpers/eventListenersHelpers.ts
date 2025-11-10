@@ -23,8 +23,6 @@ export function addListeners(
   topInputCanvas: HTMLCanvasElement,
   rotElement: HTMLDivElement
 ) {
-  const { inRoom } = useOnlineStatus.getState();
-
   document.addEventListener("mouseup", () => {
     useBrushStore.getState().setMouseDown(false);
     commitStroke();
@@ -32,6 +30,7 @@ export function addListeners(
 
   document.addEventListener("mousemove", (e) => {
     if (!topInputCanvas) return;
+    const { inRoom } = useOnlineStatus.getState();
 
     if (inRoom)
       socket.emit("user-move", {
@@ -176,6 +175,8 @@ export function addListeners(
   topInputCanvas.addEventListener("pointercancel", stopPan);
 
   document.addEventListener("keydown", (e) => {
+    const { inRoom } = useOnlineStatus.getState();
+
     if (e.code === allowedKeys.ctrl && !keysDown.ctrl) {
       keysDown.ctrl = true;
     } else if (e.code === allowedKeys.z && keysDown.ctrl) {
