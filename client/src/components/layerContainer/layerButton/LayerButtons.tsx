@@ -14,6 +14,7 @@ const LayerButtons = () => {
     layerContainerRef,
     canDrag,
     isNameEdit,
+    handleLayerTouch,
     handleKeyPress,
     setNewName,
     setIsNameEdit,
@@ -21,7 +22,7 @@ const LayerButtons = () => {
     handleLayerDown,
     changeLayer,
   } = LayerButtonMV();
-    const { inRoom, isAdmin } = useOnlineStatus.getState();
+  const { inRoom, isAdmin } = useOnlineStatus.getState();
 
   return (
     <div className={styles.layersContainer} ref={layerContainerRef}>
@@ -29,6 +30,7 @@ const LayerButtons = () => {
         <button
           onClick={() => changeLayer(layer.id)}
           onMouseDown={(e) => handleLayerDown(index, e)}
+          onTouchStart={(e) => handleLayerTouch(index, e)}
           id={layer.id}
           key={`layer-id:${layer.id}`}
           ref={(el) => {
@@ -44,9 +46,7 @@ const LayerButtons = () => {
               draggedLayer === index && canDrag ? "absolute" : "relative",
 
             cursor:
-              inRoom && layer.locked && !isAdmin
-                ? "not-allowed"
-                : "pointer",
+              inRoom && layer.locked && !isAdmin ? "not-allowed" : "pointer",
           }}
         >
           <ToggleLayerVisibility layer={layer} />
@@ -62,7 +62,7 @@ const LayerButtons = () => {
               setIsNameEdit(layer.id);
             }}
           >
-            {isNameEdit===layer.id ? (
+            {isNameEdit === layer.id ? (
               <input
                 type="text"
                 className={styles.layerEdit}

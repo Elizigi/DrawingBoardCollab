@@ -63,6 +63,21 @@ const LayerButtonsMV = () => {
       socket.emit("renamed-layer", layerId, newName);
     }
   };
+  const handleLayerTouch = (
+    index: number,
+    e: React.TouchEvent<HTMLButtonElement>
+  ) => {
+    const touch = e.touches[0];
+    if (!touch) return;
+
+    const syntheticEvent = {
+      clientY: touch.clientY,
+      stopPropagation: () => e.stopPropagation(),
+      preventDefault: () => e.preventDefault(),
+    } as React.MouseEvent<HTMLButtonElement>;
+
+    handleLayerDown(index, syntheticEvent);
+  };
   const handleLayerDown = (
     index: number,
     e: React.MouseEvent<HTMLButtonElement>
@@ -225,16 +240,30 @@ const LayerButtonsMV = () => {
       setLayerPotentialPosition(newPositionIndex);
     };
 
+    const handleTouchMove = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      if (!touch) return;
+      handleMouseMove({ clientY: touch.clientY } as MouseEvent);
+    };
+
     const handleMouseUp = () => {
+      layerLand();
+    };
+
+    const handleTouchEnd = () => {
       layerLand();
     };
 
     document.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
+    document.addEventListener("touchend", handleTouchEnd);
 
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
     };
   }, [
     isLayerDragged,
@@ -277,6 +306,7 @@ const LayerButtonsMV = () => {
     layerContainerRef,
     canDrag,
     isNameEdit,
+    handleLayerTouch,
     handleKeyPress,
     setNewName,
     setIsNameEdit,
