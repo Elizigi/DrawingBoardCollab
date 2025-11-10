@@ -1,92 +1,38 @@
 import BrushToolbarVM from "./BrushToolbarVM";
 import styles from "./BrushToolbar.module.scss";
-import { useEffect, useRef, useState } from "react";
-import { useBrushStore } from "../../zustand/useBrushStore";
 
-enum TextTarget {
-  Opacity = "opacity",
-  BrushSize = "brushSize",
-}
 const BrushToolbar = () => {
   const {
     brushColor,
     brushSize,
     usedColors,
     brushOpacity,
-    setOpacity,
+    isBrushOpen,
+    textTarget,
+    opacitySliderRef,
+    TextTarget,
+    colorInputRef,
+    handleTransparentAdjustment,
+    setTextTarget,
+    handleColorClick,
+    displayValue,
+    setIsBrushOpen,
     setBrushColor,
     setBrushSize,
     changeColor,
   } = BrushToolbarVM();
 
-  const [isBrushOpen, setIsBrushOpen] = useState(false);
-  const colorInputRef = useRef<HTMLInputElement>(null);
-  const opacitySliderRef = useRef<HTMLDivElement>(null);
-  const [textTarget, setTextTarget] = useState<null | TextTarget>(null);
-
-  const isMouseDown = useBrushStore((s) => s.isMouseDown);
-  const handleColorClick = () => {
-    colorInputRef.current?.click();
-  };
-
-  useEffect(() => {
-    if (isBrushOpen) {
-      setIsBrushOpen(false);
-    }
-  }, [isMouseDown]);
-
-  useEffect(() => {
-    if (isBrushOpen && opacitySliderRef.current) {
-      const normalized = (brushOpacity - 1) / 99;
-      const angle = normalized * 125 + -205;
-      opacitySliderRef.current.style.transform = `translate(-2.75rem, -2.75rem) rotate(${angle}deg)`;
-    }
-  }, [isBrushOpen, brushOpacity]);
-
-  const handleTransparentAdjustment = () => {
-    const opacitySlider = opacitySliderRef.current;
-    if (!opacitySlider) return;
-    const rect = opacitySlider.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      const deltaX = moveEvent.clientX - centerX;
-      const deltaY = moveEvent.clientY - centerY;
-
-      let mouseAngle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
-      if (mouseAngle > 0) mouseAngle -= 360;
-      let adjustedAngle = mouseAngle;
-
-      adjustedAngle = Math.max(-205, Math.min(-80, adjustedAngle));
-      const normalized = (adjustedAngle - -205) / (-80 - -205);
-      const size = Math.round(normalized * 99) + 1;
-
-      setOpacity(size);
-      opacitySlider.style.transform = `translate(-2.75rem, -2.75rem) rotate(${adjustedAngle}deg)`;
-    };
-
-    const handleMouseUp = () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-  };
-
-  const displayValue = () => {
-    if (textTarget === TextTarget.Opacity) return brushOpacity;
-    if (textTarget === TextTarget.BrushSize) return brushSize;
-    return "";
-  };
-  
   return (
     <div className={styles.brushToolbar}>
       {isBrushOpen && (
         <>
-          <div className={styles.colorOfSlider} style={{opacity:textTarget === TextTarget.Opacity? brushOpacity*.01:1
-          }}></div>
+          <div
+            className={styles.colorOfSlider}
+            style={{
+              opacity:
+                textTarget === TextTarget.Opacity ? brushOpacity * 0.01 : 1,
+            }}
+          ></div>
 
           <div className={styles.sizeSetBar} ref={opacitySliderRef}>
             <button
@@ -117,7 +63,6 @@ const BrushToolbar = () => {
             }}
             onClick={handleColorClick}
             aria-label="Open color picker"
-          
           >
             <div className={styles.brushSizeDisplay}>
               <h3>{displayValue()}</h3>
