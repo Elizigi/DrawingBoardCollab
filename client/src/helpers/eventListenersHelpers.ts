@@ -13,6 +13,7 @@ import {
   commitStroke,
   findLastLocalStroke,
   getMousePosPercentOnElement,
+  getTouchPosPercent,
   redrawAllLayers,
 } from "./drawingHelpers";
 
@@ -41,6 +42,56 @@ export function addListeners(
     addPoint(x, y);
   });
 
+  topInputCanvas.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    if (!touch) return;
+
+    const { x, y } = getTouchPosPercent(touch, topInputCanvas);
+    useBrushStore.getState().setMouseDown(true);
+    addPoint(x, y);
+  });
+
+  topInputCanvas.addEventListener("touchmove", (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    if (!touch) return;
+
+    const { inRoom } = useOnlineStatus.getState();
+    const { x, y } = getTouchPosPercent(touch, topInputCanvas);
+
+    if (inRoom) socket.emit("user-move", { position: { x, y } });
+
+    if (!useBrushStore.getState().isMouseDown) return;
+    addPoint(x, y);
+  });
+
+  topInputCanvas.addEventListener("touchend", () => {
+    useBrushStore.getState().setMouseDown(false);
+    commitStroke();
+  });
+
+  topInputCanvas.addEventListener("touchmove", (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    if (!touch) return;
+
+    const { inRoom } = useOnlineStatus.getState();
+    if (inRoom)
+      socket.emit("user-move", {
+        position: getTouchPosPercent(touch, topInputCanvas),
+      });
+
+    if (!useBrushStore.getState().isMouseDown) return;
+
+    const { x, y } = getTouchPosPercent(touch, topInputCanvas);
+    addPoint(x, y);
+  });
+
+  topInputCanvas.addEventListener("touchend", () => {
+    useBrushStore.getState().setMouseDown(false);
+    commitStroke();
+  });
   document.addEventListener("clearCanvas", () => {
     useBrushStore.getState().clearStrokes();
     for (const id of Object.keys(layersCanvasMap)) {
@@ -139,8 +190,7 @@ export function addListeners(
       if (!reAssignedStroke) return;
       useBrushStore.getState().reAssignStroke(reAssignedStroke.strokeId);
       useBrushStore.getState().addStroke(reAssignedStroke);
-      if (inRoom)
-        socket.emit("draw-progress", { ...reAssignedStroke });
+      if (inRoom) socket.emit("draw-progress", { ...reAssignedStroke });
     }
   });
   document.addEventListener("keyup", (e) => {

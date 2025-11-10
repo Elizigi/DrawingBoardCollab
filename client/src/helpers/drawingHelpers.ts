@@ -23,23 +23,25 @@ export function percentToCanvas(xPercent: number, yPercent: number) {
     y: (yPercent / 100) * canvasSize.height,
   };
 }
-
+export const getTouchPosPercent = (touch: Touch, el: HTMLCanvasElement) =>
+  getMousePosPercentOnElement(touch, el);
 export function getMousePosPercentOnElement(
-  e: MouseEvent,
+  e: MouseEvent | { clientX: number; clientY: number },
   el: HTMLCanvasElement
 ) {
   const rect = el.getBoundingClientRect();
-  const clientX = e.clientX - rect.left;
-  const clientY = e.clientY - rect.top;
 
-  const canvasX = (clientX - canvasScale.offsetX) / canvasScale.scale;
-  const canvasY = (clientY - canvasScale.offsetY) / canvasScale.scale;
+  const mouseX = e.clientX - rect.left;
+  const mouseY = e.clientY - rect.top;
 
-  return { x: (canvasX / el.width) * 100, y: (canvasY / el.height) * 100 };
+  const worldX = (mouseX - canvasScale.offsetX) / canvasScale.scale;
+  const worldY = (mouseY - canvasScale.offsetY) / canvasScale.scale;
+
+  return { x: (worldX / el.width) * 100, y: (worldY / el.height) * 100 };
 }
 export function restoreLayerImage(layer: any) {
   if (!layer.imageDataUrl) return;
-  
+
   const img = new Image();
   img.src = layer.imageDataUrl;
   img.onload = () => {
