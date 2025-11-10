@@ -18,7 +18,7 @@ const LayerContainerVM = () => {
 
   const activeLayerId = useBrushStore((state) => state.activeLayerId);
 
-  const [containerVisible, setContainerVisible] = useState(true);
+  const [containerVisible, setContainerVisible] = useState(window.innerWidth>660);
 
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
