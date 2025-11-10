@@ -22,7 +22,7 @@ const TopRightToolbarVM = () => {
   const [roomId, setRoomId] = useState("");
   const [hideCode, setHideCode] = useState(false);
   const [error, setError] = useState("");
-  const {  setOnline,setInRoom,setIsAdmin } = useOnlineStatus.getState();
+  const { setOnline, setInRoom, setIsAdmin } = useOnlineStatus.getState();
 
   const isMouseDown = useBrushStore((s) => s.isMouseDown);
 
@@ -197,6 +197,14 @@ const TopRightToolbarVM = () => {
     } else setSpinnerStyle(styles.spinLoad);
   }, [isOnline, hasInteracted]);
 
+  const handleUserUpdated = ({ userLimit }: { userLimit: number }) => {
+    console.log("updatingLimit", userLimit);
+    if (!userLimit) return;
+    const { setMaxUsers } = useOnlineStatus.getState();
+    setMaxUsers(userLimit);
+    addEvent(EventTypes.userLimitUpdated, `${userLimit}`);
+  };
+  
   useEffect(() => {
     socket.on("user-joined", handleUserJoined);
     socket.on("add-name", handleAddName);
@@ -205,6 +213,7 @@ const TopRightToolbarVM = () => {
     socket.on("user-left", handleUserLeft);
     socket.on("user-removed", handleUserRemoved);
     socket.on("user-kicked", handleUserKicked);
+    socket.on("user-updated", handleUserUpdated);
 
     socket.on("room-not-found", () => {
       setError("Room not found");
@@ -230,6 +239,8 @@ const TopRightToolbarVM = () => {
       socket.off("connect");
       socket.off("disconnect", disconnected);
       socket.off("user-id");
+      socket.off("user-updated", handleUserUpdated);
+
       socket.off("room-not-found", () => {
         setError("Room not found");
       });

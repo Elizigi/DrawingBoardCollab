@@ -16,9 +16,12 @@ export const EventTypes = {
   roomCreatedEvent: "Room created",
   joinedEvent: "Room joined",
   joinEvent: "has joined",
+  userLimitUpdated : `user limit updated`,
   roomClosedEvent: "Room closed",
   userLeftEvent: "has left!",
+  noPermission:"Permission denied",
   default: "Disconnected from room",
+  
 } as const;
 
 type LayerMeta = {

@@ -54,6 +54,7 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
       <input
         type="text"
         name="name"
+        maxLength={30}
         onChange={handleName}
         value={myName}
         required={!myName.trim()}
@@ -75,6 +76,8 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
           <input
             type="number"
             accept="number"
+            min={2}
+            max={20}
             onChange={(e) => setUserLimitValue(Number(e.target.value))}
             value={userLimitValue}
           />

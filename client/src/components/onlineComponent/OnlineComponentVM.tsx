@@ -82,10 +82,25 @@ const OnlineComponentVM = ({
     myNameRef.current = myName;
   }, [myName]);
 
+  const handleNoPermission = (message?: string) => {
+    setError(message || "You don't have permission");
+    addEvent(EventTypes.noPermission, "");
+  };
+
+  const handleError = (errorMsg: string | { reason: string }) => {
+    const msg = typeof errorMsg === "string" ? errorMsg : errorMsg.reason;
+    setError(msg);
+  };
+
   useEffect(() => {
     socket.on("room-created", handleRoomCreated);
+    socket.on("no-permission", handleNoPermission);
+    socket.on("error", handleError);
+
     return () => {
       socket.off("room-created", handleRoomCreated);
+      socket.off("no-permission", handleNoPermission);
+      socket.off("error", handleError);
     };
   }, []);
 
