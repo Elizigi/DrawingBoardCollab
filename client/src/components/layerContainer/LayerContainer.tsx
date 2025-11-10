@@ -15,7 +15,7 @@ const LayersContainer = () => {
     rotation,
     chooseContainerSide,
     toggleLayerContainer,
-    handleMouseDown,
+    handlePointerDown,
   } = LayerContainerVM();
 
   return (
@@ -23,7 +23,8 @@ const LayersContainer = () => {
       className={`${styles.layerToolbarContainer}  ${containerVisible ? styles.layerVisible : chooseContainerSide(styles)} ${toTheRight ? styles.right : styles.left}`}
       aria-roledescription="draggable item"
       role="toolbar"
-      onMouseDown={handleMouseDown}
+      onMouseDown={handlePointerDown}
+      onTouchStart={(e)=>handlePointerDown(e)}
       style={
         (layersToolPositionOffset.x !== 0 ||
           layersToolPositionOffset.y !== 0) &&

@@ -37,6 +37,12 @@ const LayerContainerVM = () => {
   const lastPosition = useRef({ x: 0, y: 0 });
   const animationFrame = useRef<null | number>(null);
 
+  const getPointerPosition = (e: React.MouseEvent | React.TouchEvent) => {
+    if ("touches" in e) {
+      return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+    return { x: e.clientX, y: e.clientY };
+  };
   const addComingLayer = ({
     layerId,
     layerName,
@@ -88,14 +94,16 @@ const LayerContainerVM = () => {
       });
   };
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handlePointerDown = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
     if (!containerVisible || e.target !== dragAreaElement.current) return;
 
     setIsDragging(true);
+    setIsDragging(true);
     const rect = e.currentTarget.getBoundingClientRect();
+    const pos = getPointerPosition(e);
     setDragStart({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: pos.x - rect.left,
+      y: pos.y - rect.top,
     });
   };
   const animateSpring = () => {
@@ -136,25 +144,29 @@ const LayerContainerVM = () => {
   }, []);
   useEffect(() => {
     if (!isDragging) return;
-    const handleMouseMove = (e: MouseEvent): void => {
-      if (!toolbarElement.current) return;
-      if (!isDragging) return;
+    const handlePointerMove = (e: MouseEvent | TouchEvent): void => {
+      if (!toolbarElement.current || !isDragging) return;
 
-      const newX = e.clientX - dragStart.x;
-      const newY = e.clientY - dragStart.y;
+      const pos =
+        "touches" in e
+          ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
+          : { x: e.clientX, y: e.clientY };
 
-      const vx = e.clientX - lastPosition.current.x;
-      const vy = e.clientY - lastPosition.current.y;
+      const newX = pos.x - dragStart.x;
+      const newY = pos.y - dragStart.y;
+
+      const vx = newX - lastPosition.current.x;
+      const vy = newY - lastPosition.current.y;
       setVelocity({ x: vx, y: vy });
 
       const rotationAmount = Math.max(-15, Math.min(15, vx * 0.5));
       setRotation(rotationAmount);
 
-      lastPosition.current = { x: e.clientX, y: e.clientY };
+      lastPosition.current = { x: newX, y: newY };
       setLayersToolPositionOffset({ x: newX, y: newY });
     };
 
-    const handleMouseUp = () => {
+    const handlePointerUp = () => {
       if (isDragging) {
         setIsDragging(false);
         const box = toolbarElement.current as HTMLDivElement;
@@ -173,12 +185,18 @@ const LayerContainerVM = () => {
       }
     };
 
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("mousemove", handlePointerMove);
+    document.addEventListener("mouseup", handlePointerUp);
+    document.addEventListener("touchmove", handlePointerMove, {
+      passive: false,
+    });
+    document.addEventListener("touchend", handlePointerUp);
 
     return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("mousemove", handlePointerMove);
+      document.removeEventListener("mouseup", handlePointerUp);
+      document.removeEventListener("touchmove", handlePointerMove);
+      document.removeEventListener("touchend", handlePointerUp);
     };
   }, [isDragging, dragStart, toggleLayerContainer]);
 
@@ -197,7 +215,7 @@ const LayerContainerVM = () => {
     rotation,
     chooseContainerSide,
     toggleLayerContainer,
-    handleMouseDown,
+    handlePointerDown,
   };
 };
 
