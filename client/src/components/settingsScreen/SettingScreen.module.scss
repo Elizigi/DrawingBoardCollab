@@ -57,6 +57,7 @@
   top: 50%;
   transform: translate(-50%, -50%);
   color: $text-color;
+  min-width: fit-content;
 }
 .form {
   width: 100%;
