@@ -23,7 +23,7 @@ const BrushToolbarVM = () => {
   const [isBrushOpen, setIsBrushOpen] = useState(false);
   const colorInputRef = useRef<HTMLInputElement>(null);
   const opacitySliderRef = useRef<HTMLDivElement>(null);
-  const [textTarget, setTextTarget] = useState<null | TextTarget>(null);
+  const [textTarget, setTextTarget] = useState<null | TextTarget>(TextTarget.BrushSize);
 
   const isMouseDown = useBrushStore((s) => s.isMouseDown);
   const handleColorClick = () => {
@@ -45,15 +45,27 @@ const BrushToolbarVM = () => {
   }, [isBrushOpen, brushOpacity]);
 
   const handleTransparentAdjustment = () => {
+    setTextTarget(TextTarget.Opacity);
+
     const opacitySlider = opacitySliderRef.current;
     if (!opacitySlider) return;
     const rect = opacitySlider.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
 
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      const deltaX = moveEvent.clientX - centerX;
-      const deltaY = moveEvent.clientY - centerY;
+    const handleMove = (moveEvent: MouseEvent | TouchEvent) => {
+      moveEvent.preventDefault();
+      const clientX =
+        "touches" in moveEvent
+          ? moveEvent.touches[0].clientX
+          : moveEvent.clientX;
+      const clientY =
+        "touches" in moveEvent
+          ? moveEvent.touches[0].clientY
+          : moveEvent.clientY;
+
+      const deltaX = clientX - centerX;
+      const deltaY = clientY - centerY;
 
       let mouseAngle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
       if (mouseAngle > 0) mouseAngle -= 360;
@@ -67,13 +79,18 @@ const BrushToolbarVM = () => {
       opacitySlider.style.transform = `translate(-2.75rem, -2.75rem) rotate(${adjustedAngle}deg)`;
     };
 
-    const handleMouseUp = () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
+    const handleEnd = () => {
+      document.removeEventListener("mousemove", handleMove);
+      document.removeEventListener("mouseup", handleEnd);
+      document.removeEventListener("touchmove", handleMove);
+      document.removeEventListener("touchend", handleEnd);
+      setTextTarget(TextTarget.BrushSize);
     };
 
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("mousemove", handleMove);
+    document.addEventListener("mouseup", handleEnd);
+    document.addEventListener("touchmove", handleMove);
+    document.addEventListener("touchend", handleEnd);
   };
 
   const displayValue = () => {

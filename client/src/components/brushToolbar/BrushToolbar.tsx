@@ -36,10 +36,12 @@ const BrushToolbar = () => {
 
           <div className={styles.sizeSetBar} ref={opacitySliderRef}>
             <button
+              style={{ touchAction: "manipulation" }}
               className={styles.sizeHandle}
               onMouseDown={() => handleTransparentAdjustment()}
+              onTouchStart={() => handleTransparentAdjustment()}
               onMouseEnter={() => setTextTarget(TextTarget.Opacity)}
-              onMouseLeave={() => setTextTarget(null)}
+              onMouseLeave={() => setTextTarget(TextTarget.BrushSize)}
             ></button>
           </div>
           <input
@@ -49,8 +51,6 @@ const BrushToolbar = () => {
             max={100}
             value={brushSize}
             onChange={(e) => setBrushSize(Number(e.target.value))}
-            onMouseEnter={() => setTextTarget(TextTarget.BrushSize)}
-            onMouseLeave={() => setTextTarget(null)}
           />
         </>
       )}
@@ -65,7 +65,16 @@ const BrushToolbar = () => {
             aria-label="Open color picker"
           >
             <div className={styles.brushSizeDisplay}>
-              <h3>{displayValue()}</h3>
+              <h3
+                style={{
+                  color:
+                    textTarget === TextTarget.Opacity
+                      ? "$highlight"
+                      : "$text-color",
+                }}
+              >
+                {displayValue()}
+              </h3>
             </div>
           </button>
         ) : (
