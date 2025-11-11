@@ -118,6 +118,14 @@ const ContextMenuMV = () => {
         img.onload = () => {
           const layerId = `imported-${crypto.randomUUID()}`;
           store.addLayer("Imported Image", layerId);
+          const transform = {
+            x: 0,
+            y: 0,
+            width: img.width,
+            height: img.height,
+            rotation: 0,
+          };
+          store.updateLayerTransform(layerId, transform);
           createLayerCanvas(layerId);
 
           const entry = layersCanvasMap[layerId];

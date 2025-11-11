@@ -52,7 +52,45 @@ export function restoreLayerImage(layer: any) {
     }
   };
 }
+export function drawTransformControls(
+  ctx: CanvasRenderingContext2D,
+  transform: { x: number; y: number; width: number; height: number }
+) {
+  const handleSize = 8;
 
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+  ctx.strokeStyle = "#0066ff";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(transform.x, transform.y, transform.width, transform.height);
+
+  const corners = [
+    { x: transform.x, y: transform.y },
+    { x: transform.x + transform.width, y: transform.y },
+    { x: transform.x, y: transform.y + transform.height },
+    { x: transform.x + transform.width, y: transform.y + transform.height },
+  ];
+
+  ctx.fillStyle = "#ffffff";
+  ctx.strokeStyle = "#0066ff";
+  for (const corner of corners) {
+    ctx.fillRect(
+      corner.x - handleSize / 2,
+      corner.y - handleSize / 2,
+      handleSize,
+      handleSize
+    );
+    ctx.strokeRect(
+      corner.x - handleSize / 2,
+      corner.y - handleSize / 2,
+      handleSize,
+      handleSize
+    );
+  }
+
+  ctx.restore();
+}
 export function createLayerCanvas(
   id: string,
   container?: HTMLDivElement | null
@@ -113,7 +151,24 @@ export function redrawLayer(layerId: string) {
     canvasScale.offsetY
   );
 
-  if (layerId.includes("imported") && entry.image) {
+  const layer = useBrushStore.getState().layers.find((l) => l.id === layerId);
+  if (entry.image && layer?.transform) {
+    const transform = layer.transform;
+    entry.ctx.drawImage(
+      entry.image,
+      transform.x,
+      transform.y,
+      transform.width,
+      transform.height
+    );
+
+    if (
+      layer.id === useBrushStore.getState().activeLayerId &&
+      layer.imageDataUrl
+    ) {
+      drawTransformControls(entry.ctx, transform);
+    }
+  } else if (layerId.includes("imported") && entry.image) {
     const img = entry.image;
     const offsetX = (entry.canvas.width - img.width) / 2;
     const offsetY = (entry.canvas.height - img.height) / 2;

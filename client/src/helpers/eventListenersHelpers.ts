@@ -16,6 +16,13 @@ import {
   getTouchPosPercent,
   redrawAllLayers,
 } from "./drawingHelpers";
+export const transformSettings = {
+  isDraggingImage: false,
+  isResizingImage: false,
+  resizeHandle: null as "tl" | "tr" | "bl" | "br" | null,
+  dragStartPos: { x: 0, y: 0 },
+  initialTransform: { x: 0, y: 0, width: 0, height: 0, rotation: 0 },
+};
 
 const allowedKeys = { ctrl: "ControlLeft", z: "KeyZ", y: "KeyY" };
 const keysDown = { ctrl: false, z: false };
@@ -26,16 +33,107 @@ export function addListeners(
   document.addEventListener("mouseup", () => {
     useBrushStore.getState().setMouseDown(false);
     commitStroke();
+
+    transformSettings.isDraggingImage = false;
+    transformSettings.isResizingImage = false;
+    transformSettings.resizeHandle = null;
   });
 
   document.addEventListener("mousemove", (e) => {
     if (!topInputCanvas) return;
     const { inRoom } = useOnlineStatus.getState();
+    const state = useBrushStore.getState();
 
     if (inRoom)
       socket.emit("user-move", {
         position: getMousePosPercentOnElement(e, topInputCanvas),
       });
+
+    const activeLayer = state.layers.find((l) => l.id === state.activeLayerId);
+    if (
+      activeLayer?.imageDataUrl &&
+      activeLayer.transform &&
+      (transformSettings.isDraggingImage || transformSettings.isResizingImage)
+    ) {
+      const rect = topInputCanvas.getBoundingClientRect();
+      const clientX = e.clientX - rect.left;
+      const clientY = e.clientY - rect.top;
+
+      const mouseX = (clientX - canvasScale.offsetX) / canvasScale.scale;
+      const mouseY = (clientY - canvasScale.offsetY) / canvasScale.scale;
+
+      if (transformSettings.isDraggingImage) {
+        const dx = mouseX - transformSettings.dragStartPos.x;
+        const dy = mouseY - transformSettings.dragStartPos.y;
+        state.updateLayerTransform(state.activeLayerId!, {
+          ...activeLayer.transform,
+          x: transformSettings.initialTransform.x + dx,
+          y: transformSettings.initialTransform.y + dy,
+        });
+        redrawAllLayers();
+        return;
+      } else if (
+        transformSettings.isResizingImage &&
+        transformSettings.resizeHandle
+      ) {
+        const dx = mouseX - transformSettings.dragStartPos.x;
+        const dy = mouseY - transformSettings.dragStartPos.y;
+
+        let newTransform = { ...transformSettings.initialTransform };
+
+        switch (transformSettings.resizeHandle) {
+          case "br":
+            newTransform.width = Math.max(
+              20,
+              transformSettings.initialTransform.width + dx
+            );
+            newTransform.height = Math.max(
+              20,
+              transformSettings.initialTransform.height + dy
+            );
+            break;
+          case "bl":
+            newTransform.width = Math.max(
+              20,
+              transformSettings.initialTransform.width - dx
+            );
+            newTransform.height = Math.max(
+              20,
+              transformSettings.initialTransform.height + dy
+            );
+            newTransform.x = transformSettings.initialTransform.x + dx;
+            break;
+          case "tr":
+            newTransform.width = Math.max(
+              20,
+              transformSettings.initialTransform.width + dx
+            );
+            newTransform.height = Math.max(
+              20,
+              transformSettings.initialTransform.height - dy
+            );
+            newTransform.y = transformSettings.initialTransform.y + dy;
+            break;
+          case "tl":
+            newTransform.width = Math.max(
+              20,
+              transformSettings.initialTransform.width - dx
+            );
+            newTransform.height = Math.max(
+              20,
+              transformSettings.initialTransform.height - dy
+            );
+            newTransform.x = transformSettings.initialTransform.x + dx;
+            newTransform.y = transformSettings.initialTransform.y + dy;
+            break;
+        }
+
+        state.updateLayerTransform(state.activeLayerId!, newTransform);
+        redrawAllLayers();
+        return;
+      }
+    }
+
     if (!useBrushStore.getState().isMouseDown) return;
     const { x, y } = getMousePosPercentOnElement(e, topInputCanvas);
     addPoint(x, y);

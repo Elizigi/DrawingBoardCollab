@@ -16,12 +16,11 @@ export const EventTypes = {
   roomCreatedEvent: "Room created",
   joinedEvent: "Room joined",
   joinEvent: "has joined",
-  userLimitUpdated : `user limit updated`,
+  userLimitUpdated: `user limit updated`,
   roomClosedEvent: "Room closed",
   userLeftEvent: "has left!",
-  noPermission:"Permission denied",
+  noPermission: "Permission denied",
   default: "Disconnected from room",
-  
 } as const;
 
 type LayerMeta = {
@@ -30,6 +29,13 @@ type LayerMeta = {
   visible: boolean;
   locked: boolean;
   imageDataUrl?: string;
+  transform?: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    rotation: number;
+  };
 };
 
 export type Stroke = {
@@ -71,7 +77,18 @@ export type BrushState = {
   toggleLockLayer: (layerId: string) => void;
   removeLayer: (id: string) => void;
   renameLayer: (layerId: string, newName: string) => void;
+
   setLayerImage: (layerId: string, imageDataUrl: string) => void;
+  updateLayerTransform: (
+    layerId: string,
+    transform: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      rotation: number;
+    }
+  ) => void;
 
   lockedLayersIds: Map<string, null>;
 
@@ -262,6 +279,13 @@ export const useBrushStore = create<BrushState>((set, get) => ({
       return { layers: newLayers };
     });
   },
+  updateLayerTransform: (layerId, transform) =>
+    set((state) => ({
+      layers: state.layers.map((layer) =>
+        layer.id === layerId ? { ...layer, transform } : layer
+      ),
+    })),
+
   events: [],
   addEvent: (eventType, name) =>
     set((state) => {
