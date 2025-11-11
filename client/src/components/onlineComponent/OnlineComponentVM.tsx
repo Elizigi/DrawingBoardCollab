@@ -49,6 +49,7 @@ const OnlineComponentVM = ({
     const id = e.target.value;
     setRoomId(id);
   };
+
   useEffect(() => {
     if (connected) handleModalOpen();
   }, [connected]);
@@ -91,6 +92,16 @@ const OnlineComponentVM = ({
     const msg = typeof errorMsg === "string" ? errorMsg : errorMsg.reason;
     setError(msg);
   };
+  
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        handleModalOpen();
+      }
+    };
+    globalThis.addEventListener("keydown", handleKeyDown);
+    return () => globalThis.removeEventListener("keydown", handleKeyDown);
+  }, [handleModalOpen]);
 
   useEffect(() => {
     socket.on("room-created", handleRoomCreated);

@@ -23,7 +23,9 @@ const BrushToolbarVM = () => {
   const [isBrushOpen, setIsBrushOpen] = useState(false);
   const colorInputRef = useRef<HTMLInputElement>(null);
   const opacitySliderRef = useRef<HTMLDivElement>(null);
-  const [textTarget, setTextTarget] = useState<null | TextTarget>(TextTarget.BrushSize);
+  const [textTarget, setTextTarget] = useState<null | TextTarget>(
+    TextTarget.BrushSize
+  );
 
   const isMouseDown = useBrushStore((s) => s.isMouseDown);
   const handleColorClick = () => {
@@ -98,6 +100,16 @@ const BrushToolbarVM = () => {
     if (textTarget === TextTarget.BrushSize) return brushSize;
     return "";
   };
+  useEffect(() => {
+    if (!isBrushOpen) return;
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsBrushOpen(false);
+    };
+    document.addEventListener("keydown", handleKeyPress);
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [isBrushOpen, setIsBrushOpen]);
   return {
     brushColor,
     brushSize,

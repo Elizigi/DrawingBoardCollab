@@ -16,6 +16,12 @@
   color: $text-color;
   min-width: 200px;
   z-index: 9999999999999;
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    width: 100%;
+  }
   hr {
     border: none;
     height: 2px;

@@ -24,12 +24,15 @@ const AddLayerButtonVM = () => {
     setLayerNameInputOpen(false);
     setNewLayerName("");
   };
-
+  const closeBar = () => {
+    setLayerNameInputOpen(false);
+    setNewLayerName("")
+  };
   const handlePlusBtnClick = () => {
     if (!layerNameInputOpen) return setLayerNameInputOpen(true);
     addNewLayer();
   };
-  return { updateText, handlePlusBtnClick, layerNameInputOpen, newLayerName };
+  return { updateText, handlePlusBtnClick,closeBar, layerNameInputOpen, newLayerName };
 };
 
 export default AddLayerButtonVM;

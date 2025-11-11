@@ -45,7 +45,20 @@ const SettingScreenMV = () => {
     setCanvasSizeValue(canvasSize);
     setMaxUsersInRoom(maxUsers);
   };
-
+  useEffect(() => {
+    if (!modalOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setModalOpen(false);
+        return;
+      }
+      if (e.key === "Enter") {
+        changSettings();
+      }
+    };
+    globalThis.addEventListener("keydown", handleKeyDown);
+    return () => globalThis.removeEventListener("keydown", handleKeyDown);
+  }, [modalOpen, setModalOpen]);
   return {
     canvasSizeValue,
     modalOpen,

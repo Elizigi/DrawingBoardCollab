@@ -135,14 +135,14 @@ const TopRightToolbarVM = () => {
     if (connectionType === null) return;
     if (
       (connectionType === ConnectionTypes.host && isHost) ||
-      (!isHost && connectionType===ConnectionTypes.guest)
+      (!isHost && connectionType === ConnectionTypes.guest)
     ) {
       setOnlineWindowOpen(!onlineWindowOpen);
       return;
     }
     setIsHost(connectionType === ConnectionTypes.host);
     setHasInteracted(false);
-    setOnlineWindowOpen(true)
+    setOnlineWindowOpen(true);
   };
 
   const cleanup = () => {
@@ -202,6 +202,14 @@ const TopRightToolbarVM = () => {
   useEffect(() => {
     setError("");
   }, [onlineWindowOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !onlineWindowOpen) setMenuOpen(false);
+    };
+    globalThis.addEventListener("keydown", handleKeyDown);
+    return () => globalThis.removeEventListener("keydown", handleKeyDown);
+  }, [menuOpen, onlineWindowOpen, setOnlineWindowOpen, setMenuOpen]);
 
   useEffect(() => {
     if (!hasInteracted) return;
