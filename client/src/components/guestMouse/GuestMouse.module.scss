@@ -2,7 +2,7 @@
   position: fixed;
   user-select: none;
   transform: translate(-10%, -60%);
-  z-index: 9;
+  z-index: 999;
   h2 {
     background-color: $bg-harsh;
   }
