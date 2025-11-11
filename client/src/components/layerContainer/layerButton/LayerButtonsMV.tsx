@@ -125,9 +125,8 @@ const LayerButtonsMV = () => {
 
   const findPositionInsertion = () => {
     const potentialPos = layerPotentialPositionRef.current;
-    if (potentialPos === -1 || draggedLayer === null) {
-      return draggedLayer ?? 0;
-    }
+    if (draggedLayer === null) return 0;
+    if (potentialPos === -1) return draggedLayer;
 
     if (potentialPos > draggedLayer) {
       return potentialPos - 1;
@@ -155,39 +154,34 @@ const LayerButtonsMV = () => {
       socket.emit("layer-reordered", draggedLayer, insertAt);
     }
   };
-
   const findPositionAbove = (clientY: number) => {
     if (draggedLayer === null) return -1;
-    let newPositionIndex = -1;
 
-    for (let i = draggedLayer + 1; i < layersPositionsRef.current.length; i++) {
+    for (let i = layersPositionsRef.current.length - 1; i > draggedLayer; i--) {
       if (clientY < layersPositionsRef.current[i].midpoint) {
-        newPositionIndex = i;
+        return i + 1;
       }
-      if (clientY > layersPositionsRef.current[i].midpoint) break;
+    }
+    return draggedLayer;
+  };
+
+  const findPositionBelow = (clientY: number) => {
+    if (draggedLayer === null) return -1;
+
+    for (let i = 0; i < draggedLayer; i++) {
+      if (clientY > layersPositionsRef.current[i].midpoint) {
+        return i;
+      }
     }
 
-    return newPositionIndex === -1 ? draggedLayer : newPositionIndex;
+    return draggedLayer;
   };
 
   const topCalculations = (index: number) => {
     if (draggedLayer === index) return layerOffset;
     if (draggedLayer !== null && layerPotentialPosition > index) return 60;
-
+    
     return 0;
-  };
-
-  const findPositionBelow = (clientY: number) => {
-    if (draggedLayer === null) return -1;
-    let newPositionIndex = -1;
-
-    for (let i = draggedLayer - 1; i >= 0; i--) {
-      if (clientY > layersPositionsRef.current[i].midpoint) {
-        newPositionIndex = i;
-      }
-      if (clientY < layersPositionsRef.current[i].midpoint) break;
-    }
-    return newPositionIndex === -1 ? draggedLayer : newPositionIndex;
   };
 
   const checkBoundary = (clientY: number, draggedLayer: number) => {
@@ -221,7 +215,11 @@ const LayerButtonsMV = () => {
       if (Math.abs(deltaY) < dragThreshold) {
         return;
       }
-      setCanDrag(true);
+      if (!canDrag) {
+        setCanDrag(true);
+        const offsetY = checkBoundary(clientY, draggedLayer);
+        setLayerOffset(offsetY);
+      }
       const clientYRel = clientY - layersContainerBounds.top;
 
       const draggedLayerPosition = layersPositionsRef.current[draggedLayer];
