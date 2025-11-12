@@ -8,7 +8,8 @@ export default [
         ignores: [
             "node_modules",
             "client/dist/**/*",
-            "server/dist/**/*"
+            "server/dist/**/*",
+            "railway.json"
         ]
     },
 
