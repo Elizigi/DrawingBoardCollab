@@ -6,7 +6,7 @@ A real-time collaborative drawing application that allows multiple users to draw
 ## Live Demo
 
 You can try the live version here:  
-👉 [https://drawingboardcollab-production.up.railway.app](https://drawingboardcollab-production.up.railway.app)
+ [https://drawingboardcollab-production.up.railway.app](https://drawingboardcollab-production.up.railway.app)
 
 ## Features
 
