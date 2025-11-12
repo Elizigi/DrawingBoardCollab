@@ -12,6 +12,7 @@ body {
 
 #root {
   background-color: rgb(88, 85, 85);
+  overflow: hidden;
   display: flex;
   position: relative;
   align-items: center;
@@ -21,6 +22,7 @@ body {
 #rot {
   width: fit-content;
   margin: 0;
+  overflow: hidden;
   display: flex;
   position: relative;
   background-color: #eee;

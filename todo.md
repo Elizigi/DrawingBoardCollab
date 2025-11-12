@@ -13,7 +13,7 @@
 - [✔] zoom in and out feature
 - [✔] Add export as PNG/JPEG
 - [✔] Improve mobile integration and touch support
-- [✔]Add image Movement and drag
+- [✔] Add image Movement and drag
+- [✔] Add animations
 - [ ] Reorganize file and function structure for clarity
-- [ ] Add animations
-- [ ] Chat ?!
+- [X] Chat ?!

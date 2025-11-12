@@ -64,17 +64,16 @@ const BrushToolbar = () => {
             onClick={handleColorClick}
             aria-label="Open color picker"
           >
-            <div className={styles.brushSizeDisplay}>
-              <h3
-                style={{
-                  color:
-                    textTarget === TextTarget.Opacity
-                      ? "$highlight"
-                      : "$text-color",
-                }}
-              >
-                {displayValue()}
-              </h3>
+            <div
+              style={{
+                color:
+                  textTarget === TextTarget.Opacity
+                    ? "$highlight"
+                    : "$text-color",
+              }}
+              className={styles.brushSizeDisplay}
+            >
+              <h3>{displayValue()}</h3>
             </div>
           </button>
         ) : (
