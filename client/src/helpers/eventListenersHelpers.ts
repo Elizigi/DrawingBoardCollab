@@ -1,5 +1,5 @@
 import { canvasScale, socket } from "../Main";
-import { useBrushStore } from "../zustand/useBrushStore";
+import { Transform, useBrushStore } from "../zustand/useBrushStore";
 import { useOnlineStatus } from "../zustand/useOnlineStatus";
 import {
   canvasSize,
@@ -21,7 +21,13 @@ export const transformSettings = {
   isResizingImage: false,
   resizeHandle: null as "tl" | "tr" | "bl" | "br" | null,
   dragStartPos: { x: 0, y: 0 },
-  initialTransform: { x: 0, y: 0, width: 0, height: 0, rotation: 0 },
+  initialTransform: {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+    rotation: 0,
+  } as Transform,
 };
 
 const allowedKeys = { ctrl: "ControlLeft", z: "KeyZ", y: "KeyY" };
@@ -75,7 +81,6 @@ export function addListeners(
     const { x, y } = getMousePosPercentOnElement(e, topInputCanvas);
     addPoint(x, y);
   });
-  
 
   topInputCanvas.addEventListener("touchstart", (e) => {
     e.preventDefault();
@@ -253,8 +258,13 @@ function getWorldMouseCoords(e: MouseEvent, topInputCanvas: HTMLCanvasElement) {
   return { mouseX, mouseY };
 }
 
-
-function handleImageDrag(mouseX: number, mouseY: number, activeLayer: any, state: any, inRoom: boolean) {
+function handleImageDrag(
+  mouseX: number,
+  mouseY: number,
+  activeLayer: any,
+  state: any,
+  inRoom: boolean
+) {
   const dx = mouseX - transformSettings.dragStartPos.x;
   const dy = mouseY - transformSettings.dragStartPos.y;
   const newTransform = {
@@ -262,55 +272,84 @@ function handleImageDrag(mouseX: number, mouseY: number, activeLayer: any, state
     x: transformSettings.initialTransform.x + dx,
     y: transformSettings.initialTransform.y + dy,
   };
-  
+
   state.updateLayerTransform(state.activeLayerId, newTransform);
-  
+
   if (inRoom) {
     socket.emit("update-transform", {
       layerId: state.activeLayerId,
       transform: newTransform,
     });
   }
-  
+
   redrawAllLayers();
 }
 
-function handleImageResize(mouseX: number, mouseY: number, state: any, inRoom: boolean) {
+function handleImageResize(
+  mouseX: number,
+  mouseY: number,
+  state: any,
+  inRoom: boolean
+) {
   const dx = mouseX - transformSettings.dragStartPos.x;
   const dy = mouseY - transformSettings.dragStartPos.y;
   let newTransform = { ...transformSettings.initialTransform };
 
   switch (transformSettings.resizeHandle) {
     case "br":
-      newTransform.width = Math.max(20, transformSettings.initialTransform.width + dx);
-      newTransform.height = Math.max(20, transformSettings.initialTransform.height + dy);
+      newTransform.width = Math.max(
+        20,
+        transformSettings.initialTransform.width + dx
+      );
+      newTransform.height = Math.max(
+        20,
+        transformSettings.initialTransform.height + dy
+      );
       break;
     case "bl":
-      newTransform.width = Math.max(20, transformSettings.initialTransform.width - dx);
-      newTransform.height = Math.max(20, transformSettings.initialTransform.height + dy);
+      newTransform.width = Math.max(
+        20,
+        transformSettings.initialTransform.width - dx
+      );
+      newTransform.height = Math.max(
+        20,
+        transformSettings.initialTransform.height + dy
+      );
       newTransform.x = transformSettings.initialTransform.x + dx;
       break;
     case "tr":
-      newTransform.width = Math.max(20, transformSettings.initialTransform.width + dx);
-      newTransform.height = Math.max(20, transformSettings.initialTransform.height - dy);
+      newTransform.width = Math.max(
+        20,
+        transformSettings.initialTransform.width + dx
+      );
+      newTransform.height = Math.max(
+        20,
+        transformSettings.initialTransform.height - dy
+      );
       newTransform.y = transformSettings.initialTransform.y + dy;
       break;
     case "tl":
-      newTransform.width = Math.max(20, transformSettings.initialTransform.width - dx);
-      newTransform.height = Math.max(20, transformSettings.initialTransform.height - dy);
+      newTransform.width = Math.max(
+        20,
+        transformSettings.initialTransform.width - dx
+      );
+      newTransform.height = Math.max(
+        20,
+        transformSettings.initialTransform.height - dy
+      );
       newTransform.x = transformSettings.initialTransform.x + dx;
       newTransform.y = transformSettings.initialTransform.y + dy;
       break;
   }
 
   state.updateLayerTransform(state.activeLayerId, newTransform);
-  
+
   if (inRoom) {
     socket.emit("update-transform", {
       layerId: state.activeLayerId,
       transform: newTransform,
     });
   }
-  
+
   redrawAllLayers();
 }
