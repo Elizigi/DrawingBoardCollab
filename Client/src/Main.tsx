@@ -20,18 +20,15 @@ import {
   createLayerCanvas,
   redrawAllLayers,
   processStrokeToTemp,
-  getMousePosPercentOnElement,
-  addPoint,
   drawStrokeToCtx,
   redrawLayer,
   refreshState,
   loopOverLayers,
   restoreLayerImage,
+  handleDrawing,
+  handleTransformInteraction,
 } from "./helpers/drawingHelpers.ts";
-import {
-  addListeners,
-  transformSettings,
-} from "./helpers/eventListenersHelpers.ts";
+import { addListeners } from "./helpers/eventListenersHelpers.ts";
 import { useOnlineStatus } from "./zustand/useOnlineStatus.ts";
 
 export const socket: Socket = io("http://localhost:3000", {
@@ -105,62 +102,16 @@ function main() {
       );
 
       if (activeLayer?.imageDataUrl && activeLayer.transform) {
-        const rect = topInputCanvas.getBoundingClientRect();
-        const clientX = e.clientX - rect.left;
-        const clientY = e.clientY - rect.top;
-
-        const mouseX = (clientX - canvasScale.offsetX) / canvasScale.scale;
-        const mouseY = (clientY - canvasScale.offsetY) / canvasScale.scale;
-
-        const handleSize = 8 / canvasScale.scale;
-        const transform = activeLayer.transform;
-
-        const handles = {
-          tl: { x: transform.x, y: transform.y },
-          tr: { x: transform.x + transform.width, y: transform.y },
-          bl: { x: transform.x, y: transform.y + transform.height },
-          br: {
-            x: transform.x + transform.width,
-            y: transform.y + transform.height,
-          },
-        };
-
-        for (const [key, handle] of Object.entries(handles)) {
-          if (
-            Math.abs(mouseX - handle.x) < handleSize * 2 &&
-            Math.abs(mouseY - handle.y) < handleSize * 2
-          ) {
-            transformSettings.isResizingImage = true;
-            transformSettings.resizeHandle = key as any;
-            transformSettings.dragStartPos = { x: mouseX, y: mouseY };
-            transformSettings.initialTransform = { ...transform };
-            e.preventDefault();
-            e.stopPropagation();
-            return;
-          }
-        }
-
-        if (
-          mouseX >= transform.x &&
-          mouseX <= transform.x + transform.width &&
-          mouseY >= transform.y &&
-          mouseY <= transform.y + transform.height
-        ) {
-          transformSettings.isDraggingImage = true;
-          transformSettings.dragStartPos = { x: mouseX, y: mouseY };
-          transformSettings.initialTransform = { ...transform };
-          e.preventDefault();
-          e.stopPropagation();
-          return;
-        }
+        const handled = handleTransformInteraction(
+          e,
+          topInputCanvas,
+          activeLayer,
+          state
+        );
+        if (handled) return;
       }
 
-      state.setMouseDown(true);
-      const { x, y } = getMousePosPercentOnElement(e, topInputCanvas);
-
-      state.clearPendingStroke();
-      state.addUsedColor(state.brushColor);
-      addPoint(x, y);
+      handleDrawing(e, topInputCanvas, state);
     });
   }
 
@@ -219,7 +170,10 @@ function main() {
     canvasSize.width = data.width;
     resizeAllCanvases(canvasSize.width, canvasSize.height);
   });
-
+  socket.on("transform-updated", ({ layerId, transform }) => {
+    useBrushStore.getState().updateLayerTransform(layerId, transform);
+    redrawLayer(layerId);
+  });
   socket.on("init", (data) => {
     if (!data) return;
     const { strokes, layers, canvasSize: newCanvasSize } = data;

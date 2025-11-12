@@ -165,12 +165,13 @@ const ContextMenuMV = () => {
             tempCtx.drawImage(img, 0, 0, width, height);
             const imageDataUrl = tempCanvas.toDataURL("image/jpeg", 0.8);
             store.setLayerImage(layerId, imageDataUrl);
-
+            const layer = store.layers.find((l) => l.id === layerId);
             if (inRoom && isAdmin) {
               socket.emit("new-layer", {
                 layerId,
                 layerName: "Imported Image",
                 imageDataUrl,
+                transform: layer?.transform,
               });
             }
           }

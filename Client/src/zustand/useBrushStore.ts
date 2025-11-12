@@ -29,13 +29,7 @@ type LayerMeta = {
   visible: boolean;
   locked: boolean;
   imageDataUrl?: string;
-  transform?: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    rotation: number;
-  };
+  transform?:Transform
 };
 
 export type Stroke = {
@@ -48,7 +42,13 @@ export type Stroke = {
   isRemote?: boolean;
   final?: boolean;
 };
-
+export type Transform = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotation: number;
+};
 export type BrushState = {
   pendingPoints: { x: number; y: number }[];
   lastPoint: { x: number; y: number } | null;
@@ -79,16 +79,7 @@ export type BrushState = {
   renameLayer: (layerId: string, newName: string) => void;
 
   setLayerImage: (layerId: string, imageDataUrl: string) => void;
-  updateLayerTransform: (
-    layerId: string,
-    transform: {
-      x: number;
-      y: number;
-      width: number;
-      height: number;
-      rotation: number;
-    }
-  ) => void;
+  updateLayerTransform: (layerId: string, transform: Transform) => void;
 
   lockedLayersIds: Map<string, null>;
 

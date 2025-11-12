@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useBrushStore } from "../../zustand/useBrushStore";
+import { Transform, useBrushStore } from "../../zustand/useBrushStore";
 import { socket } from "../../Main";
 import { createLayerCanvas, redrawLayer } from "../../helpers/drawingHelpers";
 import { layersCanvasMap } from "../../helpers/canvasHelpers";
@@ -7,18 +7,25 @@ type LayerPayload = {
   layerId: string;
   layerName: string;
   imageDataUrl: string;
+  transform: Transform;
 };
 
 const LayerContainerVM = () => {
   const toggleLockLayers = useBrushStore((state) => state.toggleLockLayer);
 
   const addLayer = useBrushStore((state) => state.addLayer);
+  const updateLayerTransform = useBrushStore(
+    (state) => state.updateLayerTransform
+  );
+
   const removeLayer = useBrushStore((state) => state.removeLayer);
   const setLayerImage = useBrushStore((state) => state.setLayerImage);
 
   const activeLayerId = useBrushStore((state) => state.activeLayerId);
 
-  const [containerVisible, setContainerVisible] = useState(window.innerWidth>660);
+  const [containerVisible, setContainerVisible] = useState(
+    window.innerWidth > 660
+  );
 
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
@@ -47,6 +54,7 @@ const LayerContainerVM = () => {
     layerId,
     layerName,
     imageDataUrl,
+    transform,
   }: LayerPayload) => {
     addLayer(layerName, layerId);
     createLayerCanvas(layerId);
@@ -58,6 +66,17 @@ const LayerContainerVM = () => {
         const entry = layersCanvasMap[layerId];
         if (entry) {
           entry.image = img;
+
+          const finalTransform = transform || {
+            x: 0,
+            y: 0,
+            width: img.width,
+            height: img.height,
+            rotation: 0,
+          };
+          updateLayerTransform(layerId, finalTransform);
+          setLayerImage(layerId, imageDataUrl);
+
           redrawLayer(layerId);
         }
       };
@@ -94,7 +113,9 @@ const LayerContainerVM = () => {
       });
   };
 
-  const handlePointerDown = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+  const handlePointerDown = (
+    e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
+  ) => {
     if (!containerVisible || e.target !== dragAreaElement.current) return;
 
     setIsDragging(true);

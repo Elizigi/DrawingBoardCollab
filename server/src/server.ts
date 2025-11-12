@@ -156,7 +156,7 @@ io.on("connection", (socket) => {
     const sanitizedName = name.trim().replaceAll("<", "").replaceAll(">", "");
     socket.data.name = sanitizedName;
 
-    console.log( roomId, "users now:", [
+    console.log(roomId, "users now:", [
       ...(io.sockets.adapter.rooms.get(roomId) || []),
     ]);
 
@@ -194,7 +194,7 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("user-updated", { userLimit: newLimit });
   });
 
-  socket.on("new-layer", ({ layerId, layerName, imageDataUrl }) => {
+  socket.on("new-layer", ({ layerId, layerName, imageDataUrl,transform }) => {
     if (!layerId || typeof layerId !== "string") return;
     if (!layerName || typeof layerName !== "string") return;
     if (layerName.length > 50) return;
@@ -205,7 +205,7 @@ io.on("connection", (socket) => {
     }
     socket.broadcast
       .to(roomId)
-      .emit("add-layer", { layerId, layerName, imageDataUrl });
+      .emit("add-layer", { layerId, layerName, imageDataUrl,transform });
   });
   socket.on("send-name", ({ name, userId, guestId }) => {
     console.log("name Sent:", name, userId);
@@ -301,7 +301,25 @@ io.on("connection", (socket) => {
       io.to(socket.id).emit("user-removed", { reason: "left by choice" });
     }
   });
+  socket.on("update-transform", ({ layerId, transform }) => {
+    const roomId = socket.data.roomId;
+    const hostId = roomsMap.get(roomId);
 
+    if (socket.id !== hostId) {
+      return io
+        .to(socket.id)
+        .emit("no-permission", "Only the host can transform images.");
+    }
+
+    const room = io.sockets.adapter.rooms.get(roomId);
+    if (!room?.has(socket.id)) {
+      return socket.emit("error", "Not in room");
+    }
+
+    socket.broadcast
+      .to(roomId)
+      .emit("transform-updated", { layerId, transform });
+  });
   socket.on("disconnect", () => {
     const roomId = socket.data.roomId;
     const name = socket.data.name;
