@@ -2,7 +2,17 @@
   "name": "drawingboard-root",
   "private": true,
   "scripts": {
-    "build": "cd client && npm install && npm run build && cd ../server && npm install && npm run build",
-    "start": "cd server && npm run start"
+    "install:server": "npm install --prefix server",
+    "install:client": "npm install --prefix client",
+    "build:client": "npm run build --prefix client",
+    "build:server": "npm run build --prefix server",
+    
+    "build": "npm run build:client && npm run build:server",
+    
+ 
+    "start": "npm start --prefix server" 
+  },
+  "dependencies": {
+
   }
 }
