@@ -1,9 +1,10 @@
+process.env.DEBUG_URL = "";
+if (process.env.DEBUG_URL) delete process.env.DEBUG_URL;
 import express from "express";
 import http from "node:http";
 import cors from "cors";
 import { Server as SocketIOServer } from "socket.io";
 import path from "node:path";
-delete process.env.DEBUG_URL;
 const app = express();
 const server = http.createServer(app);
 const io = new SocketIOServer(server, {
@@ -321,7 +322,7 @@ io.on("connection", (socket) => {
 });
 
 app.use(express.static(path.join(__dirname, "../client/dist")));
-app.get("*", (req, res) => {
+app.get("/*splat", (req, res) => {
   res.sendFile(path.join(__dirname, "../client/dist/index.html"));
 });
 const PORT = process.env.PORT || 3000;
