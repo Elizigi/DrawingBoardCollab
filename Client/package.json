@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "start": "npm run dev",
-    "build": "npm run lint && tsc && vite build",
-    "lint": "eslint .",
+    "clean": "if exist dist rmdir /s /q dist",
+    "build": "npm run clean && npm run lint && tsc && vite build",
+    "lint": "eslint . --ignore-pattern dist",
     "dev": "vite"
   },
   "dependencies": {
