@@ -15,5 +15,5 @@
 - [✔] Improve mobile integration and touch support
 - [✔] Add image Movement and drag
 - [✔] Add animations
-- [ ] Reorganize file and function structure for clarity
+- [✔] Reorganize file and function structure for clarity
 - [X] Chat ?!
