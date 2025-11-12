@@ -1,6 +1,5 @@
 import BrushToolbarVM from "./BrushToolbarVM";
 import styles from "./BrushToolbar.module.scss";
-
 const BrushToolbar = () => {
   const {
     brushColor,
@@ -65,15 +64,13 @@ const BrushToolbar = () => {
             aria-label="Open color picker"
           >
             <div
-              style={{
-                color:
-                  textTarget === TextTarget.Opacity
-                    ? "$highlight"
-                    : "$text-color",
-              }}
-              className={styles.brushSizeDisplay}
+              className={`${styles.brushSizeDisplay} ${
+                textTarget === TextTarget.Opacity
+                  ? styles.highlightedText
+                  : styles.brushSizeDisplay
+              }`}
             >
-              <h3>{displayValue()}</h3>
+              <h3 >{displayValue()}</h3>
             </div>
           </button>
         ) : (

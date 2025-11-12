@@ -21,7 +21,11 @@ app.use(
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https://drawingboardcollab-production.up.railway.app"],
+      imgSrc: [
+        "'self'",
+        "data:",
+        "https://drawingboardcollab-production.up.railway.app",
+      ],
     },
   })
 );
@@ -332,9 +336,18 @@ io.on("connection", (socket) => {
   });
 });
 
-app.use(express.static(path.join(__dirname, "../client/dist")));
-app.get("/*splat", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
+const clientPath = path.join(__dirname, "../../client/dist");
+app.use(express.static(clientPath));
+
+app.get("*splat", (req, res) => {
+  const indexPath = path.join(clientPath, "index.html");
+  console.log("Trying to serve:", indexPath);
+  res.sendFile(indexPath, (err) => {
+    if (err) {
+      console.error("Error sending index.html:", err);
+      res.status(500).send("Something went wrong");
+    }
+  });
 });
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
