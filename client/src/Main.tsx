@@ -31,7 +31,7 @@ import {
 import { addListeners } from "./helpers/eventListenersHelpers.ts";
 import { useOnlineStatus } from "./zustand/useOnlineStatus.ts";
 
-export const socket: Socket = io("http://localhost:3000", {
+export const socket: Socket = io(import.meta.env.VITE_SERVER_URL || globalThis.location.origin, {
   autoConnect: false,
 });
 
