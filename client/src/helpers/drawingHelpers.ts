@@ -2,6 +2,7 @@ import {
   BrushState,
   defaultLayer,
   EventTypes,
+  LayerMeta,
   Stroke,
   useBrushStore,
 } from "../zustand/useBrushStore.ts";
@@ -13,7 +14,7 @@ import {
   getLocalTempCanvas,
 } from "./canvasHelpers.ts";
 import { useOnlineStatus } from "../zustand/useOnlineStatus.ts";
-import { transformSettings } from "./eventListenersHelpers.ts";
+import { resizeTypes, transformSettings } from "./eventListenersHelpers.ts";
 
 export function numToHexColor(num: number) {
   return "#" + num.toString(16).padStart(6, "0");
@@ -41,7 +42,7 @@ export function getMousePosPercentOnElement(
 
   return { x: (worldX / el.width) * 100, y: (worldY / el.height) * 100 };
 }
-export function restoreLayerImage(layer: any) {
+export function restoreLayerImage(layer: LayerMeta) {
   if (!layer.imageDataUrl) return;
 
   const img = new Image();
@@ -458,8 +459,8 @@ export function clampCanvasOffset() {
 export function handleTransformInteraction(
   e: MouseEvent,
   topInputCanvas: HTMLCanvasElement,
-  activeLayer: any,
-  state: any
+  activeLayer: LayerMeta,
+  state: BrushState
 ): boolean {
   const rect = topInputCanvas.getBoundingClientRect();
   const clientX = e.clientX - rect.left;
@@ -470,7 +471,7 @@ export function handleTransformInteraction(
 
   const handleSize = 8 / canvasScale.scale;
   const transform = activeLayer.transform;
-
+  if (!transform) return false;
   const handles = {
     tl: { x: transform.x, y: transform.y },
     tr: { x: transform.x + transform.width, y: transform.y },
@@ -486,19 +487,19 @@ export function handleTransformInteraction(
       Math.abs(mouseX - handle.x) < handleSize * 2 &&
       Math.abs(mouseY - handle.y) < handleSize * 2
     ) {
-      const { isAdmin ,isOnline } = useOnlineStatus.getState();
-      if (!isAdmin&&isOnline) {
+      const { isAdmin, isOnline } = useOnlineStatus.getState();
+      if (!isAdmin && isOnline) {
         state.addEvent(EventTypes.noPermission, "");
-        return true; 
+        return true;
       }
 
       transformSettings.isResizingImage = true;
-      transformSettings.resizeHandle = key as any;
+      transformSettings.resizeHandle = key as resizeTypes;
       transformSettings.dragStartPos = { x: mouseX, y: mouseY };
       transformSettings.initialTransform = { ...transform };
       e.preventDefault();
       e.stopPropagation();
-      return true; 
+      return true;
     }
   }
 
@@ -508,10 +509,10 @@ export function handleTransformInteraction(
     mouseY >= transform.y &&
     mouseY <= transform.y + transform.height
   ) {
-    const { isAdmin,isOnline } = useOnlineStatus.getState();
-    if (!isAdmin&&isOnline) {
+    const { isAdmin, isOnline } = useOnlineStatus.getState();
+    if (!isAdmin && isOnline) {
       state.addEvent(EventTypes.noPermission, "");
-      return true; 
+      return true;
     }
 
     transformSettings.isDraggingImage = true;
@@ -519,16 +520,16 @@ export function handleTransformInteraction(
     transformSettings.initialTransform = { ...transform };
     e.preventDefault();
     e.stopPropagation();
-    return true; 
+    return true;
   }
 
-  return false; 
+  return false;
 }
 
 export function handleDrawing(
   e: MouseEvent,
   topInputCanvas: HTMLCanvasElement,
-  state: any
+  state: BrushState
 ) {
   state.setMouseDown(true);
   const { x, y } = getMousePosPercentOnElement(e, topInputCanvas);

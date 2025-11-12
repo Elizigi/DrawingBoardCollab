@@ -23,13 +23,13 @@ export const EventTypes = {
   default: "Disconnected from room",
 } as const;
 
-type LayerMeta = {
+export type LayerMeta = {
   id: string;
   name: string;
   visible: boolean;
   locked: boolean;
   imageDataUrl?: string;
-  transform?:Transform
+  transform?: Transform;
 };
 
 export type Stroke = {
@@ -41,6 +41,7 @@ export type Stroke = {
   layerId: string;
   isRemote?: boolean;
   final?: boolean;
+  senderId?: string;
 };
 export type Transform = {
   x: number;

@@ -1,5 +1,10 @@
 import { canvasScale, socket } from "../Main";
-import { Transform, useBrushStore } from "../zustand/useBrushStore";
+import {
+  BrushState,
+  LayerMeta,
+  Transform,
+  useBrushStore,
+} from "../zustand/useBrushStore";
 import { useOnlineStatus } from "../zustand/useOnlineStatus";
 import {
   canvasSize,
@@ -16,10 +21,11 @@ import {
   getTouchPosPercent,
   redrawAllLayers,
 } from "./drawingHelpers";
+export type resizeTypes = "tl" | "tr" | "bl" | "br" | null;
 export const transformSettings = {
   isDraggingImage: false,
   isResizingImage: false,
-  resizeHandle: null as "tl" | "tr" | "bl" | "br" | null,
+  resizeHandle: null as resizeTypes,
   dragStartPos: { x: 0, y: 0 },
   initialTransform: {
     x: 0,
@@ -209,8 +215,10 @@ export function addListeners(
     if (!canvasScale.isPanning) return;
     canvasScale.isPanning = false;
     try {
-      (e.target as Element).releasePointerCapture((e as any).pointerId);
-    } catch {}
+      (e.target as Element).releasePointerCapture(e.pointerId);
+    } catch {
+      console.log("error", e);
+    }
   };
   topInputCanvas.addEventListener("pointerup", stopPan);
   topInputCanvas.addEventListener("pointercancel", stopPan);
@@ -261,19 +269,26 @@ function getWorldMouseCoords(e: MouseEvent, topInputCanvas: HTMLCanvasElement) {
 function handleImageDrag(
   mouseX: number,
   mouseY: number,
-  activeLayer: any,
-  state: any,
+  activeLayer: LayerMeta,
+  state: BrushState,
   inRoom: boolean
 ) {
   const dx = mouseX - transformSettings.dragStartPos.x;
   const dy = mouseY - transformSettings.dragStartPos.y;
+  const currentTransform = activeLayer.transform || {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+    rotation: 0,
+  };
   const newTransform = {
-    ...activeLayer.transform,
+    ...currentTransform,
     x: transformSettings.initialTransform.x + dx,
     y: transformSettings.initialTransform.y + dy,
   };
 
-  state.updateLayerTransform(state.activeLayerId, newTransform);
+  state.updateLayerTransform(state.activeLayerId!, newTransform);
 
   if (inRoom) {
     socket.emit("update-transform", {
@@ -288,13 +303,12 @@ function handleImageDrag(
 function handleImageResize(
   mouseX: number,
   mouseY: number,
-  state: any,
+  state: BrushState,
   inRoom: boolean
 ) {
   const dx = mouseX - transformSettings.dragStartPos.x;
   const dy = mouseY - transformSettings.dragStartPos.y;
-  let newTransform = { ...transformSettings.initialTransform };
-
+  const newTransform = { ...transformSettings.initialTransform };
   switch (transformSettings.resizeHandle) {
     case "br":
       newTransform.width = Math.max(
@@ -342,7 +356,7 @@ function handleImageResize(
       break;
   }
 
-  state.updateLayerTransform(state.activeLayerId, newTransform);
+  state.updateLayerTransform(state.activeLayerId!, newTransform);
 
   if (inRoom) {
     socket.emit("update-transform", {

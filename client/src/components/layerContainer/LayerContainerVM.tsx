@@ -131,7 +131,7 @@ const LayerContainerVM = () => {
     const friction = 0.22;
     const springStrength = 0.1;
 
-    let currentVelocity = { ...velocity };
+    const currentVelocity = { ...velocity };
     let currentRotation = rotation;
 
     const animate = () => {

@@ -62,7 +62,6 @@ const ContextMenuMV = () => {
       const entry = layersCanvasMap[layer.id];
       if (!entry) return;
 
-      ctx.globalAlpha = (layer as any).opacity ?? 1;
       ctx.drawImage(entry.canvas, 0, 0);
     }
 

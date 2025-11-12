@@ -70,7 +70,6 @@ function main() {
       if (!entry || !prevLayer) continue;
 
       entry.canvas.style.display = layer.visible ? "block" : "none";
-      entry.canvas.style.opacity = (layer as any).opacity?.toString() ?? "1";
       entry.canvas.style.zIndex = `${(i + 1) * 10}`;
       if (layer.visible !== prevLayer.visible) {
         redrawLayer(layer.id);
@@ -199,7 +198,7 @@ function main() {
     }
   });
 
-  socket.on("draw-progress", (stroke: any) => {
+  socket.on("draw-progress", (stroke: Stroke) => {
     if (stroke.senderId === socket.id) return;
     const remoteTempCanvas = getRemoteTempCanvas();
     if (!remoteTempCanvas) return;

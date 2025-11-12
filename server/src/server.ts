@@ -2,6 +2,7 @@ import express from "express";
 import http from "node:http";
 import cors from "cors";
 import { Server as SocketIOServer } from "socket.io";
+import path from "node:path";
 
 const app = express();
 const server = http.createServer(app);
@@ -194,7 +195,7 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("user-updated", { userLimit: newLimit });
   });
 
-  socket.on("new-layer", ({ layerId, layerName, imageDataUrl,transform }) => {
+  socket.on("new-layer", ({ layerId, layerName, imageDataUrl }) => {
     if (!layerId || typeof layerId !== "string") return;
     if (!layerName || typeof layerName !== "string") return;
     if (layerName.length > 50) return;
@@ -205,7 +206,7 @@ io.on("connection", (socket) => {
     }
     socket.broadcast
       .to(roomId)
-      .emit("add-layer", { layerId, layerName, imageDataUrl,transform });
+      .emit("add-layer", { layerId, layerName, imageDataUrl });
   });
   socket.on("send-name", ({ name, userId, guestId }) => {
     console.log("name Sent:", name, userId);
@@ -301,25 +302,7 @@ io.on("connection", (socket) => {
       io.to(socket.id).emit("user-removed", { reason: "left by choice" });
     }
   });
-  socket.on("update-transform", ({ layerId, transform }) => {
-    const roomId = socket.data.roomId;
-    const hostId = roomsMap.get(roomId);
 
-    if (socket.id !== hostId) {
-      return io
-        .to(socket.id)
-        .emit("no-permission", "Only the host can transform images.");
-    }
-
-    const room = io.sockets.adapter.rooms.get(roomId);
-    if (!room?.has(socket.id)) {
-      return socket.emit("error", "Not in room");
-    }
-
-    socket.broadcast
-      .to(roomId)
-      .emit("transform-updated", { layerId, transform });
-  });
   socket.on("disconnect", () => {
     const roomId = socket.data.roomId;
     const name = socket.data.name;
@@ -337,7 +320,11 @@ io.on("connection", (socket) => {
   });
 });
 
-const PORT = 3000;
+app.use(express.static(path.join(__dirname, "../client/dist")));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
+});
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server listening at http://localhost:${PORT}`);
 });
