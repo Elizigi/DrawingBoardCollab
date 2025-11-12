@@ -14,6 +14,17 @@ const io = new SocketIOServer(server, {
   pingTimeout: 60000,
   pingInterval: 25000,
 });
+import helmet from "helmet";
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https://drawingboardcollab-production.up.railway.app"],
+    },
+  })
+);
 
 app.use(cors());
 
