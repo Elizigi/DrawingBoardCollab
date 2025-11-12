@@ -4,8 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "npm run dev",
-  "build": "rimraf dist && eslint . --ignore-pattern dist && tsc && vite build",
+ "build": "rimraf dist && eslint . --ignore-pattern dist && tsc && vite build",
       "dev": "vite"
   },
   "dependencies": {
