@@ -3,7 +3,7 @@ import http from "node:http";
 import cors from "cors";
 import { Server as SocketIOServer } from "socket.io";
 import path from "node:path";
-
+delete process.env.DEBUG_URL;
 const app = express();
 const server = http.createServer(app);
 const io = new SocketIOServer(server, {
