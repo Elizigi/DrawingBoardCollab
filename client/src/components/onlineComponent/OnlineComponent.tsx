@@ -1,4 +1,4 @@
-import styles from "./onlineComponent.module.scss";
+import styles from "./OnlineComponent.module.scss";
 import OnlineComponentVM from "./OnlineComponentVM";
 import { FC, RefObject } from "react";
 
