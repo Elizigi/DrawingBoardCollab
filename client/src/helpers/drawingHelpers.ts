@@ -486,8 +486,8 @@ export function handleTransformInteraction(
       Math.abs(mouseX - handle.x) < handleSize * 2 &&
       Math.abs(mouseY - handle.y) < handleSize * 2
     ) {
-      const { isAdmin } = useOnlineStatus.getState();
-      if (!isAdmin) {
+      const { isAdmin ,isOnline } = useOnlineStatus.getState();
+      if (!isAdmin&&isOnline) {
         state.addEvent(EventTypes.noPermission, "");
         return true; 
       }
@@ -508,8 +508,8 @@ export function handleTransformInteraction(
     mouseY >= transform.y &&
     mouseY <= transform.y + transform.height
   ) {
-    const { isAdmin } = useOnlineStatus.getState();
-    if (!isAdmin) {
+    const { isAdmin,isOnline } = useOnlineStatus.getState();
+    if (!isAdmin&&isOnline) {
       state.addEvent(EventTypes.noPermission, "");
       return true; 
     }
