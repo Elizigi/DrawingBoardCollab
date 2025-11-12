@@ -2,6 +2,12 @@
 
 A real-time collaborative drawing application that allows multiple users to draw together on a shared canvas. Built with React, Express.js, and Socket.IO for seamless real-time communication.
 
+
+## Live Demo
+
+You can try the live version here:  
+👉 [https://drawingboardcollab-production.up.railway.app](https://drawingboardcollab-production.up.railway.app)
+
 ## Features
 
 ### Drawing Tools
