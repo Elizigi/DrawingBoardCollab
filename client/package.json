@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "start": "npm run dev",
-    "build": "if exist dist rmdir /s /q dist && eslint . --ignore-pattern dist && tsc && vite build",
-    "dev": "vite"
+  "build": "rimraf dist && eslint . --ignore-pattern dist && tsc && vite build",
+      "dev": "vite"
   },
   "dependencies": {
     "react": "^19.1.0",
