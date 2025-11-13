@@ -21,11 +21,7 @@ app.use(
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: [
-        "'self'",
-        "data:",
-        "https://drawingboardcollab-production.up.railway.app",
-      ],
+          imgSrc: ["'self'", "data:", "blob:", "https://drawingboardcollab-production.up.railway.app"],
     },
   })
 );
