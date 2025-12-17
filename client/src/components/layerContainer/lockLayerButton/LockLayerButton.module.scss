@@ -13,7 +13,7 @@
   justify-content: center;
 
   &::after {
-    content: "\1F512";
+    content: url("./assets/lockClosed.svg");
     font-size: 1rem;
     transition: all 0.2s ease;
   }

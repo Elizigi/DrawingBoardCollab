@@ -27,17 +27,9 @@ const LayerButtons = () => {
   return (
     <div className={styles.layersContainer} ref={layerContainerRef}>
       {allLayers.map((layer, index) => (
-        <button
-          onClick={() => changeLayer(layer.id)}
-          onMouseDown={(e) => handleLayerDown(index, e)}
-          onTouchStart={(e) => handleLayerTouch(index, e)}
-          id={layer.id}
+        <div
           key={`layer-id:${layer.id}`}
-          ref={(el) => {
-            if (el) layerRefs.current.set(layer.id, el);
-            else layerRefs.current.delete(layer.id);
-          }}
-          className={`${styles.layer} ${layer.id === activeLayerId ? styles.backGReen : ""}`}
+          className={styles.layerContainer}
           style={{
             order: allLayers.length - index,
             top: `${topCalculations(index)}px`,
@@ -50,38 +42,51 @@ const LayerButtons = () => {
           }}
         >
           <ToggleLayerVisibility layer={layer} />
-
-          <div
-            role="toolbar"
-            tabIndex={0}
-            className={styles.layerNameContainer}
-            onDoubleClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              if (inRoom && !isAdmin) return;
-              setIsNameEdit(layer.id);
+          <button
+            onClick={() => changeLayer(layer.id)}
+            onMouseDown={(e) => handleLayerDown(index, e)}
+            onTouchStart={(e) => handleLayerTouch(index, e)}
+            id={layer.id}
+            ref={(el) => {
+              if (el) layerRefs.current.set(layer.id, el);
+              else layerRefs.current.delete(layer.id);
             }}
+            className={`${styles.layer} ${layer.id === activeLayerId ? styles.backGReen : ""}`}
           >
-            {isNameEdit === layer.id ? (
-              <input
-                type="text"
-                className={styles.layerEdit}
-                placeholder={layer.name}
-                onBlur={(e) => setNewName(layer.id, e.target.value, layer.name)}
-                onKeyDown={(e) => handleKeyPress(layer.id, e, layer.name)}
-                autoFocus
-              />
-            ) : (
-              <h5 className={styles.layerName}>{layer.name}</h5>
-            )}
-          </div>
-          <LockLayerButton layer={layer} />
-          <DeleteLayerButton
-            key={`delete-${layer.id}`}
-            layerId={layer.id}
-            isLocked={layer.locked}
-          />
-        </button>
+            <div
+              role="toolbar"
+              tabIndex={0}
+              className={styles.layerNameContainer}
+              onDoubleClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                if (inRoom && !isAdmin) return;
+                setIsNameEdit(layer.id);
+              }}
+            >
+              {isNameEdit === layer.id ? (
+                <input
+                  type="text"
+                  className={styles.layerEdit}
+                  placeholder={layer.name}
+                  onBlur={(e) =>
+                    setNewName(layer.id, e.target.value, layer.name)
+                  }
+                  onKeyDown={(e) => handleKeyPress(layer.id, e, layer.name)}
+                  autoFocus
+                />
+              ) : (
+                <h5 className={styles.layerName}>{layer.name}</h5>
+              )}
+            </div>
+            <LockLayerButton layer={layer} />
+            <DeleteLayerButton
+              key={`delete-${layer.id}`}
+              layerId={layer.id}
+              isLocked={layer.locked}
+            />
+          </button>
+        </div>
       ))}
     </div>
   );
