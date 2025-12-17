@@ -94,6 +94,8 @@
     width: 500;
     height: 300;
     transform-origin: center;
+    mask: linear-gradient(180deg, black, transparent);
+    -webkit-mask: linear-gradient(180deg, black, transparent);
     fill: rgb(189, 153, 110);
     circle {
       cx: 50;
@@ -102,16 +104,14 @@
       fill: none;
       transform-origin: center;
     }
-   circle:nth-child(1) {
-    stroke: rgba(0, 0, 0, 0.7);
-    stroke-width: 1.5rem;
-    stroke-dasharray: 160 314;
-    stroke-linecap: round;
-    transform-origin: center;
-    transform: translate(-5.2rem, 3.8rem) rotate(130deg);
-    mask: linear-gradient(90deg, black, transparent);
-    -webkit-mask: linear-gradient(90deg, black, transparent);
-  }
+    circle:nth-child(1) {
+      stroke: rgba(0, 0, 0, 0.7);
+      stroke-width: 1.5rem;
+      stroke-dasharray: 160 314;
+      stroke-linecap: round;
+      transform-origin: center;
+      transform: translate(-5.2rem, 3.8rem) rotate(130deg);
+    }
   }
 
   .brushSizeDisplay {
