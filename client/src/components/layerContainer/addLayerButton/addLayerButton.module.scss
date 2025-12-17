@@ -14,9 +14,11 @@
     width: 2rem;
     height: 2rem;
     transition: all 0.2s ease;
-    font-weight: 2000;
-    font-size: 2rem;
-    margin-top: 0.3rem;
+    font-weight: 500;
+    font-size: 1.8rem;
+    margin-top: 0.6rem;
+    margin-bottom: 0.4rem;
+
     &:hover {
       background-color: $bg-light;
       transform: scale(1.05);
@@ -30,7 +32,7 @@
     border-radius: 6px;
     color: $text-color;
     padding: 0.4rem 0.6rem;
-    font-size: 0.8rem;
+    font-size: 1rem;
     outline: none;
     width: 8rem;
 

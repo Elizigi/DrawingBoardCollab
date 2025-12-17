@@ -8,15 +8,21 @@ interface ToggleLayerVisibility {
 const ToggleLayerVisibility: FC<ToggleLayerVisibility> = ({ layer }) => {
   const { changeVisible } = ToggleLayerVisibilityMV();
   return (
-    <input
-      type="checkbox"
-      checked={true}
+    <div
+      role="toolbar"
       className={`${styles.visibilityIcon} ${layer.visible ? "" : styles.hidden}`}
-      onChange={(e) => {
+      onKeyDown={() => {}}
+      onClick={(e) => {
         e.stopPropagation();
         changeVisible(layer.id);
       }}
-    />
+    >
+      {layer.visible ? (
+        <img src="/assets/eyeOpen.svg" alt="open eye" />
+      ) : (
+        <img src="/assets/eyeClosed.svg" alt="closed eye" />
+      )}
+    </div>
   );
 };
 

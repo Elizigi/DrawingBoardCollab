@@ -6,7 +6,7 @@
   width: 2rem;
   height: 2rem;
   margin: 0.2rem;
-  border-radius: 3px;
+  border-radius: 6px;
   position: relative;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -15,14 +15,9 @@
   justify-content: center;
   border: 3px solid $bg-dark;
   font-size: 2rem;
-
-  &::after {
-    content: "👁";
-    font-size: 0.8rem;
-    color: $text-color;
-    transition: all 0.2s ease;
+  img{
+    width: 1.4rem;
   }
-
   &.hidden {
     &::after {
       color: $bg-dark;
