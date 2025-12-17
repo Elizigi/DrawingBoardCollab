@@ -5,20 +5,18 @@
 
   .plusBTN {
     all: unset;
-    background-color: $bg-medium;
+    background-color: $bg-light;
     color: $text-color;
     cursor: pointer;
-    padding: 0.5rem;
-    font-size: 1.2rem;
-    border-radius: 8px;
-    border: solid $border-color 1px;
     display: flex;
     align-items: center;
     justify-content: center;
     width: 2rem;
     height: 2rem;
     transition: all 0.2s ease;
-
+    font-weight: 2000;
+    font-size: 2rem;
+    margin-top: 0.3rem;
     &:hover {
       background-color: $bg-light;
       transform: scale(1.05);
