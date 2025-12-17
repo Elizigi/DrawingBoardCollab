@@ -18,7 +18,12 @@ const HideLayerButton: FC<HideLayerButtonProps> = ({
       className={`${styles.hideLayersButton} ${toTheRight ? styles.toRight : styles.toLeft}`}
       onClick={() => toggleLayerContainer()}
     >
-      {getArrowDir()}
+      <img
+        className={styles.layerImg}
+        src="/assets/layers.svg"
+        alt="close/open layers"
+      />
+      <img src={getArrowDir()} alt="close/open layers" />
     </button>
   );
 };

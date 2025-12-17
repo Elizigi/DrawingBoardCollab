@@ -5,11 +5,11 @@ const HideLayerButtonMV = (toTheRight: boolean, containerVisible: boolean) => {
       (!toTheRight && containerVisible) ||
       (toTheRight && !containerVisible)
     ) {
-      return "↩";
+      return "/assets/arrowLeft.svg";
     }
-    return "↪";
+    return "/assets/arrowRight.svg";
   };
-  return {getArrowDir};
+  return { getArrowDir };
 };
 
 export default HideLayerButtonMV;

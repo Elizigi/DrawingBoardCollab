@@ -2,7 +2,6 @@ import { FC } from "react";
 import styles from "./DeleteLayerButton.module.scss";
 import DeleteLayerButtonMV from "./DeleteLayerButtonMV";
 import { useOnlineStatus } from "../../../zustand/useOnlineStatus";
-import X from "../../../../public/assets/X.svg";
 interface DeleteLayerButtonProps {
   layerId: string;
   isLocked: boolean;
@@ -28,7 +27,7 @@ const DeleteLayerButton: FC<DeleteLayerButtonProps> = ({
           onFocus={() => {}}
           onKeyDown={() => {}}
         >
-          <img src={X} alt="Delete layer" />
+          <img src="/assets/X.svg" alt="Delete layer" />
         </div>
       )}
     </div>
