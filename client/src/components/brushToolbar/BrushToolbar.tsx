@@ -4,8 +4,6 @@ const BrushToolbar = () => {
   const {
     brushColor,
     brushSize,
-    usedColors,
-    brushOpacity,
     isBrushOpen,
     textTarget,
     opacitySliderRef,
@@ -16,7 +14,6 @@ const BrushToolbar = () => {
     handleColorClick,
     displayValue,
     setIsBrushOpen,
-    setBrushColor,
     setBrushSize,
     changeColor,
   } = BrushToolbarVM();
@@ -27,10 +24,7 @@ const BrushToolbar = () => {
         <>
           <div
             className={styles.colorOfSlider}
-            style={{
-              opacity:
-                textTarget === TextTarget.Opacity ? brushOpacity * 0.01 : 1,
-            }}
+            
           ></div>
 
           <div className={styles.sizeSetBar} ref={opacitySliderRef}>
@@ -70,7 +64,7 @@ const BrushToolbar = () => {
                   : styles.brushSizeDisplay
               }`}
             >
-              <h3 >{displayValue()}</h3>
+              <h3>{displayValue()}</h3>
             </div>
           </button>
         ) : (
@@ -95,24 +89,6 @@ const BrushToolbar = () => {
           />
         )}
       </div>
-
-      {isBrushOpen && usedColors[0] !== null && (
-        <div className={styles.colorMenu}>
-          {usedColors.map(
-            (color, index) =>
-              color !== null && (
-                <button
-                  key={`${color}-${index}`}
-                  className={styles.pastColorElement}
-                  style={{
-                    backgroundColor: `#${color.toString(16).padStart(6, "0")}`,
-                  }}
-                  onClick={() => setBrushColor(color)}
-                ></button>
-              )
-          )}
-        </div>
-      )}
     </div>
   );
 };

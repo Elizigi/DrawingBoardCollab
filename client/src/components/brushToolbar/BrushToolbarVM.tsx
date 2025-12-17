@@ -13,8 +13,6 @@ const BrushToolbarVM = () => {
   const setBrushSize = useBrushStore((state) => state.setBrushSize);
   const setOpacity = useBrushStore((state) => state.setOpacity);
 
-  const usedColors = useBrushStore((state) => state.usedColors);
-
   function changeColor(_: number, e: React.ChangeEvent<HTMLInputElement>) {
     const newColor = Number.parseInt(e.target.value.slice(1), 16);
     setBrushColor(newColor);
@@ -113,8 +111,6 @@ const BrushToolbarVM = () => {
   return {
     brushColor,
     brushSize,
-    usedColors,
-    brushOpacity,
     isBrushOpen,
     textTarget,
     opacitySliderRef,
@@ -125,7 +121,6 @@ const BrushToolbarVM = () => {
     handleColorClick,
     displayValue,
     setIsBrushOpen,
-    setBrushColor,
     setBrushSize,
     changeColor,
   };
