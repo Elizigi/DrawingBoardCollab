@@ -3,7 +3,7 @@ import styles from "./BrushToolbar.module.scss";
 const BrushToolbar = () => {
   const {
     brushColor,
-    brushSize,
+    //brushSize,
     isBrushOpen,
     textTarget,
     opacitySliderRef,
@@ -14,7 +14,7 @@ const BrushToolbar = () => {
     handleColorClick,
     displayValue,
     setIsBrushOpen,
-    setBrushSize,
+    //setBrushSize,
     changeColor,
   } = BrushToolbarVM();
 
@@ -22,10 +22,10 @@ const BrushToolbar = () => {
     <div className={styles.brushToolbar}>
       {isBrushOpen && (
         <>
-          <div
-            className={styles.colorOfSlider}
-            
-          ></div>
+          <svg>
+            <circle></circle>
+            <circle></circle>
+          </svg>
 
           <div className={styles.sizeSetBar} ref={opacitySliderRef}>
             <button
@@ -37,14 +37,7 @@ const BrushToolbar = () => {
               onMouseLeave={() => setTextTarget(TextTarget.BrushSize)}
             ></button>
           </div>
-          <input
-            className={styles.brushSizeInput}
-            type="range"
-            min={1}
-            max={100}
-            value={brushSize}
-            onChange={(e) => setBrushSize(Number(e.target.value))}
-          />
+          
         </>
       )}
       <div className={styles.blackBorderWrapper}>

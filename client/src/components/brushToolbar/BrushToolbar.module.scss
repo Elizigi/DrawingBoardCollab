@@ -1,8 +1,13 @@
 .brushToolbar {
   position: fixed;
-  top: 4rem;
-  left: 2rem;
+  top: 0;
+  left: 0;
   z-index: 999999;
+  width: 12rem;
+  height: 12rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   .blackBorderWrapper {
     position: relative;
     border: $dark 1px solid;
@@ -59,7 +64,6 @@
     top: 2rem;
     left: 2rem;
     border-radius: 50%;
-    transform: translate(-2.75rem, -2.75rem);
     border: none;
     background: transparent;
     padding: 0;
@@ -70,11 +74,11 @@
       border-radius: 50%;
       position: absolute;
       top: 50%;
+      left: 30%;
       border: solid 1px $text-color;
       cursor: pointer;
       right: -0.75rem;
-      transform: translateY(-50%);
-      z-index: 9999;
+      z-index: 999999;
       background-color: $bg-dark;
     }
   }
@@ -84,33 +88,32 @@
     left: 4rem;
     z-index: 99999;
   }
-  .colorOfSlider {
-    width: 7rem;
-    height: 7rem;
+  svg {
     position: absolute;
-    top: 2rem;
-    left: 2rem;
-    border-radius: 50%;
-    transform: translate(-3.5rem, -3.5rem);
-    border: none;
-    padding: 0;
-
-    z-index: 4;
-
-    background: conic-gradient(
-      from 0deg,
-      $active-color 0deg,
-      $bg-light 30deg,
-      transparent 30deg,
-
-      transparent 220deg,
-      $bg-light 220deg,
-
-      $active-color 230deg,
-
-      $active-color 344deg
-    );
+    z-index: 9999;
+    width: 500;
+    height: 300;
+    transform-origin: center;
+    fill: rgb(189, 153, 110);
+    circle {
+      cx: 50;
+      cy: 50;
+      r: 50;
+      fill: none;
+      transform-origin: center;
+    }
+   circle:nth-child(1) {
+    stroke: rgba(0, 0, 0, 0.7);
+    stroke-width: 1.5rem;
+    stroke-dasharray: 160 314;
+    stroke-linecap: round;
+    transform-origin: center;
+    transform: translate(-5.2rem, 3.8rem) rotate(130deg);
+    mask: linear-gradient(90deg, black, transparent);
+    -webkit-mask: linear-gradient(90deg, black, transparent);
   }
+  }
+
   .brushSizeDisplay {
     position: fixed;
     z-index: 99999;
