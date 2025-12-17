@@ -29,7 +29,7 @@
     }
   }
 }
-.layerContainer{
+.layerContainer {
   display: flex;
   align-items: center;
 }
@@ -59,7 +59,7 @@
   touch-action: none;
   &:hover {
     background-color: $bg-light;
-    transform: translateY(-1px);
+    transform: translateX(1px);
   }
 
   &.backGReen {
@@ -74,9 +74,9 @@
 
     .layerName {
       margin: 0;
-      font-size: 0.75rem;
+      font-size: 1rem;
       cursor: text;
-      font-weight: 500;
+      font-weight: 520;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -84,8 +84,8 @@
     }
     .layerEdit {
       margin: 0;
-     width: 100%;
-      font-size: 0.75rem;
+      width: 100%;
+      font-size: 1rem;
       cursor: text;
       font-weight: 500;
       overflow: hidden;

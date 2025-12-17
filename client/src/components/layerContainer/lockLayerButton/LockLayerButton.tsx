@@ -8,31 +8,31 @@ interface LockLayerButtonProps {
 }
 const LockLayerButton: FC<LockLayerButtonProps> = ({ layer }) => {
   const { toggleLockLayer } = LockLayerButtonMV();
-      const { inRoom, isAdmin } = useOnlineStatus.getState();
-  
+  const { inRoom, isAdmin } = useOnlineStatus.getState();
+
   return (
     <div>
       {inRoom && !isAdmin ? (
-        <input
-          type="checkbox"
-          disabled
-          style={{ display: layer.locked ? "block" : "none" }}
-          checked={true}
-          className={layer.locked ? styles.lockedLock : ""}
-          onChange={(e) => {
-            e.stopPropagation();
-          }}
-        />
+        <div role="toolbar" className={styles.lockedLock}>
+          <img src="/assets/lockClosed.svg" alt="lock locked" />
+        </div>
       ) : (
-        <input
-          type="checkbox"
-          checked={true}
+        <div
+          role="toolbar"
           className={layer.locked ? styles.lockedLock : styles.openLock}
-          onChange={(e) => {
+          tabIndex={0}
+          onKeyDown={() => {}}
+          onClick={(e) => {
             e.stopPropagation();
             toggleLockLayer(layer.id);
           }}
-        />
+        >
+          {layer.locked ? (
+            <img src="/assets/lockClosed.svg" alt="lock locked" />
+          ) : (
+            <img src="/assets/lockOpen.svg" alt="lock Open" />
+          )}
+        </div>
       )}
     </div>
   );

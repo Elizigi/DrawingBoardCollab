@@ -11,12 +11,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
-  &::after {
-    content: url("./assets/lockClosed.svg");
-    font-size: 1rem;
-    transition: all 0.2s ease;
-  }
 }
 
 .openLock {
@@ -32,10 +26,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
-  &::after {
-    content: "\1F513";
-    font-size: 1rem;
-    transition: all 0.2s ease;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
   }
 }
