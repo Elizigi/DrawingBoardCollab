@@ -6,12 +6,14 @@
   width: 12rem;
   height: 12rem;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   .blackBorderWrapper {
     position: relative;
     border: $dark 1px solid;
     width: 4rem;
+    margin-top: 2.7rem;
     height: 4rem;
     z-index: 9999;
 
@@ -46,16 +48,7 @@
     z-index: 4;
     border: 2px solid $bg-dark;
     position: fixed;
-    .pastColorElement {
-      width: 2rem;
-      height: 2rem;
-      margin: 0 auto;
-      cursor: pointer;
-      margin-top: 0.5rem;
-
-      border: 1px $dark solid;
-      border-radius: 50%;
-    }
+    
   }
   .opacitySetBar {
     width: 11rem;

@@ -1,5 +1,6 @@
 import BrushToolbarVM from "./BrushToolbarVM";
 import styles from "./BrushToolbar.module.scss";
+import BrushScaleButtons from "./brushScaleButtons/BrushScaleButtons";
 const BrushToolbar = () => {
   const {
     brushColor,
@@ -72,6 +73,7 @@ const BrushToolbar = () => {
           />
         )}
       </div>
+      {isBrushOpen && <BrushScaleButtons />}
     </div>
   );
 };
