@@ -20,6 +20,8 @@ const TopRightToolbarVM = () => {
   const addEvent = useBrushStore((state) => state.addEvent);
 
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
   const [hasInteracted, setHasInteracted] = useState(false);
   const [onlineWindowOpen, setOnlineWindowOpen] = useState(false);
   const [isHost, setIsHost] = useState(false);
@@ -281,6 +283,8 @@ const TopRightToolbarVM = () => {
     connectedUsers,
     myNameRef,
     connected,
+    isSettingsOpen,
+    setIsSettingsOpen,
     setError,
     setRoomId,
     setOnlineWindowOpen,

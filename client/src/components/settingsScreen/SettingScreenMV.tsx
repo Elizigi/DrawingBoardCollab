@@ -3,12 +3,11 @@ import { canvasSize, resizeAllCanvases } from "../../helpers/canvasHelpers";
 import { socket } from "../../Main";
 import { useOnlineStatus } from "../../zustand/useOnlineStatus";
 
-const SettingScreenMV = () => {
+const SettingScreenMV = (close: (isOpen: boolean) => void, isOpen: boolean) => {
   const { inRoom, isAdmin, maxUsers, setMaxUsers } = useOnlineStatus();
 
   const [canvasSizeValue, setCanvasSizeValue] = useState(canvasSize);
   const [maxUsersInRoom, setMaxUsersInRoom] = useState(maxUsers);
-  const [modalOpen, setModalOpen] = useState(false);
   const [shouldSeeIcon, setShouldSeeIcon] = useState(true);
   useEffect(() => {
     if (inRoom && !isAdmin) {
@@ -24,7 +23,7 @@ const SettingScreenMV = () => {
     ) {
       canvasSize.height = canvasSizeValue.height;
       canvasSize.width = canvasSizeValue.width;
-      setModalOpen(false);
+      close(false);
       resizeAllCanvases(canvasSizeValue.width, canvasSizeValue.height);
       if (inRoom && isAdmin) {
         socket.emit("new-size", canvasSize);
@@ -37,19 +36,19 @@ const SettingScreenMV = () => {
         socket.emit("update-limit", newLimit);
       }
     }
-    setModalOpen(false);
+    close(false);
   };
 
   const noChange = () => {
-    setModalOpen(false);
+    close(false);
     setCanvasSizeValue(canvasSize);
     setMaxUsersInRoom(maxUsers);
   };
   useEffect(() => {
-    if (!modalOpen) return;
+    if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        setModalOpen(false);
+        close(false);
         return;
       }
       if (e.key === "Enter") {
@@ -58,15 +57,13 @@ const SettingScreenMV = () => {
     };
     globalThis.addEventListener("keydown", handleKeyDown);
     return () => globalThis.removeEventListener("keydown", handleKeyDown);
-  }, [modalOpen, setModalOpen]);
+  }, [isOpen, close]);
   return {
     canvasSizeValue,
-    modalOpen,
     maxUsersInRoom,
     shouldSeeIcon,
     noChange,
     setMaxUsersInRoom,
-    setModalOpen,
     changSettings,
     setCanvasSizeValue,
   };

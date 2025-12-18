@@ -1,26 +1,3 @@
-.settingIcon {
-  position: fixed;
-  top: 2rem;
-  right: 2rem;
-  border: 1px solid $dark;
-  border-radius: 50%;
-  transition: all 0.3;
-  font-weight: bolder;
-  z-index: 9999;
-  width: 3rem;
-  height: 3rem;
-  display: flex;
-  justify-content: center;
-  background-color: $bg-dark;
-  img {
-    width: 100%;
-
-  }
-  &:hover {
-    rotate: 30deg;
-  }
-  cursor: pointer;
-}
 .openingContainer {
   position: fixed;
   top: 0;

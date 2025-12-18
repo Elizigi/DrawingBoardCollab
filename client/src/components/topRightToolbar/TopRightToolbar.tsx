@@ -2,14 +2,14 @@ import styles from "./TopRightToolbar.module.scss";
 import OnlineComponent from "../onlineComponent/OnlineComponent";
 import TopRightToolbarVM from "./TopRightToolbarVM";
 import CopyText from "./copyText/CopyText";
-import InternetIcon from "./internetIcon/InternetIcon";
 import GuestMouse from "../guestMouse/GuestMouse";
 import UserList from "./userList/UserList";
+import SettingScreen from "../settingsScreen/SettingScreen";
 
 const TopRightToolbar = () => {
   const {
-    isOnline,
-    spinnerStyle,
+    // isOnline,
+    // spinnerStyle,
     menuOpen,
     onlineWindowOpen,
     isHost,
@@ -19,6 +19,8 @@ const TopRightToolbar = () => {
     connectedUsers,
     myNameRef,
     connected,
+    isSettingsOpen,
+    setIsSettingsOpen,
     setError,
     setRoomId,
     setOnlineWindowOpen,
@@ -31,7 +33,12 @@ const TopRightToolbar = () => {
 
   return (
     <div className={styles.topRightToolContainer}>
-      {menuOpen && !connected && (
+     
+      
+      <button className={styles.menuIcon} onClick={() => handleOnline()}>
+        <img src="/assets/cog.svg" alt="cog" />
+      </button>
+       {menuOpen && !connected && (
         <button
           onClick={() => handleConnectionWindow("host")}
           className={`${styles.HostButton} ${styles.connectionButtons}`}
@@ -47,15 +54,20 @@ const TopRightToolbar = () => {
           Exit
         </button>
       )}
-      <button className={styles.netMenu} onClick={() => handleOnline()}>
-        <InternetIcon connected={isOnline} spinnerStyle={spinnerStyle} />
-      </button>
       {menuOpen && !connected && (
         <button
           onClick={() => handleConnectionWindow("guest")}
           className={`${styles.exitButton} ${styles.connectionButtons}`}
         >
           Join
+        </button>
+      )}
+       {menuOpen && (
+        <button
+          onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+          className={`${styles.exitButton} ${styles.connectionButtons}`}
+        >
+          Canvas settings
         </button>
       )}
       {menuOpen && connected && (
@@ -72,6 +84,7 @@ const TopRightToolbar = () => {
           <CopyText roomId={roomId} />
         </div>
       )}
+      {isSettingsOpen && <SettingScreen close={setIsSettingsOpen} isOpen={isSettingsOpen} />}
       {onlineWindowOpen && (
         <div className={styles.subMenu}>
           <OnlineComponent
