@@ -18,10 +18,17 @@ const BrushToolbar = () => {
   return (
     <div className={styles.brushToolbar}>
       {isBrushOpen && (
-        <svg>
-          <circle></circle>
-          <circle></circle>
-        </svg>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  className={styles.arcSvg}
+>
+  <circle
+    cx="50"
+    cy="50"
+    r="50"
+    className={styles.arcCircle}
+  />
+</svg>
       )}
       <div className={styles.blackBorderWrapper}>
         {isBrushOpen ? (
