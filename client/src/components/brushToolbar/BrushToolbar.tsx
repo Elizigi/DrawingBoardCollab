@@ -3,7 +3,7 @@ import styles from "./BrushToolbar.module.scss";
 const BrushToolbar = () => {
   const {
     brushColor,
-    //brushSize,
+    brushSize,
     isBrushOpen,
     textTarget,
     opacitySliderRef,
@@ -26,10 +26,6 @@ const BrushToolbar = () => {
             <circle></circle>
             <circle></circle>
           </svg>
-
-         
-          
-     
       )}
       <div className={styles.blackBorderWrapper}>
         {isBrushOpen ? (<>
@@ -49,7 +45,7 @@ const BrushToolbar = () => {
                   : styles.brushSizeDisplay
               }`}
             >
-              <h3>{displayValue()}</h3>
+              <h3>{brushSize}</h3>
             </div>
           </button>
            <div className={styles.opacitySetBar} ref={opacitySliderRef}>

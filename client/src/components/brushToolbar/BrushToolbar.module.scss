@@ -79,8 +79,9 @@
       border: solid 1px $text-color;
       cursor: pointer;
       z-index: 999999;
+      box-shadow: inset 3px 3px rgb(52, 52, 52);
       transform: translate(3.2rem);
-      background-color: $bg-dark;
+      background-color: rgb(85, 85, 85);
     }
   }
 
