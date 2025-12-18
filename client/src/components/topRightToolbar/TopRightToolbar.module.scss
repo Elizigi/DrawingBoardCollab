@@ -5,15 +5,16 @@
   flex-direction: column;
   justify-content: space-between;
   gap: 0.5rem;
-  right: 4rem;
+  right: 3rem;
   height: 3.5rem;
   width: 8.5rem;
   top: 5rem;
   z-index: 9999999;
-
+  .buttonsContainer {
+  }
   .menuButton {
     z-index: 999999;
-    
+
     border: $dark 3px solid;
     background-color: $bg-dark;
     color: $text-color;
@@ -85,7 +86,8 @@
 .codeBar {
   height: 4rem;
   position: absolute;
-  right: 4rem;
+  right: 9rem;
+  bottom: .5rem;
   display: flex;
   flex-direction: row;
   color: $text-color;
