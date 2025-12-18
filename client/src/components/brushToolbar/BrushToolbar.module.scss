@@ -24,11 +24,15 @@
     background-color: $bg-dark;
     width: 4rem;
     border: none;
+
     padding: 0.2rem;
     height: 4rem;
     cursor: pointer;
     transform: scaleX(-1);
     z-index: 9999;
+    img {
+      width: 100%;
+    }
   }
   .colorMenu {
     width: 3rem;
@@ -48,7 +52,6 @@
     z-index: 4;
     border: 2px solid $bg-dark;
     position: fixed;
-    
   }
   .opacitySetBar {
     width: 11rem;
@@ -67,7 +70,7 @@
       border-radius: 50%;
       width: 1.3rem;
       padding: 0.2rem;
-      height:  1.3rem;
+      height: 1.3rem;
       margin: auto;
       border: solid 1px transparent;
       cursor: pointer;
