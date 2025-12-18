@@ -33,39 +33,34 @@ const TopRightToolbar = () => {
 
   return (
     <div className={styles.topRightToolContainer}>
-     
-      
       <button className={styles.menuIcon} onClick={() => handleOnline()}>
         <img src="/assets/cog.svg" alt="cog" />
       </button>
-       {menuOpen && !connected && (
+      {menuOpen && !connected && (
         <button
           onClick={() => handleConnectionWindow("host")}
-          className={`${styles.HostButton} ${styles.connectionButtons}`}
+          className={styles.menuButton}
         >
           Host
         </button>
       )}
       {menuOpen && connected && (
-        <button
-          onClick={() => handleLeaveRoom()}
-          className={`${styles.HostButton} ${styles.connectionButtons}`}
-        >
+        <button onClick={() => handleLeaveRoom()} className={styles.menuButton}>
           Exit
         </button>
       )}
       {menuOpen && !connected && (
         <button
           onClick={() => handleConnectionWindow("guest")}
-          className={`${styles.exitButton} ${styles.connectionButtons}`}
+          className={styles.menuButton}
         >
           Join
         </button>
       )}
-       {menuOpen && (
+      {menuOpen && (
         <button
           onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-          className={`${styles.exitButton} ${styles.connectionButtons}`}
+          className={styles.menuButton}
         >
           Canvas settings
         </button>
@@ -84,7 +79,9 @@ const TopRightToolbar = () => {
           <CopyText roomId={roomId} />
         </div>
       )}
-      {isSettingsOpen && <SettingScreen close={setIsSettingsOpen} isOpen={isSettingsOpen} />}
+      {isSettingsOpen && (
+        <SettingScreen close={setIsSettingsOpen} isOpen={isSettingsOpen} />
+      )}
       {onlineWindowOpen && (
         <div className={styles.subMenu}>
           <OnlineComponent

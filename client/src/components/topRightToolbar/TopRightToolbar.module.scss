@@ -7,15 +7,15 @@
   gap: 0.5rem;
   right: 4rem;
   height: 3.5rem;
-  width: 6.5rem;
+  width: 8.5rem;
   top: 5rem;
   z-index: 9999999;
 
-  .connectionButtons {
+  .menuButton {
     z-index: 999999;
-
-    border: $border-color 3px solid;
-    background-color: $bg-light;
+    
+    border: $dark 3px solid;
+    background-color: $bg-dark;
     color: $text-color;
     padding: 0.3rem;
     text-align: center;
