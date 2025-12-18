@@ -21,28 +21,20 @@ const BrushToolbar = () => {
   return (
     <div className={styles.brushToolbar}>
       {isBrushOpen && (
-        <>
+     
           <svg>
             <circle></circle>
             <circle></circle>
           </svg>
 
-          <div className={styles.sizeSetBar} ref={opacitySliderRef}>
-            <button
-              style={{ touchAction: "manipulation" }}
-              className={styles.sizeHandle}
-              onMouseDown={() => handleTransparentAdjustment()}
-              onTouchStart={() => handleTransparentAdjustment()}
-              onMouseEnter={() => setTextTarget(TextTarget.Opacity)}
-              onMouseLeave={() => setTextTarget(TextTarget.BrushSize)}
-            ></button>
-          </div>
+         
           
-        </>
+     
       )}
       <div className={styles.blackBorderWrapper}>
-        {isBrushOpen ? (
+        {isBrushOpen ? (<>
           <button
+          
             className={styles.brushIcon}
             style={{
               backgroundColor: `#${brushColor.toString(16).padStart(6, "0")}`,
@@ -60,6 +52,17 @@ const BrushToolbar = () => {
               <h3>{displayValue()}</h3>
             </div>
           </button>
+           <div className={styles.opacitySetBar} ref={opacitySliderRef}>
+            <button
+              style={{ touchAction: "manipulation" }}
+              className={styles.opacityHandle}
+              onMouseDown={() => handleTransparentAdjustment()}
+              onTouchStart={() => handleTransparentAdjustment()}
+              onMouseEnter={() => setTextTarget(TextTarget.Opacity)}
+              onMouseLeave={() => setTextTarget(TextTarget.BrushSize)}
+            ></button>
+          </div>
+          </>
         ) : (
           <button
             className={styles.brushIcon}

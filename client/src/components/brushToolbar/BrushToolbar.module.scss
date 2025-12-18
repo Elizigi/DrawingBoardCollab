@@ -57,37 +57,33 @@
       border-radius: 50%;
     }
   }
-  .sizeSetBar {
-    width: 5.5rem;
-    height: 5.5rem;
-    position: absolute;
-    top: 2rem;
-    left: 2rem;
+  .opacitySetBar {
+    width: 11rem;
+    height: 11rem;
+    margin-left: -3.5rem;
+    margin-top: -7.5rem;
     border-radius: 50%;
     border: none;
     background: transparent;
     padding: 0;
     z-index: 9999;
-    .sizeHandle {
-      width: 1.5rem;
-      height: 1.5rem;
+    transform-origin: center;
+    display: flex;
+    .opacityHandle {
+      position: relative;
       border-radius: 50%;
-      position: absolute;
-      top: 50%;
-      left: 30%;
+      width: 1.5rem;
+      padding: 0.2rem;
+      height:  1.5rem;
+      margin: auto;
       border: solid 1px $text-color;
       cursor: pointer;
-      right: -0.75rem;
       z-index: 999999;
+      transform: translate(3.2rem);
       background-color: $bg-dark;
     }
   }
-  .brushSizeInput {
-    position: absolute;
-    top: 2rem;
-    left: 4rem;
-    z-index: 99999;
-  }
+
   svg {
     position: absolute;
     z-index: 9999;

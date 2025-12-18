@@ -39,8 +39,8 @@ const BrushToolbarVM = () => {
   useEffect(() => {
     if (isBrushOpen && opacitySliderRef.current) {
       const normalized = (brushOpacity - 1) / 99;
-      const angle = normalized * 125 + -205;
-      opacitySliderRef.current.style.transform = `translate(-2.75rem, -2.75rem) rotate(${angle}deg)`;
+      const angle = normalized * 180 + -230;
+      opacitySliderRef.current.style.transform = ` rotate(${angle}deg)`;
     }
   }, [isBrushOpen, brushOpacity]);
 
@@ -71,12 +71,12 @@ const BrushToolbarVM = () => {
       if (mouseAngle > 0) mouseAngle -= 360;
       let adjustedAngle = mouseAngle;
 
-      adjustedAngle = Math.max(-205, Math.min(-80, adjustedAngle));
-      const normalized = (adjustedAngle - -205) / (-80 - -205);
+      adjustedAngle = Math.max(-230, Math.min(-50, adjustedAngle));
+      const normalized = (adjustedAngle - -230) / (-50 - -230);
       const size = Math.round(normalized * 99) + 1;
 
       setOpacity(size);
-      opacitySlider.style.transform = `translate(-2.75rem, -2.75rem) rotate(${adjustedAngle}deg)`;
+      opacitySlider.style.transform = ` rotate(${adjustedAngle}deg)`;
     };
 
     const handleEnd = () => {
