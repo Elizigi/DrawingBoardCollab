@@ -1,16 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useBrushStore } from "../../zustand/useBrushStore";
-enum TextTarget {
-  Opacity = "opacity",
-  BrushSize = "brushSize",
-}
+
 const BrushToolbarVM = () => {
+  const minAngle = -230;
+  const maxAngle = -50;
+  const angleRange = maxAngle - minAngle;
+
   const brushColor = useBrushStore((state) => state.brushColor);
   const brushSize = useBrushStore((state) => state.brushSize);
   const brushOpacity = useBrushStore((state) => state.brushOpacity);
 
   const setBrushColor = useBrushStore((state) => state.setBrushColor);
-  const setBrushSize = useBrushStore((state) => state.setBrushSize);
   const setOpacity = useBrushStore((state) => state.setOpacity);
 
   function changeColor(_: number, e: React.ChangeEvent<HTMLInputElement>) {
@@ -21,9 +21,6 @@ const BrushToolbarVM = () => {
   const [isBrushOpen, setIsBrushOpen] = useState(false);
   const colorInputRef = useRef<HTMLInputElement>(null);
   const opacitySliderRef = useRef<HTMLDivElement>(null);
-  const [textTarget, setTextTarget] = useState<null | TextTarget>(
-    TextTarget.BrushSize
-  );
 
   const isMouseDown = useBrushStore((s) => s.isMouseDown);
   const handleColorClick = () => {
@@ -39,14 +36,12 @@ const BrushToolbarVM = () => {
   useEffect(() => {
     if (isBrushOpen && opacitySliderRef.current) {
       const normalized = (brushOpacity - 1) / 99;
-      const angle = normalized * 180 + -230;
+      const angle = normalized * angleRange + minAngle;
       opacitySliderRef.current.style.transform = ` rotate(${angle}deg)`;
     }
   }, [isBrushOpen, brushOpacity]);
 
   const handleTransparentAdjustment = () => {
-    setTextTarget(TextTarget.Opacity);
-
     const opacitySlider = opacitySliderRef.current;
     if (!opacitySlider) return;
     const rect = opacitySlider.getBoundingClientRect();
@@ -71,8 +66,8 @@ const BrushToolbarVM = () => {
       if (mouseAngle > 0) mouseAngle -= 360;
       let adjustedAngle = mouseAngle;
 
-      adjustedAngle = Math.max(-230, Math.min(-50, adjustedAngle));
-      const normalized = (adjustedAngle - -230) / (-50 - -230);
+      adjustedAngle = Math.max(minAngle, Math.min(maxAngle, adjustedAngle));
+      const normalized = (adjustedAngle - minAngle) / angleRange;
       const size = Math.round(normalized * 99) + 1;
 
       setOpacity(size);
@@ -84,7 +79,6 @@ const BrushToolbarVM = () => {
       document.removeEventListener("mouseup", handleEnd);
       document.removeEventListener("touchmove", handleMove);
       document.removeEventListener("touchend", handleEnd);
-      setTextTarget(TextTarget.BrushSize);
     };
 
     document.addEventListener("mousemove", handleMove);
@@ -93,11 +87,6 @@ const BrushToolbarVM = () => {
     document.addEventListener("touchend", handleEnd);
   };
 
-  const displayValue = () => {
-    if (textTarget === TextTarget.Opacity) return brushOpacity;
-    if (textTarget === TextTarget.BrushSize) return brushSize;
-    return "";
-  };
   useEffect(() => {
     if (!isBrushOpen) return;
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -112,16 +101,12 @@ const BrushToolbarVM = () => {
     brushColor,
     brushSize,
     isBrushOpen,
-    textTarget,
     opacitySliderRef,
-    TextTarget,
     colorInputRef,
     handleTransparentAdjustment,
-    setTextTarget,
     handleColorClick,
-    displayValue,
     setIsBrushOpen,
-    setBrushSize,
+    //setBrushSize,
     changeColor,
   };
 };

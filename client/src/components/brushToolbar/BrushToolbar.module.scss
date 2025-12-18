@@ -72,16 +72,15 @@
     .opacityHandle {
       position: relative;
       border-radius: 50%;
-      width: 1.5rem;
+      width: 1.3rem;
       padding: 0.2rem;
-      height:  1.5rem;
+      height:  1.3rem;
       margin: auto;
-      border: solid 1px $text-color;
+      border: solid 1px transparent;
       cursor: pointer;
       z-index: 999999;
-      box-shadow: inset 3px 3px rgb(52, 52, 52);
-      transform: translate(3.2rem);
-      background-color: rgb(85, 85, 85);
+      transform: translate(3.15rem);
+      background-color: $text-color;
     }
   }
 
@@ -93,7 +92,6 @@
     transform-origin: center;
     mask: linear-gradient(180deg, black, transparent);
     -webkit-mask: linear-gradient(180deg, black, transparent);
-    fill: rgb(189, 153, 110);
     circle {
       cx: 50;
       cy: 50;
@@ -104,7 +102,7 @@
     circle:nth-child(1) {
       stroke: rgba(0, 0, 0, 0.7);
       stroke-width: 1.5rem;
-      stroke-dasharray: 160 314;
+      stroke-dasharray: 157 314;
       stroke-linecap: round;
       transform-origin: center;
       transform: translate(-5.2rem, 3.8rem) rotate(130deg);

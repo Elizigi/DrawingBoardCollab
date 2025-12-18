@@ -5,14 +5,10 @@ const BrushToolbar = () => {
     brushColor,
     brushSize,
     isBrushOpen,
-    textTarget,
     opacitySliderRef,
-    TextTarget,
     colorInputRef,
     handleTransparentAdjustment,
-    setTextTarget,
     handleColorClick,
-    displayValue,
     setIsBrushOpen,
     //setBrushSize,
     changeColor,
@@ -21,43 +17,38 @@ const BrushToolbar = () => {
   return (
     <div className={styles.brushToolbar}>
       {isBrushOpen && (
-     
-          <svg>
-            <circle></circle>
-            <circle></circle>
-          </svg>
+        <svg>
+          <circle></circle>
+          <circle></circle>
+        </svg>
       )}
       <div className={styles.blackBorderWrapper}>
-        {isBrushOpen ? (<>
-          <button
-          
-            className={styles.brushIcon}
-            style={{
-              backgroundColor: `#${brushColor.toString(16).padStart(6, "0")}`,
-            }}
-            onClick={handleColorClick}
-            aria-label="Open color picker"
-          >
-            <div
-              className={`${styles.brushSizeDisplay} ${
-                textTarget === TextTarget.Opacity
-                  ? styles.highlightedText
-                  : styles.brushSizeDisplay
-              }`}
-            >
-              <h3>{brushSize}</h3>
-            </div>
-          </button>
-           <div className={styles.opacitySetBar} ref={opacitySliderRef}>
+        {isBrushOpen ? (
+          <>
             <button
-              style={{ touchAction: "manipulation" }}
-              className={styles.opacityHandle}
-              onMouseDown={() => handleTransparentAdjustment()}
-              onTouchStart={() => handleTransparentAdjustment()}
-              onMouseEnter={() => setTextTarget(TextTarget.Opacity)}
-              onMouseLeave={() => setTextTarget(TextTarget.BrushSize)}
-            ></button>
-          </div>
+              className={styles.brushIcon}
+              style={{
+                backgroundColor: `#${brushColor.toString(16).padStart(6, "0")}`,
+              }}
+              onClick={handleColorClick}
+              aria-label="Open color picker"
+            >
+              <div
+                className={`${styles.brushSizeDisplay} ${
+                  styles.brushSizeDisplay
+                }`}
+              >
+                <h3>{brushSize}</h3>
+              </div>
+            </button>
+            <div className={styles.opacitySetBar} ref={opacitySliderRef}>
+              <button
+                style={{ touchAction: "manipulation" }}
+                className={styles.opacityHandle}
+                onMouseDown={() => handleTransparentAdjustment()}
+                onTouchStart={() => handleTransparentAdjustment()}
+              ></button>
+            </div>
           </>
         ) : (
           <button
