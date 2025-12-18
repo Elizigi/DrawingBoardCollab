@@ -18,7 +18,7 @@ const SettingScreen = () => {
   return (
     <>
       <button className={style.settingIcon} onClick={() => setModalOpen(true)}>
-        ⚙
+        <img src="/assets/cog.svg" alt="cog" />
       </button>
       {modalOpen && (
         <div className={style.openingContainer}>

@@ -14,8 +14,8 @@ const ContextMenu = () => {
           style={{ top: menuPos.y, left: menuPos.x }}
           className={styles.contextMenuContainer}
         >
-          <button onClick={saveAsPng}>💾Save As PNG</button>
-          <button onClick={saveAsJson}>📃Save As JSON</button>
+          <button onClick={saveAsPng}>Save As PNG</button>
+          <button onClick={saveAsJson}>Save As JSON</button>
           {inRoom && !isAdmin ? (
             ""
           ) : (
@@ -33,7 +33,7 @@ const ContextMenu = () => {
                 input.click();
               }}
             >
-              💻Load JSON / Image
+              Load JSON / Image
             </button>
           )}
         </div>

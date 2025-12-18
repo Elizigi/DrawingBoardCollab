@@ -1,14 +1,21 @@
 .settingIcon {
   position: fixed;
-  font-size: 2rem;
-  color: $bg-dark;
-  top: 0.5rem;
-  right: 0.5rem;
-  background-color: transparent;
-  border: none;
+  top: 4rem;
+  right: 4rem;
+  border: 1px solid $dark;
+  border-radius: 50%;
   transition: all 0.3;
   font-weight: bolder;
   z-index: 9999;
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  justify-content: center;
+  background-color: $bg-dark;
+  img {
+    width: 100%;
+
+  }
   &:hover {
     rotate: 30deg;
   }
