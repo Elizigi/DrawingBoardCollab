@@ -36,36 +36,16 @@ const TopRightToolbar = () => {
       <button className={styles.menuIcon} onClick={() => handleOnline()}>
         <img src="/assets/cog.svg" alt="cog" />
       </button>
-      {menuOpen && !connected && (
-        <button
-          onClick={() => handleConnectionWindow("host")}
-          className={styles.menuButton}
-        >
-          Host
-        </button>
-      )}
-      {menuOpen && connected && (
-        <button onClick={() => handleLeaveRoom()} className={styles.menuButton}>
-          Exit
-        </button>
-      )}
-      {menuOpen && !connected && (
-        <button
-          onClick={() => handleConnectionWindow("guest")}
-          className={styles.menuButton}
-        >
-          Join
-        </button>
-      )}
-      {menuOpen && (
-        <button
-          onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-          className={styles.menuButton}
-        >
-          Canvas settings
-        </button>
-      )}
-      {menuOpen && connected && (
+      <div className={styles.buttonsContainer}>
+        {menuOpen && !connected && (
+          <button
+            onClick={() => handleConnectionWindow("host")}
+            className={styles.menuButton}
+          >
+            Host
+          </button>
+        )}
+          {menuOpen && connected && (
         <div className={styles.codeBar}>
           <button
             className={styles.handle}
@@ -79,6 +59,32 @@ const TopRightToolbar = () => {
           <CopyText roomId={roomId} />
         </div>
       )}
+        {menuOpen && connected && (
+          <button
+            onClick={() => handleLeaveRoom()}
+            className={styles.menuButton}
+          >
+            Exit
+          </button>
+        )}
+        {menuOpen && !connected && (
+          <button
+            onClick={() => handleConnectionWindow("guest")}
+            className={styles.menuButton}
+          >
+            Join
+          </button>
+        )}
+        {menuOpen && (
+          <button
+            onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+            className={styles.menuButton}
+          >
+            Canvas settings
+          </button>
+        )}
+      </div>
+    
       {isSettingsOpen && (
         <SettingScreen close={setIsSettingsOpen} isOpen={isSettingsOpen} />
       )}

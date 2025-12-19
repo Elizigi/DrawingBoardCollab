@@ -2,26 +2,27 @@
   position: fixed;
   pointer-events: none;
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 0.5rem;
-  right: 3rem;
+  flex-direction: row;
+  right: 0rem;
   height: 3.5rem;
-  width: 8.5rem;
+  width: 13rem;
   top: 5rem;
   z-index: 9999999;
   .buttonsContainer {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
   }
   .menuButton {
     z-index: 999999;
-
+    margin-top: 0.5rem;
     border: $dark 3px solid;
     background-color: $bg-dark;
     color: $text-color;
     padding: 0.3rem;
     text-align: center;
     font-size: 1.5rem;
-    left: 50%;
+    width: 12rem;
     pointer-events: auto;
     transform: translateX(-50%);
     border-radius: 10px;
@@ -32,13 +33,15 @@
   .menuIcon {
     color: $text-color;
     width: 3.5rem;
-
+    border: $dark 3px solid;
+    flex-shrink: none;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: none;
     padding: 0.5rem;
+    position: absolute;
+    right: 3rem;
     cursor: pointer;
     pointer-events: auto;
     z-index: 9999999;
@@ -85,18 +88,21 @@
 }
 .codeBar {
   height: 4rem;
-  position: absolute;
-  right: 9rem;
-  bottom: .5rem;
+  bottom: 0.5rem;
   display: flex;
   flex-direction: row;
   color: $text-color;
   pointer-events: auto;
   z-index: 9999;
-
+  width: 12rem;
+  justify-content: end;
+  transform: translateX(-50%);
+  margin-right: 12rem;
   .roomIdBar {
     border: none;
     text-wrap: nowrap;
+    text-align: center;
+    width: 10rem;
     background-color: $bg-medium;
     cursor: text;
     padding-left: 0.5rem;
@@ -115,7 +121,7 @@
     height: 100%;
     z-index: 9999;
 
-    border-right: 1px $bg-dark solid;
+    border-right: 1px $dark solid;
   }
 }
 .spinLoad {
