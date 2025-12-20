@@ -46,7 +46,7 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
   return (
     <div className={styles.onlineContainer}>
       <button className={styles.XBtn} onClick={() => handleModalOpen()}>
-        X
+        <img src="/assets/X.svg" alt="X" />
       </button>
       <h1> {isHost ? "Host" : "Join"}</h1>
       <hr />

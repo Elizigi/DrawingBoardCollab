@@ -3,8 +3,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
-  width: 20vw;
+  width: 20rem;
   max-width: 470px;
   height: fit-content;
   margin: 1rem;
@@ -16,6 +15,13 @@
   color: $text-color;
   min-width: 200px;
   z-index: 9999999999999;
+  @media (max-width: 768px) {
+    width: 80%;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-55%, -50%);
+  }
   form {
     display: flex;
     flex-direction: column;
@@ -37,6 +43,7 @@
   .XBtn {
     font-size: 2rem;
     color: $accent;
+    width: 2rem;
     position: absolute;
     top: 0;
     right: 0;
@@ -45,6 +52,9 @@
     background-color: transparent;
     border: none;
     cursor: pointer;
+    img {
+      width: 100%;
+    }
   }
   input {
     margin-top: -1.7rem;

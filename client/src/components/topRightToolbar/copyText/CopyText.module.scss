@@ -7,7 +7,13 @@
   padding-right: 0.5rem;
   width: fit-content;
   height: 100%;
-  border-left: 1px $dark solid;
+  border: $dark solid 2px;
+  border-left:none;
+
+  @media (max-width: 768px) {
+    height: 2.2rem;
+    border-radius: 0 10px 10px 0;
+  }
 }
 .textCopied {
   position: absolute;

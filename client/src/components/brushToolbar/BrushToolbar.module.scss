@@ -9,7 +9,10 @@
   flex-direction: column;
   align-items: center;
   pointer-events: none;
-
+  @media (max-width: 768px) {
+    width: 8rem;
+    height: 8rem;
+  }
   justify-content: center;
   .blackBorderWrapper {
     position: relative;
@@ -84,26 +87,25 @@
     }
   }
 
- .arcSvg {
-  position: absolute;
-  z-index: 9999;
-  width: 500px;
-  height: 300px;
-  transform-origin: center;
-  mask: linear-gradient(180deg, black, transparent);
-  -webkit-mask: linear-gradient(180deg, black, transparent);
-}
+  .arcSvg {
+    position: absolute;
+    z-index: 9999;
+    width: 500px;
+    height: 300px;
+    transform-origin: center;
+    mask: linear-gradient(180deg, black, transparent);
+    -webkit-mask: linear-gradient(180deg, black, transparent);
+  }
 
-.arcCircle {
-  fill: none;
-  stroke: rgba(0, 0, 0, 0.7);
-  stroke-width: 1.5rem;
-  stroke-dasharray: 157 314;
-  stroke-linecap: round;
-  transform-origin: center;
-  transform: translate(-12.8rem, 5.65rem) rotate(130deg);
-}
-
+  .arcCircle {
+    fill: none;
+    stroke: rgba(0, 0, 0, 0.7);
+    stroke-width: 1.5rem;
+    stroke-dasharray: 157 314;
+    stroke-linecap: round;
+    transform-origin: center;
+    transform: translate(-12.8rem, 5.65rem) rotate(130deg);
+  }
 
   .brushSizeDisplay {
     position: fixed;

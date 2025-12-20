@@ -5,9 +5,13 @@
   flex-direction: row;
   right: 0rem;
   height: 3.5rem;
-  width: 13rem;
-  top: 5rem;
+  width: 13.5rem;
+  top: 4.5rem;
   z-index: 9999999;
+  @media (max-width: 768px) {
+    top: 2rem;
+    width: 10.5rem;
+  }
   .buttonsContainer {
     display: flex;
     width: 100%;
@@ -28,11 +32,16 @@
     border-radius: 10px;
     animation: moveToCenter 0.3s ease-in reverse;
     cursor: pointer;
+    @media (max-width: 768px) {
+      font-size: 1rem;
+      width: 9rem;
+    }
   }
 
   .menuIcon {
     color: $text-color;
     width: 3.5rem;
+    height: 3.5rem;
     border: $dark 3px solid;
     flex-shrink: none;
     border-radius: 50%;
@@ -47,9 +56,12 @@
     z-index: 9999999;
     background-color: $bg-dark;
     margin: 0;
+    @media (max-width: 768px) {
+      right: 2rem;
+    }
     img {
-      width: 100%;
-      height: 100%;
+      width: 90%;
+      height: 90%;
     }
   }
 
@@ -82,6 +94,9 @@
 
       span {
         font-size: 2rem;
+        @media (max-width: 768px) {
+          font-size: 1rem;
+        }
       }
     }
   }
@@ -98,15 +113,30 @@
   justify-content: end;
   transform: translateX(-50%);
   margin-right: 12rem;
+  @media (max-width: 768px) {
+    width: 8rem;
+    height: 2.5rem;
+    transform: translateX(-45%);
+  }
   .roomIdBar {
-    border: none;
     text-wrap: nowrap;
     text-align: center;
-    width: 10rem;
+    width: 8rem;
     background-color: $bg-medium;
     cursor: text;
+    border: $dark solid 2px;
+
     padding-left: 0.5rem;
     padding-right: 0.5rem;
+    @media (max-width: 768px) {
+      width: 8rem;
+      height: 2.2rem;
+      h2 {
+        font-size: 1rem;
+        margin: 0;
+        margin-top: 0.6rem;
+      }
+    }
   }
 
   .handle {
@@ -116,12 +146,21 @@
     cursor: pointer;
     border-radius: 20px 0 0 20px;
     width: fit-content;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
     height: 100%;
     z-index: 9999;
+    border: $dark solid 2px;
+    border-right: none;
+    @media (max-width: 768px) {
+      height: 2.2rem;
+      border-radius: 10px 0 0 10px;
 
-    border-right: 1px $dark solid;
+      h3 {
+        margin: 0;
+        margin-left: 0.2rem;
+      }
+    }
   }
 }
 .spinLoad {
