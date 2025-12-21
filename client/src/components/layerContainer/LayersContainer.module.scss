@@ -1,10 +1,17 @@
 .left {
   left: 0;
   right: unset;
+  @media (max-width: 768px) {
+    left: -10.5%;
+  }
 }
 .right {
-  left: unset;
   right: 0;
+
+  left: unset;
+  @media (max-width: 768px) {
+    right: -10.5%;
+  }
 }
 .layerToolbarContainer {
   user-select: none;
@@ -23,14 +30,14 @@
 .layersToolbar {
   overflow-x: hidden;
 
-  width: 230px;
+  width: 220px;
   display: flex;
   flex-direction: column;
   z-index: 999999;
   background-color: $bg-dark;
   border: $dark solid 3px;
   border-radius: 15px;
-  height: 24rem;
+  height: 20rem;
   align-items: center;
   padding: 0.5rem;
   gap: 0.5rem;
@@ -38,11 +45,13 @@
 }
 
 .layerVisible {
-  transform: translateX(0);
+  transform: translateX(-50%);
+
   transition: transform 0.3s ease-out;
 }
 .layerVisibleRight {
-  transform: translateX(0);
+  transform: translateX(-50%);
+
   transition: transform 0.3s ease-out;
 }
 .layerHiddenRight {
@@ -51,6 +60,6 @@
 }
 
 .layerHiddenLeft {
-  transform: translateX(100%);
+  transform: translateX(90%);
   transition: transform 0.3s ease-out;
 }

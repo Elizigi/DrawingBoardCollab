@@ -44,6 +44,10 @@ const LayerContainerVM = () => {
   const lastPosition = useRef({ x: 0, y: 0 });
   const animationFrame = useRef<null | number>(null);
 
+  const getScale = () => {
+    return window.innerWidth <= 768 ? 0.82 : 1;
+  };
+
   const getPointerPosition = (e: React.MouseEvent | React.TouchEvent) => {
     if ("touches" in e) {
       return { x: e.touches[0].clientX, y: e.touches[0].clientY };
@@ -105,12 +109,16 @@ const LayerContainerVM = () => {
     const box = toolbarElement.current as HTMLDivElement;
     const rect = box.getBoundingClientRect();
     const bottomMarginPercent = (window.innerHeight * 90) / 100;
+    const scale = getScale();
+    if (!containerVisible) {
+      const scaledWidth = rect.width / scale;
+      const scaledHeight = rect.height / scale;
 
-    if (!containerVisible)
       setLayersToolPositionOffset({
-        x: toTheRight ? window.innerWidth - rect.width : 0,
-        y: bottomMarginPercent - rect.height,
+        x: toTheRight ? scaledWidth : 0,
+        y: bottomMarginPercent - scaledHeight,
       });
+    }
   };
 
   const handlePointerDown = (
@@ -122,9 +130,10 @@ const LayerContainerVM = () => {
     setIsDragging(true);
     const rect = e.currentTarget.getBoundingClientRect();
     const pos = getPointerPosition(e);
+    const scale = getScale();
     setDragStart({
-      x: pos.x - rect.left,
-      y: pos.y - rect.top,
+      x: (pos.x - rect.left) / scale,
+      y: (pos.y - rect.top) / scale,
     });
   };
   const animateSpring = () => {
@@ -173,8 +182,10 @@ const LayerContainerVM = () => {
           ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
           : { x: e.clientX, y: e.clientY };
 
-      const newX = pos.x - dragStart.x;
-      const newY = pos.y - dragStart.y;
+      const scale = getScale();
+
+      const newX = pos.x - dragStart.x * scale;
+      const newY = pos.y - dragStart.y * scale;
 
       const vx = newX - lastPosition.current.x;
       const vy = newY - lastPosition.current.y;
