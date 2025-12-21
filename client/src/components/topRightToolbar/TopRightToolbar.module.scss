@@ -125,9 +125,14 @@
     background-color: $bg-medium;
     cursor: text;
     border: $dark solid 2px;
+    height: 3.5rem;
+    border-right: none;
 
     padding-left: 0.5rem;
     padding-right: 0.5rem;
+    h2 {
+      margin-top: 1rem;
+    }
     @media (max-width: 768px) {
       width: 8rem;
       height: 2.2rem;
@@ -148,10 +153,12 @@
     width: fit-content;
     padding-left: 0.4rem;
     padding-right: 0.4rem;
-    height: 100%;
     z-index: 9999;
     border: $dark solid 2px;
     border-right: none;
+    height: 3.5rem;
+    display: flex;
+    justify-content: center;
     @media (max-width: 768px) {
       height: 2.2rem;
       border-radius: 10px 0 0 10px;

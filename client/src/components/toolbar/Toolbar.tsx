@@ -9,7 +9,6 @@ export const Toolbar = () => {
     <div>
       <BrushToolbar />
       <LayersContainer />
-
       <TopRightToolbar />
       <EventAlert />
       <ContextMenu />

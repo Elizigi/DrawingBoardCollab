@@ -6,9 +6,9 @@
   padding-left: 0.5rem;
   padding-right: 0.5rem;
   width: fit-content;
-  height: 100%;
   border: $dark solid 2px;
-  border-left:none;
+  border-right: none;
+  height: 3.5rem;
 
   @media (max-width: 768px) {
     height: 2.2rem;
