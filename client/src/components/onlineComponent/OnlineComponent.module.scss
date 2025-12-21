@@ -15,12 +15,28 @@
   color: $text-color;
   min-width: 200px;
   z-index: 9999999999999;
+  .darkenBg {
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
+    width: 300vw;
+    height: 300vh;
+    background-color: rgba(0, 0, 0, 0.315);
+    transform: translate(-50%, -20%);
+    display: none;
+    @media (max-width: 768px) {
+      display: block;
+    }
+  }
   @media (max-width: 768px) {
-    width: 80%;
+    width: 20rem;
+    height: 30rem;
+
     position: fixed;
     left: 50%;
     top: 50%;
-    transform: translate(-55%, -50%);
+    transform: translate(-100%);
   }
   form {
     display: flex;

@@ -45,6 +45,7 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
   });
   return (
     <div className={styles.onlineContainer}>
+      <div className={styles.darkenBg}></div>
       <button className={styles.XBtn} onClick={() => handleModalOpen()}>
         <img src="/assets/X.svg" alt="X" />
       </button>

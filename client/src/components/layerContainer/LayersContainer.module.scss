@@ -15,6 +15,9 @@
   bottom: 10%;
   z-index: 999999;
   cursor: grab;
+  @media (max-width: 768px) {
+    scale: 0.7;
+  }
 }
 
 .layersToolbar {
