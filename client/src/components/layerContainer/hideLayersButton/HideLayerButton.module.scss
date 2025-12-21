@@ -16,10 +16,15 @@
 }
 img {
   width: 0.8rem;
+  width: 0.56rem;
 }
 .layerImg {
   width: 2rem;
   margin-bottom: 0.5rem;
+  @media (max-width: 768px) {
+    width: 1.4rem;
+    margin-bottom: 0.35rem;
+  }
 }
 .hideLayersButton {
   background-color: $bg-medium;
@@ -35,4 +40,10 @@ img {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  @media (max-width: 768px) {
+    height: 3.5rem;
+    width: 1.75rem;
+    font-size: 0.84rem;
+    padding: 0.35rem;
+  }
 }

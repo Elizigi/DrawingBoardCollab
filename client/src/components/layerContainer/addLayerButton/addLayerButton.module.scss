@@ -2,7 +2,9 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-
+  @media (max-width: 768px) {
+    gap: 0.35rem;
+  }
   .plusBTN {
     all: unset;
     background-color: $bg-light;
@@ -18,7 +20,13 @@
     font-size: 1.8rem;
     margin-top: 0.6rem;
     margin-bottom: 0.4rem;
-
+    @media (max-width: 768px) {
+      width: 1.4rem;
+      height: 1.4rem;
+      font-size: 1.26rem;
+      margin-top: 0.42rem;
+      margin-bottom: 0.28rem;
+    }
     &:hover {
       background-color: $bg-light;
       transform: scale(1.05);
@@ -35,7 +43,11 @@
     font-size: 1rem;
     outline: none;
     width: 8rem;
-
+    @media (max-width: 768px) {
+      width: 5.6rem;
+      font-size: 0.7rem;
+      padding: 0.28rem 0.42rem;
+    }
     &:focus {
       border-color: $active-color;
     }

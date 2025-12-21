@@ -10,6 +10,10 @@
   padding: 0.25rem 0.25rem 0.75rem 0.25rem;
   background-color: $bg-light;
   height: 100%;
+  @media (max-width: 768px) {
+    padding: 0;
+  }
+
   &::-webkit-scrollbar {
     height: 6px;
   }
@@ -32,6 +36,9 @@
 .layerContainer {
   display: flex;
   align-items: center;
+  @media (max-width: 768px) {
+    scale: 0.8;
+  }
 }
 .gapLayer {
   all: unset;
