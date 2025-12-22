@@ -12,6 +12,7 @@ const BrushScaleButtons = () => {
         onPointerDown={startScaleUp}
         onPointerUp={stopScaling}
         onPointerLeave={stopScaling}
+        onContextMenu={(e) => e.preventDefault()}
       >
         <img src="/assets/plus.svg" alt="plus" />
       </button>
@@ -21,6 +22,7 @@ const BrushScaleButtons = () => {
         onPointerUp={stopScaling}
         onPointerLeave={stopScaling}
         className={`${styles.scaleButton} ${styles.scaleButtonMinus}`}
+        onContextMenu={(e) => e.preventDefault()}
       >
         <img src="/assets/minus.svg" alt="minus" />
       </button>
