@@ -9,17 +9,17 @@ const BrushScaleButtons = () => {
       <button
         className={`${styles.scaleButton} ${styles.scaleButtonPlus}`}
         onClick={scaleUp}
-        onMouseDown={startScaleUp}
-        onMouseUp={stopScaling}
-        onMouseLeave={stopScaling}
+        onPointerDown={startScaleUp}
+        onPointerUp={stopScaling}
+        onPointerLeave={stopScaling}
       >
         <img src="/assets/plus.svg" alt="plus" />
       </button>
       <button
         onClick={scaleDown}
-        onMouseDown={startScaleDown}
-        onMouseUp={stopScaling}
-        onMouseLeave={stopScaling}
+        onPointerDown={startScaleDown}
+        onPointerUp={stopScaling}
+        onPointerLeave={stopScaling}
         className={`${styles.scaleButton} ${styles.scaleButtonMinus}`}
       >
         <img src="/assets/minus.svg" alt="minus" />
