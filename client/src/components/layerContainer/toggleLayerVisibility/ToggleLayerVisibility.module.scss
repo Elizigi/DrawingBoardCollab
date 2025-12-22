@@ -15,8 +15,16 @@
   justify-content: center;
   border: 3px solid $bg-dark;
   font-size: 2rem;
-  img{
+  @media (max-width: 768px) {
     width: 1.4rem;
+    height: 1.4rem;
+    margin: 0.14rem;
+  }
+  img {
+    width: 1.4rem;
+    @media (max-width: 768px) {
+      width: 0.98rem;
+    }
   }
   &.hidden {
     &::after {

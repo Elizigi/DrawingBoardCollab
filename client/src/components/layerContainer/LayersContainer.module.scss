@@ -35,8 +35,10 @@
   @media (max-width: 768px) {
     height: 14rem;
     width: 154px;
-      border-radius: 10px;
+    padding: 0.25;
 
+    border-radius: 10px;
+    gap: 0;
   }
 }
 

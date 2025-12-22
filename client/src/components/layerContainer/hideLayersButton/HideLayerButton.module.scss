@@ -17,6 +17,10 @@
 img {
   width: 0.8rem;
   width: 0.56rem;
+   @media (max-width: 768px) {
+    width: 0.84rem;
+    height: 0.84rem;
+  }
 }
 .layerImg {
   width: 2rem;
