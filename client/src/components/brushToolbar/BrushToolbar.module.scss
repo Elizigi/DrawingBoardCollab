@@ -38,7 +38,8 @@
     transform: scaleX(-1);
     z-index: 9999;
     img {
-      width: 100%;
+      width: 70%;
+      transform: scaleX(-1);
     }
   }
   .colorMenu {

@@ -66,7 +66,7 @@ const BrushToolbar = () => {
             }}
             onClick={() => setIsBrushOpen(true)}
           >
-            <img src="/brushIcon.svg" alt="Brush" />
+            <img className={styles.brushIconImg} src="/assets/brush.svg" alt="Brush" />
           </button>
         )}
         {isBrushOpen && (
