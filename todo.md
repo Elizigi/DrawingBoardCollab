@@ -16,4 +16,6 @@
 - [✔] Add image Movement and drag
 - [✔] Add animations
 - [✔] Reorganize file and function structure for clarity
-- [X] Chat ?!
+- [ ] eraser tool
+- [ ] filler tool
+- [ ] mobile canvas movement
