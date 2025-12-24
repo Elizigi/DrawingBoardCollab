@@ -2,17 +2,16 @@
   all: unset;
   cursor: pointer;
   background-color: $bg-dark;
-  border-radius: 0 20px 20px 0;
+  border-radius: 0 10px 10px 0;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
   width: fit-content;
-  border: $dark solid 2px;
+  border: $dark solid 3px;
   border-right: none;
-  height: 3.5rem;
+  height: 3rem;
 
   @media (max-width: 768px) {
     height: 2.2rem;
-    border-radius: 0 10px 10px 0;
   }
 }
 .textCopied {
