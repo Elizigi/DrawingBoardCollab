@@ -21,7 +21,12 @@ app.use(
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-          imgSrc: ["'self'", "data:", "blob:", "https://drawingboardcollab-production.up.railway.app"],
+      imgSrc: [
+        "'self'",
+        "data:",
+        "blob:",
+        "https://drawingboardcollab-production.up.railway.app",
+      ],
     },
   })
 );
@@ -328,6 +333,11 @@ io.on("connection", (socket) => {
     } else {
       const guestId = socket.id;
       io.to(roomId).emit("user-left", { guestId, name });
+    }
+    const room = io.sockets.adapter.rooms.get(roomId);
+    if (!room || room.size === 0) {
+      roomLimitsMap.delete(roomId);
+      roomsMap.delete(roomId);
     }
   });
 });
