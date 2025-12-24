@@ -37,11 +37,19 @@ const maxUserLimit = 20;
 const roomLimitsMap = new Map<string, number>();
 const roomsMap = new Map<string, string>();
 const rateLimitMap = new Map();
+const roomCreationLimit = new Map();
 io.on("connection", (socket) => {
   console.log("User connected to server:", socket.id);
   socket.emit("user-id", socket.id);
 
   socket.on("create-room", ({ name, userLimit }) => {
+    const now = Date.now();
+    const lastCreated = roomCreationLimit.get(socket.id) || 0;
+
+    if (now - lastCreated < 5000) {
+      return socket.emit("error", "Please wait before creating another room");
+    }
+    roomCreationLimit.set(socket.id, now);
     if (!name || typeof name !== "string" || name.trim().length === 0) {
       return socket.emit("error", "Invalid name");
     }
@@ -126,6 +134,9 @@ io.on("connection", (socket) => {
   socket.on("renamed-layer", (layerId, newName) => {
     const roomId = socket.data.roomId;
     const hostId = roomsMap.get(roomId);
+    if (!newName || typeof newName !== "string" || newName.length > 50) {
+      return socket.emit("error", "Invalid layer name");
+    }
     if (socket.id !== hostId) return io.to(socket.id).emit("no-permission");
     socket.to(roomId).emit("rename-layer", layerId, newName);
   });
@@ -213,6 +224,9 @@ io.on("connection", (socket) => {
   });
 
   socket.on("new-layer", ({ layerId, layerName, imageDataUrl }) => {
+    if (imageDataUrl && imageDataUrl.length > 5 * 1024 * 1024) {
+      return socket.emit("error", "Image too large");
+    }
     if (!layerId || typeof layerId !== "string") return;
     if (!layerName || typeof layerName !== "string") return;
     if (layerName.length > 50) return;
@@ -326,10 +340,12 @@ io.on("connection", (socket) => {
     rateLimitMap.delete(socket.id);
     if (!roomId) return;
 
+    rateLimitMap.delete(socket.id);
     const hostId = roomsMap.get(roomId);
     if (socket.id === hostId) {
       roomsMap.delete(roomId);
       io.to(roomId).emit("user-removed", { reason: "room closed" });
+      roomLimitsMap.delete(roomId);
     } else {
       const guestId = socket.id;
       io.to(roomId).emit("user-left", { guestId, name });
