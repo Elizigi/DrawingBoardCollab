@@ -102,6 +102,7 @@ const OnlineComponentVM = ({
 
   const handleError = (errorMsg: string | { reason: string }) => {
     const msg = typeof errorMsg === "string" ? errorMsg : errorMsg.reason;
+    setIsConnecting(false);
     setError(msg);
   };
 

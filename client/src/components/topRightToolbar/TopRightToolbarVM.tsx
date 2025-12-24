@@ -30,7 +30,6 @@ const TopRightToolbarVM = () => {
   const [hideCode, setHideCode] = useState(false);
   const [error, setError] = useState("");
 
-  const [selfId, setSelfId] = useState(socket.id);
   const [connectedUsers, setConnectedUsers] = useState<ConnectedUser[]>([]);
 
   const myNameRef = useRef<string>("");
@@ -150,6 +149,7 @@ const TopRightToolbarVM = () => {
     setConnectedUsers([]);
     setInRoom(false);
     setIsAdmin(false);
+    setIsConnecting(false);
   };
 
   const handleLeaveRoom = () => {
@@ -176,6 +176,7 @@ const TopRightToolbarVM = () => {
     setIsAdmin(false);
     setInRoom(false);
     setOnline(false);
+    setIsConnecting(false);
     console.log("Disconnected");
   };
 
@@ -226,14 +227,12 @@ const TopRightToolbarVM = () => {
     });
     socket.on("connect_error", (err) => {
       console.error("Connection failed:", err.message);
-      setIsConnecting(false);
       setOnline(false);
 
       setError("Could not connect to the server.");
+      setIsConnecting(false);
     });
-    socket.on("user-id", (userId: string) => {
-      setSelfId(userId);
-    });
+
     socket.on("disconnect", disconnected);
     return () => {
       socket.off("user-joined", handleUserJoined);
@@ -255,7 +254,6 @@ const TopRightToolbarVM = () => {
   }, []);
 
   return {
-    selfId,
     menuOpen,
     onlineWindowOpen,
     isHost,
