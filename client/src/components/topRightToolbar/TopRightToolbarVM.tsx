@@ -31,7 +31,6 @@ const TopRightToolbarVM = () => {
 
   const isMouseDown = useBrushStore((s) => s.isMouseDown);
 
-  const [isOnline, setIsOnline] = useState(false);
   const [selfId, setSelfId] = useState(socket.id);
   const [connectedUsers, setConnectedUsers] = useState<ConnectedUser[]>([]);
 
@@ -153,14 +152,7 @@ const TopRightToolbarVM = () => {
     setInRoom(false);
     setIsAdmin(false);
   };
-  const handleOnline = () => {
-    if (isOnline) {
-      setMenuOpen(!menuOpen);
-    } else {
-      socket.connect();
-      setOnline(true);
-    }
-  };
+ 
   const handleLeaveRoom = () => {
     socket.emit("leave-room");
   };
@@ -176,7 +168,6 @@ const TopRightToolbarVM = () => {
   };
 
   const disconnected = () => {
-    setIsOnline(false);
     setConnected(false);
     setMenuOpen(false);
     setRoomId("");
@@ -229,7 +220,6 @@ const TopRightToolbarVM = () => {
     });
 
     socket.on("connect", () => {
-      setIsOnline(true);
       handleMenuOpen();
       console.log("Connected:", socket.id);
     });
@@ -273,7 +263,6 @@ const TopRightToolbarVM = () => {
     setRoomId,
     setOnlineWindowOpen,
     setConnected,
-    handleOnline,
     handleMenuOpen,
     handleLeaveRoom,
     handleConnectionWindow,

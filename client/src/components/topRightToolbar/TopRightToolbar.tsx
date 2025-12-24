@@ -23,7 +23,6 @@ const TopRightToolbar = () => {
     setRoomId,
     setOnlineWindowOpen,
     setConnected,
-    handleOnline,
     handleMenuOpen,
     handleLeaveRoom,
     handleConnectionWindow,
@@ -99,7 +98,6 @@ const TopRightToolbar = () => {
             setError={setError}
             error={error}
             setRoomId={setRoomId}
-            handleOnline={handleOnline}
           />
         </div>
       )}

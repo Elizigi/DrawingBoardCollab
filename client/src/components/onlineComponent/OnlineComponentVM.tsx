@@ -12,7 +12,6 @@ interface ConnectionParams {
   setConnected: (connected: boolean) => void;
   setOnlineWindowOpen: (windowOpen: boolean) => void;
   setRoomId: (roomId: string) => void;
-  handleOnline: () => void;
 }
 
 const OnlineComponentVM = ({
@@ -24,15 +23,17 @@ const OnlineComponentVM = ({
   setConnected,
   setOnlineWindowOpen,
   setRoomId,
-  handleOnline,
 }: ConnectionParams) => {
   const [myName, setMyName] = useState("");
   const addEvent = useBrushStore((state) => state.addEvent);
-  const { setInRoom, setIsAdmin, maxUsers, setMaxUsers } =
+  const { setOnline, setInRoom, setIsAdmin, maxUsers, setMaxUsers } =
     useOnlineStatus.getState();
 
   const [userLimitValue, setUserLimitValue] = useState(maxUsers);
-
+  const handleOnline = () => {
+    socket.connect();
+    setOnline(true);
+  };
   const handleModalOpen = () => {
     setOnlineWindowOpen(false);
   };
