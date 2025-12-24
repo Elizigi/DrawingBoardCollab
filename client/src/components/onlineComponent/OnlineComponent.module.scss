@@ -76,6 +76,10 @@
     margin-top: -1.7rem;
     font-size: 2rem;
   }
+  .connectionDots {
+    animation: dotsSpinner 1s linear infinite;
+    overflow-x: hidden;
+  }
   .actionButton {
     background-color: $bg-light;
     color: $text-color;
@@ -133,6 +137,8 @@
   border: 1px solid $border-color;
   border-radius: 4px;
   font-weight: 500;
+  display: flex;
+  justify-content: center;
   cursor: pointer;
   transition:
     background-color 0.2s,
@@ -158,4 +164,12 @@
   flex-direction: row;
   justify-content: space-evenly;
   width: 100%;
+}
+@keyframes dotsSpinner {
+  0% {
+    width: .2rem;
+  }
+  100% {
+    width: 1rem;
+  }
 }

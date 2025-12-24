@@ -12,6 +12,8 @@ interface ConnectionParams {
   setConnected: (connected: boolean) => void;
   setOnlineWindowOpen: (windowOpen: boolean) => void;
   setRoomId: (roomId: string) => void;
+  isConnecting: boolean;
+  setIsConnecting: (isConnecting: boolean) => void;
 }
 
 const OnlineComponentVM = ({
@@ -23,6 +25,8 @@ const OnlineComponentVM = ({
   setConnected,
   setOnlineWindowOpen,
   setRoomId,
+  isConnecting,
+  setIsConnecting,
 }: ConnectionParams) => {
   const [myName, setMyName] = useState("");
   const addEvent = useBrushStore((state) => state.addEvent);
@@ -32,6 +36,7 @@ const OnlineComponentVM = ({
   const [userLimitValue, setUserLimitValue] = useState(maxUsers);
   const handleOnline = () => {
     socket.connect();
+    setIsConnecting(true);
     setOnline(true);
   };
   const handleModalOpen = () => {
@@ -52,7 +57,11 @@ const OnlineComponentVM = ({
     const id = e.target.value;
     setRoomId(id);
   };
-
+  const displayWord = () => {
+    if (isConnecting) return "⋯";
+    if (isHost) return "Host";
+    return "Connect";
+  };
   useEffect(() => {
     if (connected) handleModalOpen();
   }, [connected]);
@@ -127,6 +136,7 @@ const OnlineComponentVM = ({
     handleModalOpen,
     handleName,
     handleSubmit,
+    displayWord,
   };
 };
 

@@ -11,6 +11,8 @@ interface OnlineComponentProps {
   roomId: string;
   setRoomId: (roomId: string) => void;
   setError: (errorMessage: string) => void;
+  isConnecting: boolean;
+  setIsConnecting: (isConnecting: boolean) => void;
   error: string;
 }
 
@@ -23,7 +25,8 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
   myNameRef,
   setRoomId,
   setError,
-  
+  isConnecting,
+  setIsConnecting,
   error,
 }) => {
   const {
@@ -34,6 +37,7 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
     handleModalOpen,
     handleName,
     handleSubmit,
+    displayWord,
   } = OnlineComponentVM({
     isHost,
     roomId,
@@ -43,6 +47,8 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
     setConnected,
     setOnlineWindowOpen,
     setRoomId,
+    isConnecting,
+    setIsConnecting,
   });
   return (
     <div className={styles.onlineContainer}>
@@ -95,7 +101,9 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
         <h2>{error}</h2>
 
         <button type="submit" className={styles.submitBtn}>
-          <h2> {isHost ? "Host" : "Connect"}</h2>
+          <div className={isConnecting ? styles.connectionDots : ""}>
+            <h2>{displayWord()}</h2>
+          </div>
         </button>
       </form>
     </div>

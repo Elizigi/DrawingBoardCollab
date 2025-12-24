@@ -18,6 +18,8 @@ const TopRightToolbar = () => {
     myNameRef,
     connected,
     isSettingsOpen,
+    isConnecting,
+    setIsConnecting,
     setIsSettingsOpen,
     setError,
     setRoomId,
@@ -98,6 +100,8 @@ const TopRightToolbar = () => {
             setError={setError}
             error={error}
             setRoomId={setRoomId}
+            isConnecting={isConnecting}
+            setIsConnecting={setIsConnecting}
           />
         </div>
       )}

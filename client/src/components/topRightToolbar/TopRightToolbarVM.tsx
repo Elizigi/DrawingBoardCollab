@@ -16,20 +16,19 @@ const ConnectionTypes = {
   null: null,
 };
 const TopRightToolbarVM = () => {
+  const { setOnline, setInRoom, setIsAdmin } = useOnlineStatus.getState();
+  const isMouseDown = useBrushStore((s) => s.isMouseDown);
   const addEvent = useBrushStore((state) => state.addEvent);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-
+  const [isConnecting, setIsConnecting] = useState(false);
   const [onlineWindowOpen, setOnlineWindowOpen] = useState(false);
   const [isHost, setIsHost] = useState(false);
   const [connected, setConnected] = useState(false);
   const [roomId, setRoomId] = useState("");
   const [hideCode, setHideCode] = useState(false);
   const [error, setError] = useState("");
-  const { setOnline, setInRoom, setIsAdmin } = useOnlineStatus.getState();
-
-  const isMouseDown = useBrushStore((s) => s.isMouseDown);
 
   const [selfId, setSelfId] = useState(socket.id);
   const [connectedUsers, setConnectedUsers] = useState<ConnectedUser[]>([]);
@@ -152,7 +151,7 @@ const TopRightToolbarVM = () => {
     setInRoom(false);
     setIsAdmin(false);
   };
- 
+
   const handleLeaveRoom = () => {
     socket.emit("leave-room");
   };
@@ -221,6 +220,7 @@ const TopRightToolbarVM = () => {
 
     socket.on("connect", () => {
       handleMenuOpen();
+      setIsConnecting(false);
       console.log("Connected:", socket.id);
     });
     socket.on("user-id", (userId: string) => {
@@ -258,6 +258,8 @@ const TopRightToolbarVM = () => {
     myNameRef,
     connected,
     isSettingsOpen,
+    isConnecting,
+    setIsConnecting,
     setIsSettingsOpen,
     setError,
     setRoomId,
