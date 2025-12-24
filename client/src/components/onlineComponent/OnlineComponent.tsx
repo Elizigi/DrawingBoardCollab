@@ -101,7 +101,7 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
         <h2>{error}</h2>
 
         <button type="submit" className={styles.submitBtn}>
-          <div className={isConnecting ? styles.connectionDots : ""}>
+          <div >
             <h2>{displayWord()}</h2>
           </div>
         </button>

@@ -77,8 +77,23 @@
     font-size: 2rem;
   }
   .connectionDots {
-    animation: dotsSpinner 1s linear infinite;
-    overflow-x: hidden;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    div {
+      animation: dotsSpinner 1s linear infinite;
+      margin: 0 0.2rem;
+      font-size: 1.2rem;
+    }
+    div:nth-child(1) {
+      animation-delay: 0s;
+    }
+    div:nth-child(2) {
+      animation-delay: 0.3s;
+    }
+    div:nth-child(3) {
+      animation-delay: 0.3s;
+    }
   }
   .actionButton {
     background-color: $bg-light;
@@ -167,9 +182,12 @@
 }
 @keyframes dotsSpinner {
   0% {
-    width: .2rem;
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.2rem);
   }
   100% {
-    width: 1rem;
+    transform: translateY(0);
   }
 }

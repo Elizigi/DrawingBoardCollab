@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { socket } from "../../Main";
 import { EventTypes, useBrushStore } from "../../zustand/useBrushStore";
 import { useOnlineStatus } from "../../zustand/useOnlineStatus";
+import styles from "./OnlineComponent.module.scss";
 
 interface ConnectionParams {
   isHost: boolean;
@@ -57,7 +58,14 @@ const OnlineComponentVM = ({
     setRoomId(id);
   };
   const displayWord = () => {
-    if (isConnecting) return "⋯";
+    if (isConnecting)
+      return (
+        <div className={isConnecting ? styles.connectionDots : ""}>
+          <div>.</div>
+          <div>.</div>
+          <div>.</div>
+        </div>
+      );
     if (isHost) return "Host";
     return "Connect";
   };
