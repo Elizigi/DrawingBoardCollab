@@ -1,10 +1,10 @@
 .userList {
   position: fixed;
-  top: 9rem;
+  top: 16rem;
   display: flex;
   flex-direction: column;
   opacity: 0.5;
-  right: 1rem;
+  right: 0.5rem;
   padding: 0 1rem 1rem 1rem;
   z-index: 9999999;
   max-width: 250px;
@@ -12,10 +12,16 @@
 
   cursor: text;
   pointer-events: auto;
-  border-radius: 1rem;
-
+  border-radius: 10px;
+  @media (max-width: 768px) {
+    top: 9rem;
+  }
+  h3 {
+    font-size: 1rem;
+    color: $text-color;
+  }
   &:hover {
-    opacity: 0.9;
+    opacity: 1;
   }
 }
 .guestIcon {
@@ -26,7 +32,7 @@
   width: calc(100% - 1rem);
   border-top: 1px solid transparent;
   border-bottom: 1px solid transparent;
-  border-radius: 0.5rem;
+  border-radius: 10px;
   cursor: pointer;
 
   h2 {
@@ -34,12 +40,13 @@
     overflow-x: hidden;
     max-width: 75%;
     margin: 0.5rem 0;
+    -webkit-text-stroke: 1px black;
   }
 
   &:hover {
     border-top-color: $bg-dark;
     border-bottom-color: $bg-dark;
-    background-color: $bg-harsh;
+    background-color: $bg-light;
     text-shadow:
       0 0 1px $dark,
       0 0 2px $dark;
@@ -49,10 +56,6 @@
   flex-direction: row;
   height: fit-content;
   align-items: center;
-  h3 {
-    font-size: 1rem;
-    color: $text-color;
-  }
 }
 
 .userColorIcon {
@@ -80,8 +83,5 @@
   img {
     width: 100%;
     height: 100%;
-  }
-  &:hover {
-    color: $sharp-red;
   }
 }
