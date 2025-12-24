@@ -44,7 +44,7 @@ const UserList: FC<UserListProps> = ({ connectedUsers, menuOpen }) => {
                     className={styles.removeUser}
                     onClick={() => removeUser(user.guestId)}
                   >
-                    X
+                    <img src="/assets/X.svg" alt="X remove" />
                   </button>
                 )}
               </div>

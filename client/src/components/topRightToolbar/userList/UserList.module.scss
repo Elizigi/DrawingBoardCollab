@@ -75,7 +75,12 @@
 .removeUser {
   all: unset;
   margin-left: auto;
-  color: $dull-red;
+  width: 1rem;
+  height: 1rem;
+  img {
+    width: 100%;
+    height: 100%;
+  }
   &:hover {
     color: $sharp-red;
   }
