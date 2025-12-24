@@ -73,7 +73,6 @@ const LayerButtonsMV = () => {
     const syntheticEvent = {
       clientY: touch.clientY,
       stopPropagation: () => e.stopPropagation(),
-      preventDefault: () => e.preventDefault(),
     } as React.MouseEvent<HTMLButtonElement>;
 
     handleLayerDown(index, syntheticEvent);
@@ -118,7 +117,7 @@ const LayerButtonsMV = () => {
     setDragStartOffset(clientYRel - clickedRect.midpoint);
 
     e.stopPropagation();
-    e.preventDefault();
+    e.preventDefault?.();
     setDraggedLayer(index);
     setIsLayerDragged(true);
   };
