@@ -337,10 +337,12 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     const roomId = socket.data.roomId;
     const name = socket.data.name;
-    rateLimitMap.delete(socket.id);
     if (!roomId) return;
-
+    
     rateLimitMap.delete(socket.id);
+    roomCreationLimit.delete(socket.id);
+    rateLimitMap.delete(socket.id);
+
     const hostId = roomsMap.get(roomId);
     if (socket.id === hostId) {
       roomsMap.delete(roomId);
