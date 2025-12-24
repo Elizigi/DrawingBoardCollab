@@ -221,7 +221,15 @@ const TopRightToolbarVM = () => {
     socket.on("connect", () => {
       handleMenuOpen();
       setIsConnecting(false);
+      setOnline(true);
       console.log("Connected:", socket.id);
+    });
+    socket.on("connect_error", (err) => {
+      console.error("Connection failed:", err.message);
+      setIsConnecting(false);
+      setOnline(false);
+
+      setError("Could not connect to the server.");
     });
     socket.on("user-id", (userId: string) => {
       setSelfId(userId);

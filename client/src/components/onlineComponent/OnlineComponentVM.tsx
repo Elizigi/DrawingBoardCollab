@@ -30,14 +30,13 @@ const OnlineComponentVM = ({
 }: ConnectionParams) => {
   const [myName, setMyName] = useState("");
   const addEvent = useBrushStore((state) => state.addEvent);
-  const { setOnline, setInRoom, setIsAdmin, maxUsers, setMaxUsers } =
+  const { setInRoom, setIsAdmin, maxUsers, setMaxUsers } =
     useOnlineStatus.getState();
 
   const [userLimitValue, setUserLimitValue] = useState(maxUsers);
   const handleOnline = () => {
     socket.connect();
     setIsConnecting(true);
-    setOnline(true);
   };
   const handleModalOpen = () => {
     setOnlineWindowOpen(false);
