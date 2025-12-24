@@ -12,6 +12,7 @@ interface ConnectionParams {
   setConnected: (connected: boolean) => void;
   setOnlineWindowOpen: (windowOpen: boolean) => void;
   setRoomId: (roomId: string) => void;
+  handleOnline: () => void;
 }
 
 const OnlineComponentVM = ({
@@ -23,6 +24,7 @@ const OnlineComponentVM = ({
   setConnected,
   setOnlineWindowOpen,
   setRoomId,
+  handleOnline,
 }: ConnectionParams) => {
   const [myName, setMyName] = useState("");
   const addEvent = useBrushStore((state) => state.addEvent);
@@ -56,6 +58,7 @@ const OnlineComponentVM = ({
 
   const handleSubmit = () => {
     if (myName.trim().length < 2) return setError("Name too short");
+    handleOnline();
     if (isHost) {
       isSetMaxUsers();
       socket.emit("create-room", {
@@ -92,7 +95,7 @@ const OnlineComponentVM = ({
     const msg = typeof errorMsg === "string" ? errorMsg : errorMsg.reason;
     setError(msg);
   };
-  
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {

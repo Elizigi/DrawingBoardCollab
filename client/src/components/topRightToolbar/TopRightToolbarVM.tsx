@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { socket } from "../../Main";
-import styles from "./TopRightToolbar.module.scss";
 import { EventTypes, useBrushStore } from "../../zustand/useBrushStore";
 import { useOnlineStatus } from "../../zustand/useOnlineStatus";
 
@@ -22,7 +21,6 @@ const TopRightToolbarVM = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  const [hasInteracted, setHasInteracted] = useState(false);
   const [onlineWindowOpen, setOnlineWindowOpen] = useState(false);
   const [isHost, setIsHost] = useState(false);
   const [connected, setConnected] = useState(false);
@@ -35,7 +33,6 @@ const TopRightToolbarVM = () => {
 
   const [isOnline, setIsOnline] = useState(false);
   const [selfId, setSelfId] = useState(socket.id);
-  const [spinnerStyle, setSpinnerStyle] = useState("");
   const [connectedUsers, setConnectedUsers] = useState<ConnectedUser[]>([]);
 
   const myNameRef = useRef<string>("");
@@ -143,7 +140,6 @@ const TopRightToolbarVM = () => {
       return;
     }
     setIsHost(connectionType === ConnectionTypes.host);
-    setHasInteracted(false);
     setOnlineWindowOpen(true);
   };
 
@@ -157,13 +153,11 @@ const TopRightToolbarVM = () => {
     setInRoom(false);
     setIsAdmin(false);
   };
-
   const handleOnline = () => {
     if (isOnline) {
       setMenuOpen(!menuOpen);
     } else {
       socket.connect();
-      setHasInteracted(true);
       setOnline(true);
     }
   };
@@ -187,7 +181,6 @@ const TopRightToolbarVM = () => {
     setMenuOpen(false);
     setRoomId("");
     setIsHost(false);
-    setSpinnerStyle("");
     setError("");
     setConnectedUsers([]);
     setIsAdmin(false);
@@ -212,13 +205,6 @@ const TopRightToolbarVM = () => {
     globalThis.addEventListener("keydown", handleKeyDown);
     return () => globalThis.removeEventListener("keydown", handleKeyDown);
   }, [menuOpen, onlineWindowOpen, setOnlineWindowOpen, setMenuOpen]);
-
-  useEffect(() => {
-    if (!hasInteracted) return;
-    if (isOnline) {
-      setSpinnerStyle(styles.spinFinish);
-    } else setSpinnerStyle(styles.spinLoad);
-  }, [isOnline, hasInteracted]);
 
   const handleUserUpdated = ({ userLimit }: { userLimit: number }) => {
     console.log("updatingLimit", userLimit);
@@ -271,8 +257,6 @@ const TopRightToolbarVM = () => {
   }, []);
 
   return {
-    isOnline,
-    spinnerStyle,
     selfId,
     menuOpen,
     onlineWindowOpen,
@@ -290,6 +274,7 @@ const TopRightToolbarVM = () => {
     setOnlineWindowOpen,
     setConnected,
     handleOnline,
+    handleMenuOpen,
     handleLeaveRoom,
     handleConnectionWindow,
     setHideCode,

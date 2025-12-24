@@ -11,6 +11,7 @@ interface OnlineComponentProps {
   roomId: string;
   setRoomId: (roomId: string) => void;
   setError: (errorMessage: string) => void;
+  handleOnline: () => void;
   error: string;
 }
 
@@ -23,6 +24,7 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
   myNameRef,
   setRoomId,
   setError,
+  handleOnline,
   error,
 }) => {
   const {
@@ -38,6 +40,7 @@ const OnlineComponent: FC<OnlineComponentProps> = ({
     roomId,
     myNameRef,
     connected,
+    handleOnline,
     setError,
     setConnected,
     setOnlineWindowOpen,

@@ -8,8 +8,6 @@ import SettingScreen from "../settingsScreen/SettingScreen";
 
 const TopRightToolbar = () => {
   const {
-    // isOnline,
-    // spinnerStyle,
     menuOpen,
     onlineWindowOpen,
     isHost,
@@ -26,6 +24,7 @@ const TopRightToolbar = () => {
     setOnlineWindowOpen,
     setConnected,
     handleOnline,
+    handleMenuOpen,
     handleLeaveRoom,
     handleConnectionWindow,
     setHideCode,
@@ -33,7 +32,7 @@ const TopRightToolbar = () => {
 
   return (
     <div className={styles.topRightToolContainer}>
-      <button className={styles.menuIcon} onClick={() => handleOnline()}>
+      <button className={styles.menuIcon} onClick={() => handleMenuOpen()}>
         <img src="/assets/cog.svg" alt="cog" />
       </button>
       <div className={styles.buttonsContainer}>
@@ -45,20 +44,20 @@ const TopRightToolbar = () => {
             Host
           </button>
         )}
-          {menuOpen && connected && (
-        <div className={styles.codeBar}>
-          <button
-            className={styles.handle}
-            onClick={() => setHideCode(!hideCode)}
-          >
-            <h3>{hideCode ? "◀" : "▶"}</h3>
-          </button>
-          <div hidden={hideCode} className={styles.roomIdBar}>
-            <h2>{roomId}</h2>
+        {menuOpen && connected && (
+          <div className={styles.codeBar}>
+            <button
+              className={styles.handle}
+              onClick={() => setHideCode(!hideCode)}
+            >
+              <h3>{hideCode ? "◀" : "▶"}</h3>
+            </button>
+            <div hidden={hideCode} className={styles.roomIdBar}>
+              <h2>{roomId}</h2>
+            </div>
+            <CopyText roomId={roomId} />
           </div>
-          <CopyText roomId={roomId} />
-        </div>
-      )}
+        )}
         {menuOpen && connected && (
           <button
             onClick={() => handleLeaveRoom()}
@@ -84,7 +83,7 @@ const TopRightToolbar = () => {
           </button>
         )}
       </div>
-    
+
       {isSettingsOpen && (
         <SettingScreen close={setIsSettingsOpen} isOpen={isSettingsOpen} />
       )}
@@ -100,6 +99,7 @@ const TopRightToolbar = () => {
             setError={setError}
             error={error}
             setRoomId={setRoomId}
+            handleOnline={handleOnline}
           />
         </div>
       )}
