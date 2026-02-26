@@ -25,9 +25,13 @@ const SettingScreen: FC<SettingScreenProps> = ({ close, isOpen }) => {
         onPointerDown={noChange}
       ></div>
       <div className={style.openingModal}>
+        <h1 className={style.title}>Settings</h1>
         <div className={style.form}>
           <h2>Canvas Size:</h2>
-
+          <div className={style.row}>
+            <h2>Height</h2>
+            <h2>Width</h2>
+          </div>
           <div className={style.inputContainer}>
             <input
               onChange={(e) =>
@@ -41,7 +45,7 @@ const SettingScreen: FC<SettingScreenProps> = ({ close, isOpen }) => {
               placeholder={`${canvasSizeValue.height}`}
             />
             <h2>px </h2>
-            <h1>X</h1>
+            <h1>-</h1>
             <input
               type="number"
               onChange={(e) =>
@@ -55,6 +59,7 @@ const SettingScreen: FC<SettingScreenProps> = ({ close, isOpen }) => {
             />
             <h2>px</h2>
           </div>
+
           <h2>Connected Users limit:</h2>
           <div className={style.inputContainer}>
             <input

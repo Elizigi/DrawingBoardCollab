@@ -15,8 +15,8 @@
     z-index: 999999;
     color: $text-color;
 
-    border: $border-color 3px solid;
-    background-color: $bg-light;
+    border: $dark 3px solid;
+    background-color: $bg-dark;
     padding: 0.3rem;
     text-align: center;
     font-size: 1.5rem;
@@ -41,7 +41,6 @@
   }
 }
 .openingModal {
-  background-color: $bg-dark;
   width: 40%;
   height: 60%;
   position: fixed;
@@ -52,6 +51,23 @@
   transform: translate(-50%, -50%);
   color: $text-color;
   min-width: fit-content;
+  border: 6px solid $dark;
+  border-radius: 20px;
+  background-color: $bg-dark;
+  .title {
+    text-align: center;
+    border-bottom: 1px $text-color solid;
+    padding-bottom: 1rem;
+  }
+}
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 50%;
+  h2 {
+    padding: 0;
+  }
 }
 .form {
   width: 100%;
@@ -59,6 +75,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+
   @media (max-width: 768px) {
     padding: 1rem;
     width: 90%;
@@ -72,10 +89,9 @@
   flex-direction: row;
   justify-content: center;
   padding-bottom: 1rem;
-  border-bottom: 1px $highlight solid;
-
+  border-bottom: 1px $text-color solid;
   h2 {
-    color: $highlight;
+    color: $text-color;
     font-size: 1.5rem;
     margin: 0;
     margin-left: 0.2rem;
