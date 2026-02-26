@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { canvasSize, resizeAllCanvases } from "../../helpers/canvasHelpers";
-import { socket } from "../../Main";
 import { useOnlineStatus } from "../../zustand/useOnlineStatus";
+import { socket } from "../../helpers/sockets";
 
 const SettingScreenMV = (close: (isOpen: boolean) => void, isOpen: boolean) => {
   const { inRoom, isAdmin, maxUsers, setMaxUsers } = useOnlineStatus();

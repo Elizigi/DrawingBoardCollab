@@ -1,8 +1,8 @@
 import { FC } from "react";
 import { ConnectedUser } from "../TopRightToolbarVM";
 import styles from "./UserList.module.scss";
-import { socket } from "../../../Main";
 import { useOnlineStatus } from "../../../zustand/useOnlineStatus";
+import { socket } from "../../../helpers/sockets";
 interface UserListProps {
   connectedUsers: ConnectedUser[];
   menuOpen: boolean;

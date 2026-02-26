@@ -1,4 +1,4 @@
-import {  socket } from "../../../Main";
+import { socket } from "../../../helpers/sockets";
 import { useBrushStore } from "../../../zustand/useBrushStore";
 import { useOnlineStatus } from "../../../zustand/useOnlineStatus";
 

@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Transform, useBrushStore } from "../../zustand/useBrushStore";
-import { socket } from "../../Main";
 import { createLayerCanvas, redrawLayer } from "../../helpers/drawingHelpers";
 import { layersCanvasMap } from "../../helpers/canvasHelpers";
+import { socket } from "../../helpers/sockets";
 type LayerPayload = {
   layerId: string;
   layerName: string;

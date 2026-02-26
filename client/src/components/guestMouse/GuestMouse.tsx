@@ -1,4 +1,4 @@
-import { canvasScale } from "../../Main";
+import { canvasScale } from "../../helpers/canvasScale";
 import styles from "./GuestMouse.module.scss";
 interface ConnectedUser {
   name: string;

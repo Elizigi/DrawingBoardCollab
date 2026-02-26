@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { socket } from "../../../Main";
 import { useBrushStore } from "../../../zustand/useBrushStore";
+import { socket } from "../../../helpers/sockets";
 
 const AddLayerButtonVM = () => {
   const [newLayerName, setNewLayerName] = useState("");

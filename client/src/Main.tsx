@@ -3,8 +3,8 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./main.css";
 import { Stroke, useBrushStore } from "./zustand/useBrushStore.ts";
-import { io, Socket } from "socket.io-client";
-
+import { socket } from "./helpers/sockets.ts";
+import { canvasScale } from "./helpers/canvasScale.ts";
 import {
   setupDOMAndCanvases,
   layersCanvasMap,
@@ -31,21 +31,12 @@ import {
 import { addListeners } from "./helpers/eventListenersHelpers.ts";
 import { useOnlineStatus } from "./zustand/useOnlineStatus.ts";
 
-export const socket: Socket = io(import.meta.env.VITE_SERVER_URL || globalThis.location.origin, {
-  autoConnect: false,
-});
+
 
 const rootElement = document.getElementById("root") as HTMLDivElement;
 const rotElement = document.getElementById("rot") as HTMLDivElement;
 
-export const canvasScale = {
-  scale: 1,
-  offsetX: 0,
-  offsetY: 0,
-  isPanning: false,
-  lastPanX: 0,
-  lastPanY: 0,
-};
+
 
 function main() {
   setupDOMAndCanvases(rotElement);
@@ -60,7 +51,7 @@ function main() {
       createLayerCanvas(newLayer.id);
     }
     const activeLayerIndex = state.layers.findIndex(
-      (l) => l.id === state.activeLayerId
+      (l) => l.id === state.activeLayerId,
     );
     refreshState(state, prev);
     for (let i = 0; i < state.layers.length; i++) {
@@ -97,7 +88,7 @@ function main() {
 
       const state = useBrushStore.getState();
       const activeLayer = state.layers.find(
-        (l) => l.id === state.activeLayerId
+        (l) => l.id === state.activeLayerId,
       );
 
       if (activeLayer?.imageDataUrl && activeLayer.transform) {
@@ -105,7 +96,7 @@ function main() {
           e,
           topInputCanvas,
           activeLayer,
-          state
+          state,
         );
         if (handled) return;
       }
@@ -208,7 +199,7 @@ function main() {
     if (!stroke.final) {
       const allLayers = useBrushStore.getState().layers;
       const strokeLayer = allLayers.find(
-        (layer) => layer.id === stroke.layerId
+        (layer) => layer.id === stroke.layerId,
       );
       if (!remoteTempCanvas || !strokeLayer?.visible) return;
       const ctx = remoteTempCanvas.getContext("2d")!;
@@ -222,7 +213,7 @@ function main() {
         0,
         canvasScale.scale,
         canvasScale.offsetX,
-        canvasScale.offsetY
+        canvasScale.offsetY,
       );
       drawStrokeToCtx(ctx, stroke);
       return;
@@ -246,10 +237,10 @@ if (rootElement) {
   ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>
       <App />
-    </React.StrictMode>
+    </React.StrictMode>,
   );
 } else {
   console.error(
-    "Root element not found! Make sure you have <div id='root'></div> in your index.html"
+    "Root element not found! Make sure you have <div id='root'></div> in your index.html",
   );
 }

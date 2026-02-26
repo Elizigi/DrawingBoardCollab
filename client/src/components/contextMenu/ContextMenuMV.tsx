@@ -6,8 +6,8 @@ import {
   redrawAllLayers,
   redrawLayer,
 } from "../../helpers/drawingHelpers";
-import { socket } from "../../Main";
 import { useOnlineStatus } from "../../zustand/useOnlineStatus";
+import { socket } from "../../helpers/sockets";
 
 const ContextMenuMV = () => {
   const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });

@@ -6,7 +6,6 @@ import {
   Stroke,
   useBrushStore,
 } from "../zustand/useBrushStore.ts";
-import { canvasScale, socket } from "../Main.tsx";
 import {
   canvasSize,
   layersCanvasMap,
@@ -15,6 +14,8 @@ import {
 } from "./canvasHelpers.ts";
 import { useOnlineStatus } from "../zustand/useOnlineStatus.ts";
 import { resizeTypes, transformSettings } from "./eventListenersHelpers.ts";
+import { canvasScale } from "./canvasScale.ts";
+import { socket } from "./sockets.ts";
 
 export function numToHexColor(num: number) {
   return "#" + num.toString(16).padStart(6, "0");

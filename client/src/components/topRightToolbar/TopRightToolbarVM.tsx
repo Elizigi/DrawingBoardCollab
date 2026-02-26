@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { socket } from "../../Main";
 import { EventTypes, useBrushStore } from "../../zustand/useBrushStore";
 import { useOnlineStatus } from "../../zustand/useOnlineStatus";
+import { socket } from "../../helpers/sockets";
 
 export interface ConnectedUser {
   name: string;

@@ -1,4 +1,3 @@
-import { canvasScale, socket } from "../Main";
 import {
   BrushState,
   LayerMeta,
@@ -11,6 +10,7 @@ import {
   getCanvasContainer,
   layersCanvasMap,
 } from "./canvasHelpers";
+import { canvasScale } from "./canvasScale";
 import {
   addPoint,
   clampCanvasOffset,
@@ -21,6 +21,7 @@ import {
   getTouchPosPercent,
   redrawAllLayers,
 } from "./drawingHelpers";
+import { socket } from "./sockets";
 export type resizeTypes = "tl" | "tr" | "bl" | "br" | null;
 export const transformSettings = {
   isDraggingImage: false,

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { socket } from "../../Main";
 import { EventTypes, useBrushStore } from "../../zustand/useBrushStore";
 import { useOnlineStatus } from "../../zustand/useOnlineStatus";
 import styles from "./OnlineComponent.module.scss";
+import { socket } from "../../helpers/sockets";
 
 interface ConnectionParams {
   isHost: boolean;

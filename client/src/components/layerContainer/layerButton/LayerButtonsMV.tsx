@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useBrushStore } from "../../../zustand/useBrushStore";
-import { socket } from "../../../Main";
 import { useOnlineStatus } from "../../../zustand/useOnlineStatus";
+import { socket } from "../../../helpers/sockets";
 
 type LayerPosition = {
   id: string;
